@@ -4,7 +4,11 @@
   <head>
     <meta charset='utf-8' />
     <meta http-equiv="X-UA-Compatible" content="chrome=1" />
-    <meta name="description" content="Lightweight Modular Staging : embedded compilers in Scala" />
+    {% if page.title %}
+    <meta name="description" content="{{ page.title }} : {{ page.tagline }}" />
+    {% else %}
+    <meta name="description" content="{{ site.title }} : {{ site.tagline }}" />
+    {% endif %}
 
     <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
 
@@ -18,8 +22,13 @@
         <header class="inner">
           <a id="forkme_banner" href="https://github.com/scala-lms">View on GitHub</a>
 
-          <h1 id="project_title">Lightweight Modular Staging</h1>
-          <h2 id="project_tagline">embedded compilers in Scala</h2>
+	  {% if page.title %}
+          <h1 id="project_title"><a href="/">LMS</a> &rarr; {{ page.title }}</h1>
+          <h2 id="project_tagline">{{ page.tagline }}</h2>
+	  {% else %}
+          <h1 id="project_title">{{ site.title }}</h1>
+          <h2 id="project_tagline">{{ site.tagline }}</h2>
+	  {% endif %}
 
         </header>
     </div>
@@ -27,20 +36,16 @@
     <!-- MAIN CONTENT -->
     <div id="main_content_wrap" class="outer">
       <section id="main_content" class="inner">
-        <p>Lightweight Modular Staging (LMS) is a runtime code generation approach. This framework, LMS-Core, provides a library of core components for building high performance code generators and embedded compilers in Scala.</p>
-
-<p>Closely related projects are Delite, a framework for heterogeneous parallel domain specific languages (DSLs), and Scala-Virtualized, a set of minimal extensions to the Scala compiler to make embedding DSLs more seamless.</p>
+{{ content }}
       </section>
     </div>
 
     <!-- FOOTER  -->
     <div id="footer_wrap" class="outer">
       <footer class="inner">
-        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+	
       </footer>
     </div>
-
-    
 
   </body>
 </html>
