@@ -37,6 +37,9 @@ Speedup graph here.
 Heterogenenous Targets. Compiling Scala to JavaScript, SQL, CUDA, C.
 Teaser snippets.
 
+* [JavaScript](https://github.com/js-scala/js-scala)
+* [SQL](http://code.google.com/p/scala-integrated-query/)
+
 
 ## Getting Started
 
