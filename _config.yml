@@ -1,7 +1,7 @@
-auto: true
+#auto: true
 pygments: true
 
 title: Lightweight Modular Staging
-tagline: embedded compilers in Scala
+tagline: Embedded Compilers in Scala
 
 production_url : http://scala-lms.github.com

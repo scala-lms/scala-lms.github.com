@@ -281,7 +281,7 @@ Full-Width Styles
   display: block;
   position: absolute;
   top:0;
-  right: 10px;
+  right: 25px;
   z-index: 10;
   padding: 10px 50px 10px 10px;
   color: #fff;
@@ -302,7 +302,7 @@ Full-Width Styles
 }
 
 #header_wrap .inner {
-  padding: 50px 10px 30px 10px;
+  padding: 10px 10px 5px 10px;
 }
 
 #project_title {
@@ -318,6 +318,7 @@ Full-Width Styles
   font-size: 24px;
   font-weight: 300;
   background: none;
+  padding-bottom: 0px;
   text-shadow: #111 0px 0px 10px;
 }
 
