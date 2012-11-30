@@ -8,15 +8,16 @@ approach. The framework provides a library of core components for
 building high performance code generators and embedded compilers in
 Scala.
 
-Two closely related projects are Delite, a framework for domain specific 
-languages (DSLs) that generates parallel code for heterogeneous devices,
-and Scala-Virtualized, a set of minimal extensions to the Scala compiler 
-that make embedding DSLs more seamless.
+Two closely related projects are [Delite](http://stanford-ppl.github.com/Delite/), 
+a framework for domain specific languages (DSLs) that generates parallel 
+code for heterogeneous devices, and [Scala Virtualized](https://github.com/tiarkrompf/scala-virtualized/wiki), 
+a set of minimal extensions to the Scala compiler that make embedding 
+DSLs more seamless.
 
 
 ## Abstraction Without Regret
 
-Turn high-level programs into fast low-level code. Strip abstraction overhead from generic programs. Add Domain-specific optimizations.
+Turn nice high-level programs into fast low-level code. Strip abstraction overhead from generic programs. Add domain-specific optimizations.
 
 {% highlight scala %}
 class Vector[T:Numeric:Manifest](val data: Rep[Array[T]]) {
@@ -31,10 +32,13 @@ println(v.sumIf(_ > 0))
 {% endhighlight %}
 
 <!-- TODO: use grid-based css style file -->
-<table style="border: 0px;"><tr><td markdown="1" style="border: 0px; padding-left: 0px">
+
+<table style="border: 0px;">
+<tr>
+<td markdown="1" style="border: 0px; padding-left: 0px;">
 {% highlight scala %}
-var n = 0.0
-var i = 0
+var n: Double = 0.0
+var i: Int = 0
 val end = data.length
 while (i < end) {
   val x = data(i)
@@ -43,21 +47,29 @@ while (i < end) {
 }
 println(n)
 {% endhighlight %}
-</td><td markdown="1" style="border:0px;padding-left:50px;">
 
-Generated code:
+</td>
+<td markdown="0" style="border:0px;padding-left:50px;">
 
-All functions inlined, all generics specialized, all type class instances removed.
-All of this is guaranteed by the type system.
+Running the snippet above will generate the program on the left: All functions are inlined, 
+all generics specialized, all type class instances removed.
+All of this is guaranteed by the type system: Expressions of type `Rep\[T\]` become
+part of the generated program, everything else is evaluated when the original
+snippet is run. 
 
-[more](publications.html)
+</td>
+</tr>
+</table>
 
-</td></tr></table>
+Actually this is only half of the story: The output on the left is not produced
+directly, but going through an extensible intermediate representation (IR) that
+can be further transformed and optimized.
+[Read more...](#docs)
 
 
 ## Run Scala Anywhere
 
-Generate Code for Heterogenenous Targets. Compile Scala to JavaScript, SQL, CUDA, C...
+Generate code for heterogenenous targets. Compile Scala to JavaScript, SQL, CUDA, C...
 
 * CUDA, OpenCL, C: [Delite](http://stanford-ppl.github.com/Delite/)
 * JavaScript: [JS-SCALA](https://github.com/js-scala/js-scala)
@@ -71,9 +83,9 @@ Clone the [GitHub repo](http://github.com/TiarkRompf/virtualization-lms-core). I
 
     git clone git://github.com/TiarkRompf/virtualization-lms-core.git
 
-Be sure to check out the docs below!
+Be sure to check out the [docs](#docs) below!
 
-## Background / Documentation
+## Background / Documentation {#docs}
 
 Overview presentations:
 
@@ -91,7 +103,7 @@ Tutorial write-ups:
 
 * [LMS Tutorial](https://github.com/julienrf/lms-tutorial/wiki) by Julien Richard Foy
 * [OptiML getting started guide](http://stanford-ppl.github.com/Delite/optiml/getting_started.html) by Arvind Sujeeth (about Delite and OptiML)
-* [Understanding Rep](tutorial1.html) (work in progress)
+* [Understanding Rep](tutorial1.html) by Sandro Stucki (work in progress)
 
 Comprehensive, but many many pages: 
 
