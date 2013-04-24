@@ -3,6 +3,7 @@ layout: page
 title: Tutorial 1
 tagline: Understanding Rep
 category: test
+github_url: https://github.com/scala-lms/tutorials
 ---
 
 

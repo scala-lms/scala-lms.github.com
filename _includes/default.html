@@ -19,7 +19,7 @@
 
     <!-- HEADER -->
     <div id="header_wrap" class="outer">
-        <a id="forkme_banner" href="https://github.com/scala-lms">View on GitHub</a>
+        <a id="forkme_banner" href="{% if page.github_url %} {{ page.github_url }} {% else %} {{ site.github_url }} {% endif %}">View on GitHub</a>
         <header class="inner">
 
 	  {% if page.title %}
