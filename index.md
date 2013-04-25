@@ -101,6 +101,7 @@ Talks/videos from ScalaDays, Spring 2012:
 
 Tutorial write-ups:
 
+* [Tutorials](http://scala-lms.github.io/tutorials) hosted here
 * [LMS Tutorial](https://github.com/julienrf/lms-tutorial/wiki) by Julien Richard Foy
 * [OptiML getting started guide](http://stanford-ppl.github.com/Delite/optiml/getting_started.html) by Arvind Sujeeth (about Delite and OptiML)
 
