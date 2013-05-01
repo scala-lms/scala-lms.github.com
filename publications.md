@@ -4,7 +4,6 @@ title: Publications
 category: documentation
 ---
 
-TODO\: PDF links
 
 ## Theses
 
@@ -26,6 +25,10 @@ TODO\: PDF links
 
 
 ## Conferences
+
+* Composition and Reuse with Compiled Domain-Specific Languages.
+  Arvind K. Sujeeth, Tiark Rompf, Kevin J. Brown, HyoukJoong Lee, Hassan Chafi, Victoria Popic, Michael Wu, Aleksander Prokopec, Vojin Jovanovic, Martin Odersky, Kunle Olukotun.
+  ECOOP '13
 
 * Optimizing Data Structures in High-Level Programs: New Directions for Extensible Compilers based on Staging.
   Tiark Rompf, Arvind K. Sujeeth, Nada Amin, Kevin J. Brown, Vojin Jovanovic, HyoukJoong Lee, Martin Odersky, Kunle Olukotun. 
