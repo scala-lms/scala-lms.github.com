@@ -14,6 +14,15 @@ code for heterogeneous devices, and [Scala Virtualized](https://github.com/tiark
 a set of minimal extensions to the Scala compiler that make embedding 
 DSLs more seamless.
 
+## News Flash
+
+We're holding tutorials on LMS and Delite at upcoming conferences:
+
+- [PLDI 2013](http://pldi2013.ucombinator.org): Seattle, June 16. More info: 
+  [scala-lms.github.io/pldi2013](pldi2013/index.html) 
+- [ECOOP 2013](http://www.lirmm.fr/ecoop13/): Montpellier, July 3-5. More info: 
+  [scala-lms.github.io/ecoop2013](ecoop2013/index.html)
+
 
 ## Abstraction Without Regret
 
