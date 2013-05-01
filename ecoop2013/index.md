@@ -12,7 +12,7 @@ This tutorial provides an overview of the technology stack, presents existing hi
 
 ## Coordinates
 
-- Part of the [ECOOP 2013](http://pldi2013.ucombinator.org) summer school in Montpellier.
+- Part of the [ECOOP 2013](http://www.lirmm.fr/ecoop13) [summer school](http://www.cs.purdue.edu/homes/jv/events/ESS13/) in Montpellier.
 - Presenters: [Tiark Rompf](http://tiarkrompf.github.io) (EPFL/Oracle), [Arvind Sujeeth](http://www.stanford.edu/~asujeeth/) (Stanford)
 
 
