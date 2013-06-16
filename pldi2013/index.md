@@ -22,7 +22,7 @@ This tutorial will cover the following topics:
   - [slides](https://dl.dropboxusercontent.com/u/5146003/pldi13-part1-lms.pdf), 
     [notes](http://scala-lms.github.io/tutorials/),
     [code](https://github.com/scala-lms/tutorials)
-  - encoding binding-time information in the type system (Rep[T])
+  - encoding binding-time information in the type system (`Rep[T]`)
   - program transformation using staged interpreters
   - representing lifted program expressions in the LMS graph IR
 - High-performance DSLs using Delite (10am - 11am)
