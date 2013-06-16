@@ -18,7 +18,10 @@ The aim of this tutorial is to equip attendees with the knowledge and tools to d
 
 This tutorial will cover the following topics:
 
-- Intro to LMS and staging in Scala (9am - 10am) [slides](https://dl.dropboxusercontent.com/u/5146003/pldi13-part1-lms.pdf), [code](https://github.com/scala-lms/tutorials)
+- Intro to LMS and staging in Scala (9am - 10am) 
+  - [slides](https://dl.dropboxusercontent.com/u/5146003/pldi13-part1-lms.pdf), 
+    [notes](http://scala-lms.github.io/tutorials/),
+    [code](https://github.com/scala-lms/tutorials)
   - encoding binding-time information in the type system (Rep[T])
   - program transformation using staged interpreters
   - representing lifted program expressions in the LMS graph IR
@@ -26,7 +29,9 @@ This tutorial will cover the following topics:
   - an overview of existing DSLs: OptiQL, OptiGraph, OptiML
   - developing a simple linear-algebra DSL from scratch
   - using Delite for powerful generic optimizations and parallel patterns
-- Generating numeric kernels  (11am - noon) [slides](http://people.inf.ethz.ch/ofgeorg/SpiralS_mini.pdf), [code](https://github.com/GeorgOfenbeck/SpiralS-mini)
+- Generating numeric kernels  (11am - noon) 
+  - [slides](http://people.inf.ethz.ch/ofgeorg/SpiralS_mini.pdf), 
+    [code](https://github.com/GeorgOfenbeck/SpiralS-mini)
   - generating low-level C code for fast FFT kernels from Scala
   - emitting different code shapes from a generic source
   - empirical search / autotuning
