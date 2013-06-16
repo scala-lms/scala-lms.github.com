@@ -18,10 +18,10 @@ The aim of this tutorial is to equip attendees with the knowledge and tools to d
 
 This tutorial will cover the following topics:
 
-- Intro to LMS and staging in Scala (9am - 10am)
+- Intro to LMS and staging in Scala (9am - 10am) [[slides](https://dl.dropboxusercontent.com/u/5146003/pldi13-part1-lms.pdf), [code](https://github.com/scala-lms/tutorials)]
   - encoding binding-time information in the type system (Rep[T])
-  - representing lifted program expressions in the LMS graph IR
   - program transformation using staged interpreters
+  - representing lifted program expressions in the LMS graph IR
 - High-performance DSLs using Delite (10am - 11am)
   - an overview of existing DSLs: OptiQL, OptiGraph, OptiML
   - developing a simple linear-algebra DSL from scratch
