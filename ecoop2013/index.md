@@ -19,15 +19,15 @@ This tutorial provides an overview of the technology stack, presents existing hi
 
 This tutorial will cover the following topics:
 
-- Intro to LMS and staging in Scala (10:45am - 11:30am) 
-  - [slides](https://dl.dropboxusercontent.com/u/5146003/ecoop13-part1-lms.pdf), 
-    [notes](http://scala-lms.github.io/tutorials/),
-    [code](https://github.com/scala-lms/tutorials)
+- Intro to LMS and staging in Scala (10:45am - 11:30am) - 
+  [slides](https://dl.dropboxusercontent.com/u/5146003/ecoop13-part1-lms.pdf), 
+  [notes](http://scala-lms.github.io/tutorials/),
+  [code](https://github.com/scala-lms/tutorials)
   - encoding binding-time information in the type system (`Rep[T]`)
   - program transformation using staged interpreters
   - representing lifted program expressions in the LMS graph IR
-- High-performance DSLs using Delite (11:30am - 12:15am)
-  - [slides](https://dl.dropboxusercontent.com/u/5146003/delite-ecoop-tutorial.pdf)
+- High-performance DSLs using Delite (11:30am - 12:15am) - 
+  [slides](https://dl.dropboxusercontent.com/u/5146003/delite-ecoop-tutorial.pdf)
   - an overview of existing DSLs: OptiQL, OptiGraph, OptiML
   - developing a simple linear-algebra DSL from scratch
   - using Delite for powerful generic optimizations and parallel patterns

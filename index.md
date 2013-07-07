@@ -23,6 +23,7 @@ We're holding tutorials on LMS and Delite at upcoming conferences:
 - [ECOOP 2013](http://www.lirmm.fr/ecoop13/): Montpellier, July 3-5. More info: 
   [scala-lms.github.io/ecoop2013](ecoop2013/index.html)
 
+Slides and additional materials are available from the links above.
 
 ## Abstraction Without Regret
 
