@@ -27,8 +27,7 @@ This tutorial will cover the following topics:
   - program transformation using staged interpreters
   - representing lifted program expressions in the LMS graph IR
 - High-performance DSLs using Delite (11:30am - 12:15am)
-  - [slides pptx](https://www.dropbox.com/s/4zurhmlwji0rdop/delite-pldi-tutorial.pptx),
-    [slides pdf](https://dl.dropboxusercontent.com/u/5146003/delite-pldi-tutorial.pdf)
+  - [slides](https://dl.dropboxusercontent.com/u/5146003/delite-ecoop-tutorial.pdf)
   - an overview of existing DSLs: OptiQL, OptiGraph, OptiML
   - developing a simple linear-algebra DSL from scratch
   - using Delite for powerful generic optimizations and parallel patterns
