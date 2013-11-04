@@ -26,6 +26,10 @@ category: documentation
 
 ## Conferences
 
+* Efficient high-level abstractions for Web programming.
+  Julien Richard-Foy, Olivier Barais, Jean-Marc Jézéquel.
+  GPCE '13
+
 * Composition and Reuse with Compiled Domain-Specific Languages.
   Arvind K. Sujeeth, Tiark Rompf, Kevin J. Brown, HyoukJoong Lee, Hassan Chafi, Victoria Popic, Michael Wu, Aleksander Prokopec, Vojin Jovanovic, Martin Odersky, Kunle Olukotun.
   ECOOP '13

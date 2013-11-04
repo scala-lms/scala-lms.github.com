@@ -99,7 +99,6 @@ Be sure to check out the [docs](#docs) below!
 
 Overview presentations:
 
-* [Intro to LMS](https://docs.google.com/presentation/pub?id=1-wMnoDrIBTF1qDbhXtHVxOmCE4oP2SzaDk8o-2Ef3Bo&start=false&loop=false&delayms=3000) by Julien Richard-Foy
 * [Building Blocks for Performance-Related DSLs](http://ppl.stanford.edu/papers/dsl11-rompf-slides.pdf) by Tiark Rompf
 
 Talks/videos from ScalaDays, Spring 2012:
