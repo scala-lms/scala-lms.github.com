@@ -101,11 +101,13 @@ Overview presentations:
 
 * [Building Blocks for Performance-Related DSLs](http://ppl.stanford.edu/papers/dsl11-rompf-slides.pdf) by Tiark Rompf
 
-Talks/videos from ScalaDays, Spring 2012:
+Talks/videos from ScalaDays:
 
-* [Scala-Virtualized, LMS and Delite](http://skillsmatter.com/podcast/scala/high-level-high-performance-programming-with-scala-virtualized-lms-and-delite) by Tiark Rompf
-* [High-Performance DSLs with Delite](http://skillsmatter.com/podcast/scala/high-performance-dsl-delite) by Arvind Sujeeth
-* [JavaScript as an Embedded DSL](http://skillsmatter.com/podcast/agile-testing/javascript-embedded-dsl-scala) by Nada Amin
+* [Big Data Analytics with Delite](http://parleys.com/play/51c2ddefe4b0ed877035684c/chapter0/about) by Kevin Brown (2013)
+* [Project Lancet: Surgical Precision JIT compilers](http://parleys.com/play/51c19f0be4b0ed877035681e/chapter0/about) by Tiark Rompf (2013)
+* [Scala-Virtualized, LMS and Delite](http://skillsmatter.com/podcast/scala/high-level-high-performance-programming-with-scala-virtualized-lms-and-delite) by Tiark Rompf (2012)
+* [High-Performance DSLs with Delite](http://skillsmatter.com/podcast/scala/high-performance-dsl-delite) by Arvind Sujeeth (2012)
+* [JavaScript as an Embedded DSL](http://skillsmatter.com/podcast/agile-testing/javascript-embedded-dsl-scala) by Nada Amin (2012)
 
 
 Tutorial write-ups:
@@ -133,7 +135,6 @@ Conference and Journal publications:
 * [PACT'11](), [IEEE Micro 2011](), [ECOOP'13](): Delite
 * [GPCE'13](): Spiral in Scala
 * [ECOOP'12](): JavaScript
-* [PACT'11](), [IEEE Micro 2011](), [ECOOP'13](): Delite
 * [more](publications.html)
 
 

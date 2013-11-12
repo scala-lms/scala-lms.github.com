@@ -15,6 +15,10 @@ category: documentation
 
 ## Journals
 
+* Scala-virtualized: Linguistic Reuse for Deep Embeddings.
+  Tiark Rompf, Nada Amin, Adriaan Moors, Philipp Haller, Martin Odersky.
+  Higher-Order and Symbolic Computation, September 2013
+
 * Lightweight Modular Staging: A Pragmatic Approach to Runtime Code Generation and Compiled DSLs.
   Tiark Rompf, Martin Odersky. 
   Commun. ACM 55(6): 121-130 (2012)
@@ -25,6 +29,18 @@ category: documentation
 
 
 ## Conferences
+
+* Spiral in Scala: Towards the Systematic Construction of Generators for Performance Libraries.
+  Georg Ofenbeck, Tiark Rompf, Alen Stojanov, Martin Odersky, Markus Püschel.
+  GPCE '13
+
+* Forge: Generating a High Performance DSL Implementation from a Declarative Specification.
+  Arvind Sujeeth, Austin Gibbons, Kevin Brown, Hyoukjoong Lee, Tiark Rompf, Martin Odersky, Kunle Olukotun. 
+  GPCE '13
+
+* Efficient high-level abstractions for Web programming.
+  Julien Richard-Foy, Olivier Barais, Jean-Marc Jézéquel.
+  GPCE '13
 
 * Efficient high-level abstractions for Web programming.
   Julien Richard-Foy, Olivier Barais, Jean-Marc Jézéquel.
