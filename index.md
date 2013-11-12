@@ -16,7 +16,7 @@ DSLs more seamless.
 
 ## News Flash
 
-We're holding tutorials on LMS and Delite at upcoming conferences:
+We've been holding tutorials on LMS and Delite at recent conferences:
 
 - [PLDI 2013](http://pldi2013.ucombinator.org): Seattle, June 16. More info: 
   [scala-lms.github.io/pldi2013](pldi2013/index.html) 
@@ -120,6 +120,8 @@ Comprehensive, but many many pages:
 
 Training courses, full-day tutorials:
 
+* [LMS/Delite Tutorial](http://scala-lms.github.io/ecoop2013) at ECOOP, Summer 2012
+* [LMS/Delite Tutorial](http://scala-lms.github.io/pldi2013) at PLDI, Summer 2012
 * [Delite Tutorial](http://cgo2012.hyperdsls.org) at CGO, Spring 2012
 * [Stanford CS442](http://www.stanford.edu/class/cs442/) Spring 2011
 
@@ -128,9 +130,10 @@ Conference and Journal publications:
 
 * [POPL'13](http://ppl.stanford.edu/papers/popl13_rompf.pdf), 
   [CACM 2012](): LMS and extensible compilers
-* [PACT'11](), [IEEE Micro 2011](): Delite
+* [PACT'11](), [IEEE Micro 2011](), [ECOOP'13](): Delite
+* [GPCE'13](): Spiral in Scala
 * [ECOOP'12](): JavaScript
-* [PEPM'12](): Scala-Virtualized
+* [PACT'11](), [IEEE Micro 2011](), [ECOOP'13](): Delite
 * [more](publications.html)
 
 
