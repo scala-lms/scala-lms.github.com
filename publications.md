@@ -30,6 +30,10 @@ category: documentation
 
 ## Conferences
 
+* Making Domain-Specific Hardware Synthesis Tools Cost-Efficient.
+  Nithin George, David Novo, Tiark Rompf, Martin Odersky, Paolo Ienne.
+  ICFPT '13
+
 * Spiral in Scala: Towards the Systematic Construction of Generators for Performance Libraries.
   Georg Ofenbeck, Tiark Rompf, Alen Stojanov, Martin Odersky, Markus Püschel.
   GPCE '13
@@ -41,6 +45,10 @@ category: documentation
 * Efficient high-level abstractions for Web programming.
   Julien Richard-Foy, Olivier Barais, Jean-Marc Jézéquel.
   GPCE '13
+
+* What are the Odds? Probabilistic Programming in Scala.
+  Sandro Stucki, Nada Amin, Manohar Jonnalagedda, Tiark Rompf.
+  Scala Workshop '13
 
 * Composition and Reuse with Compiled Domain-Specific Languages.
   Arvind K. Sujeeth, Tiark Rompf, Kevin J. Brown, HyoukJoong Lee, Hassan Chafi, Victoria Popic, Michael Wu, Aleksander Prokopec, Vojin Jovanovic, Martin Odersky, Kunle Olukotun.
