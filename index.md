@@ -63,7 +63,7 @@ println(n)
 
 Running the snippet above will generate the program on the left: All functions are inlined, 
 all generics specialized, all type class instances removed.
-All of this is guaranteed by the type system: Expressions of type `Rep\[T\]` become
+All of this is guaranteed by the type system: Expressions of type `Rep[T]` become
 part of the generated program, everything else is evaluated when the original
 snippet is run. 
 
