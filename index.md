@@ -139,6 +139,7 @@ Conference and Journal publications:
 
 
 Related projects:
+
 * [Delite](http://stanford-ppl.github.com/Delite/)
 * [OptiML](http://stanford-ppl.github.com/Delite/optiml/index.html)
 * [Scala Virtualized](https://github.com/tiarkrompf/scala-virtualized/wiki)
