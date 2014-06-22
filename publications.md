@@ -7,6 +7,10 @@ category: documentation
 
 ## Theses
 
+* Productivity and Performance with Embedded Domain-Specific Languages.
+  Arvind Sujeeth.
+  PhD Thesis, PPL, Stanford University, 2014.
+
 * Lightweight Modular Staging and Embedded Compilers: Abstraction Without Regret for High-Level High-Performance Programming. 
   Tiark Rompf. 
   PhD Thesis, LAMP, EPFL, 2012
@@ -14,6 +18,10 @@ category: documentation
 
 
 ## Journals
+
+* Delite: A Compiler Architecture for Performance-Oriented Embedded Domain-Specific Languages.
+  Arvind K. Sujeeth, Kevin J. Brown, HyoukJoong Lee, Tiark Rompf, Hassan Chafi, Martin Odersky, Kunle Olukotun.
+  ACM Trans. on Embedded Computing Systems (TECS), Volume 13, Issue 4s, April 2014.
 
 * Scala-virtualized: Linguistic Reuse for Deep Embeddings.
   Tiark Rompf, Nada Amin, Adriaan Moors, Philipp Haller, Martin Odersky.
@@ -29,6 +37,22 @@ category: documentation
 
 
 ## Conferences
+
+* Hardware System Synthesis from Domain-Specific Languages.
+  Nithin George, Hyoukjoong Lee, David Novo, Tiark Rompf, Kevin Brown, Arvind Sujeeth, Martin Odersky, Kunle Olukotun and Paolo Ienne.
+  FPL '14
+
+* Abstracting Vector Architectures in Library Generators: Case Study Convolution Filters.
+  Alen Stojanov, Georg Ofenbeck, Tiark Rompf, Markus Püschel.
+  ARRAY '14
+
+* Building Efficient Query Engines in a High-Level Language.
+  Yannis Klonatos, Christoph Koch, Tiark Rompf, Hassan Chafi.
+  VLDB '14
+
+* Surgical Precision JIT Compilers.
+  Tiark Rompf, Arvind K Sujeeth, Kevin J Brown, HyoukJoong Lee, Hassan Chafi, Kunle Olukotun.
+  PLDI '14
 
 * Making Domain-Specific Hardware Synthesis Tools Cost-Efficient.
   Nithin George, David Novo, Tiark Rompf, Martin Odersky, Paolo Ienne.
