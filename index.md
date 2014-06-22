@@ -59,7 +59,7 @@ println(n)
 {% endhighlight %}
 
 </td>
-<td markdown="0" style="border:0px;padding-left:50px;">
+<td markdown="1" style="border:0px;padding-left:50px;">
 
 Running the snippet above will generate the program on the left: All functions are inlined, 
 all generics specialized, all type class instances removed.
