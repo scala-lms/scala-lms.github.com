@@ -1,36 +1,11 @@
-<!doctype html>
-<html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Summer-of-lms-2014 by scala-lms</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">Summer-of-lms-2014</h1>
-        <p class="header">Tracking progress of ongoing LMS hackathon</p>
-
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/scala-lms/summer-of-lms-2014/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/scala-lms/summer-of-lms-2014/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/scala-lms/summer-of-lms-2014">View On GitHub</a></li>
-        </ul>
-
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/scala-lms">scala-lms</a></p>
+---
+layout: landing
+title: The LMS Platform
+tagline: Generative Programming and Embedded Compilers in Scala
+---
 
 
-      </header>
-      <section>
-        <h3>
+<h3>
 <a name="welcome-to-github-pages" class="anchor" href="#welcome-to-github-pages"><span class="octicon octicon-link"></span></a>Welcome to GitHub Pages.</h3>
 
 <p>This automatic page generator is the easiest way to create beautiful pages for all of your projects. Author your page content here using GitHub Flavored Markdown, select a template crafted by a designer, and publish. After your page is generated, you can check out the new branch:</p>
@@ -40,7 +15,17 @@ $ git fetch origin
 $ git checkout gh-pages
 </code></pre>
 
+
 <p>If you're using the GitHub for Mac, simply sync your repository and you'll see the new branch.</p>
+
+
+Tutorials
+---------
+
+See here: [LMS Tutorials](tutorials/index.html)
+
+
+
 
 <h3>
 <a name="designer-templates" class="anchor" href="#designer-templates"><span class="octicon octicon-link"></span></a>Designer Templates</h3>
@@ -61,12 +46,3 @@ $ git checkout gh-pages
 <a name="support-or-contact" class="anchor" href="#support-or-contact"><span class="octicon octicon-link"></span></a>Support or Contact</h3>
 
 <p>Having trouble with Pages? Check out the documentation at <a href="http://help.github.com/pages">http://help.github.com/pages</a> or contact <a href="mailto:support@github.com">support@github.com</a> and we’ll help you sort it out.</p>
-      </section>
-      <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
-  </body>
-</html>
