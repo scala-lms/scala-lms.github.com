@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>shonan.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 22px;
+            color: #252519;
+            margin: 0; padding: 0;
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            /*padding-top: 40px;*/
+            padding-bottom: 15px;
+            color: #000;
+        }
+        #container {
+            position: relative;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;
+            padding: 10px 25px 1px 50px;
+            overflow-x: hidden;
+            vertical-align: top;
+            text-align: left;
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            width: 100%;
+            vertical-align: top;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th class="docs">
+                <h1>shonan.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                <h1>Shonan Challenge</h1>
+<p>In this tutorial we will develop a solution to the HMM problem from the Shonan Challenge.</p>
+<p>For further reference, see:</p>
+<pre><code>- Shonan Challenge for Generative Programming
+  Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13
+  https://www.cs.rutgers.edu/~ccshan/metafx/pepm2013.pdf
+
+- https://github.com/StagedHPC/shonan-challenge
+</code></pre>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import scala.virtualization.lms.common._
+import scala.reflect.SourceContext
+
+class ShonanTest extends TutorialFunSuite {
+  val under = &quot;dslapi&quot;
+  val A = scala.Array
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_1">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <p>We first define our static matrix. We notice that some rows are dense,
+<br  />some rows are sparse, and some rows are fully zero.</p>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  val a =
+    A(A(1, 1, 1, 1, 1), // dense
+      A(0, 0, 0, 0, 0), // null
+      A(0, 0, 1, 0, 0), // sparse
+      A(0, 0, 0, 0, 0),
+      A(0, 0, 1, 0, 1))
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_2">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>STEP 0: starting point</h2>
+<p>We start with a fully static implementation.</p>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1a&quot;) {
+
+    def matrix_vector_prod(a: Array[Array[Int]], v: Array[Int]) = {
+      val n = a.length
+      val v1 = new Array[Int](n)
+
+      for (i &lt;- (0 until n)) {
+        for (j &lt;- (0 until n)) {
+          v1(i) = v1(i) + a(i)(j) * v(j)
+        }
+      }
+      v1
+    }
+
+    // let's run it on some static input:
+
+    val v = A(1,1,1,1,1)
+
+    val v1 = matrix_vector_prod(a, v)
+    val result = v1.mkString(&quot;,&quot;)
+
+    check(&quot;shonan-hmm1a&quot;, result)
+  }
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_3">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_3">&#182;</a>
+                </div>
+                <h2>STEP 0.5: static vs dynamic conditional</h2>
+<p>Now we're adding some basic codegen facilities and play
+<br  />with static vs dynamic expressions. Fully static expressions
+<br  />do not show up in generated code. If we change the
+<br  />condition to depend on the (dynamic) input array, an if/else
+<br  />statement will be generated.</p>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1b&quot;) {
+    val snippet = new DslDriver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+
+        val x = 100 - 5 //* v0.length
+
+        if (x &gt; 10) {
+          println(&quot;hello&quot;)
+        }
+
+        v
+      }
+    }
+    check(&quot;shonan-hmm1b&quot;, snippet.code)
+  }
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_4">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_4">&#182;</a>
+                </div>
+                <h2>STEP 1: Staging the matrix vector product</h2>
+<p>We want to change the mv prod function to take a dynamic vector
+<br  />and a static matrix. We move it into the DslDriver trait so
+<br  />it can use Rep.</p>
+<p>We generate nested loops by default (Rep[Range]). To make that
+<br  />work, we need to lift the static matrix to a Rep value. We
+<br  />do that using <code>staticData</code>.</p>
+<p>Now we can play with the loops shapes: Range loops are computed
+<br  />statically, i.e. unrolled at staging time. Rep[Range] loops cause
+<br  />generation of loop code.</p>
+<p>We can make unrolling decisions in a very fine-grained manner:
+<br  />for dense rows we want to generate a loop, for sparse rows
+<br  />we want to unroll. We just add a condition <code>sparse</code> and
+<br  />either do a Range or Rep[Range] loop.</p>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1c&quot;) {
+    val snippet = new DslDriver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+
+        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
+          val n = a0.length
+          val a = staticData(a0)
+          val v1 = NewArray[Int](n)
+
+          for (i &lt;- (0 until n):Range) {
+            val sparse = a0(i).count(_ != 0) &lt; 3
+            if (sparse) {
+              for (j &lt;- (0 until n):Range) {
+                v1(i) = v1(i) + a(i).apply(j) * v(j)
+              }
+            } else {                  
+              for (j &lt;- (0 until n):Rep[Range]) {
+                v1(i) = v1(i) + a(i).apply(j) * v(j)
+              }
+          }
+          }
+          v1
+        }
+
+        val v1 = matrix_vector_prod(a, v)
+        v1
+      }
+    }
+    //check(&quot;shonan-hmm1c&quot;, snippet.code)
+  }
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_5">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_5">&#182;</a>
+                </div>
+                <h2>STEP 2: Conditional unrolling</h2>
+<p>The code duplication of the loop body above is not very nice.
+<br  />fortunately, we can create arbitrary staging-time abstractions.
+<br  />We create an auxiliary method unrollIf that captures the
+<br  />conditional unrolling pattern in a general way.
+<br  />The mv prod function no longer needs to express the loop
+<br  />body twice.</p>
+<p>The generated code is identical. &ldquo;abstraction without regret&rdquo; ftw!</p>
+
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1d&quot;) {
+    val snippet = new DslDriver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+
+        def unrollIf(c:Boolean,r: Range) = new { def foreach(f: Rep[Int] =&gt; Rep[Unit]) = {
+          if (c) {
+            for (j &lt;- (r.start until r.end):Range) {
+              f(j)
+            }
+          } else {                  
+            for (j &lt;- (r.start until r.end):Rep[Range]) {
+              f(j)
+            }
+          }
+        }}
+
+        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
+          val n = a0.length
+          val a = staticData(a0)
+          val v1 = NewArray[Int](n)
+
+          for (i &lt;- (0 until n):Range) {
+            val sparse = a0(i).count(_ != 0) &lt; 3
+            for (j &lt;- unrollIf(sparse, 0 until n)) {
+              v1(i) = v1(i) + a(i).apply(j) * v(j)
+            }
+          }
+          v1
+        }
+
+        val v1 = matrix_vector_prod(a, v)
+        v1
+      }
+    }
+    //check(&quot;shonan-hmm1d&quot;, snippet.code)
+  }
+}
+</code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{title}}</title>
+    <title>utils.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -153,11 +153,47 @@
         Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
-                {{#sources}}
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/{{.}}">
-                    {{.}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
                 </a>
-                {{/sources}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
             </div>
         </div>
     </div>
@@ -166,25 +202,103 @@
         <thead>
         <tr>
             <th class="docs">
-                <h1>{{title}}</h1>
+                <h1>utils.scala</h1>
             </th>
             <th class="code"></th>
         </tr>
         </thead>
         <tbody>
-        {{#sections}}
-        <tr id="section_{{index}}">
+        
+        <tr id="section_0">
             <td class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_{{index}}">&#182;</a>
+                    <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                {{{doc}}}
+                
             </td></tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>{{code}}</code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import java.io._
+import org.scalatest.FunSuite
+
+trait TutorialFunSuite extends FunSuite {
+  val prefix = &quot;src/out/&quot;
+  val under: String
+  def readFile(name: String): String = {
+    try {
+      val buf = new Array[Byte](new File(name).length().toInt)
+      val fis = new FileInputStream(name)
+      fis.read(buf)
+      fis.close()
+      new String(buf)
+    } catch {
+      case e: IOException =&gt; &quot;&quot;
+    }
+  }
+  def writeFile(name: String, content: String) {
+    val out = new java.io.PrintWriter(new File(name))
+    out.write(content)
+    out.close()
+  }
+  def writeFileIndented(name: String, content: String) {
+    val out = new java.io.PrintWriter(new File(name))
+    printIndented(content)(out)
+    out.close()
+  }
+  def check(label: String, code: String) = {
+    val fileprefix = prefix+under+label
+    val name = fileprefix+&quot;.check.scala&quot;
+    val aname = fileprefix+&quot;.actual.scala&quot;
+    val expected = readFile(name)
+    if (expected != code) {
+      println(&quot;writing &quot; + aname)
+      writeFile(aname, code)
+    }
+    assert(expected == code, name)
+  }
+
+  def printIndented(str: String)(out: PrintWriter): Unit = {
+    val lines = str.split(&quot;[\n\r]&quot;)
+    var indent = 0
+    for (l0 &lt;- lines) {
+      val l = l0.trim
+      if (l.length &gt; 0) {
+        var open = 0
+        var close = 0
+        var initClose = 0
+        var nonWsChar = false
+        l foreach {
+          case '{' =&gt; {
+            open += 1
+            if (!nonWsChar) {
+              nonWsChar = true
+              initClose = close
+            }
+          }
+          case '}' =&gt; close += 1
+          case x =&gt; if (!nonWsChar &amp;&amp; !x.isWhitespace) {
+            nonWsChar = true
+            initClose = close
+          }
+        }
+        if (!nonWsChar) initClose = close
+        out.println(&quot;  &quot; * (indent - initClose) + l)
+        indent += (open - close)
+      }
+    }
+  }
+
+  def exec(label: String, code: String) = {
+    val fileprefix = prefix+under+label
+    val aname = fileprefix+&quot;.actual.scala&quot;
+    writeFileIndented(aname, code)
+  }
+}
+</code></pre>
             </td>
         </tr>
-        {{/sections}}
+        
         </tbody>
     </table>
 </div>

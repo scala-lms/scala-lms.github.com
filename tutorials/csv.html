@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{title}}</title>
+    <title>csv.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -153,11 +153,47 @@
         Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
-                {{#sources}}
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/{{.}}">
-                    {{.}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
                 </a>
-                {{/sources}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
             </div>
         </div>
     </div>
@@ -166,25 +202,127 @@
         <thead>
         <tr>
             <th class="docs">
-                <h1>{{title}}</h1>
+                <h1>csv.scala</h1>
             </th>
             <th class="code"></th>
         </tr>
         </thead>
         <tbody>
-        {{#sections}}
-        <tr id="section_{{index}}">
+        
+        <tr id="section_0">
             <td class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_{{index}}">&#182;</a>
+                    <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                {{{doc}}}
+                
             </td></tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>{{code}}</code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import scala.virtualization.lms.common._
+import scala.reflect.SourceContext
+
+// sbt ~test-only *CSV*
+
+class CSVTest extends TutorialFunSuite {
+  val under = &quot;dslapi&quot;
+
+/*  playground for live demo */
+
+  test(&quot;csv-live&quot;) {
+
+    def FileReader(file: String) = 
+&quot;&quot;&quot;Name,Value,Flag
+A,7,no
+B,2,yes&quot;&quot;&quot;.split(&quot;\n&quot;).iterator
+
+    case class Record(fields: Array[String], schema: Array[String]) {
+      def apply(key: String) = fields(schema indexOf key)
+    }
+
+    def CSV(file: String) = new Object {
+      def foreach(yld: Record =&gt; Unit) = {
+        val lines = FileReader(file)
+        val schema = lines.next.split(&quot;,&quot;)
+        while (lines.hasNext) {
+          val fields = lines.next().split(&quot;,&quot;)
+          yld(new Record(fields,schema))
+        }
+      }
+    }
+    
+    for (record &lt;- CSV(&quot;data.txt&quot;)) { 
+      if (record(&quot;Flag&quot;) == &quot;yes&quot;)
+        println(record(&quot;Name&quot;))
+    }
+
+
+    abstract class Operator
+    case class Scan(file: String) extends Operator
+    case class Filter(pred: Predicate, parent: Operator) extends Operator
+    case class Project(fields: Array[String], parent: Operator) extends Operator
+    case class Print(parent: Operator) extends Operator
+
+    abstract class Predicate
+    case class Eq(a: Ref, b: Ref) extends Predicate
+
+    abstract class Ref
+    case class Field(name: String) extends Ref
+    case class Const(x: Any) extends Ref
+
+    def exec(o: Operator)(yld: Record =&gt; Unit): Unit = o match {
+      case Scan(file) =&gt; 
+        CSV(file).foreach(yld)
+      case Filter(pred, parent) =&gt; 
+        exec(parent) { rec =&gt; if (evalp(pred)(rec)) yld(rec) }
+      case Project(fields, parent) =&gt; 
+        exec(parent) { rec =&gt; yld(new Record(fields map (k =&gt; rec(k)), fields)) }
+      case Print(parent) =&gt;
+        exec(parent) { rec =&gt; println(rec.fields mkString &quot;,&quot;) }
+    }
+    def evalp(p: Predicate)(rec: Record): Boolean = p match {
+      case Eq(a1,a2) =&gt; eval(a1)(rec) == eval(a2)(rec)
+    }
+    def eval(p: Ref)(rec: Record): Any = p match {
+      case Field(name) =&gt; rec(name)
+      case Const(x) =&gt; x
+    }
+
+    // SELECT Name FROM data.txt WHERE Flag == 'yes'
+
+    val q = Print(
+      Project(Array(&quot;Name&quot;),
+        Filter(Eq(Field(&quot;Flag&quot;),Const(&quot;yes&quot;)),
+          Scan(&quot;data.txt&quot;))))
+
+    exec(q) { _ =&gt; }
+
+    this.exec(&quot;csv-live&quot;, &quot;done&quot;)
+  }
+
+
+
+
+  /*
+    val snippet = new DslDriver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+        println(&quot;hello&quot;)
+        v
+      }
+    }
+    exec(&quot;csv-live&quot;, snippet.code)
+
+
+
+/*
+  DEMO:
+  1) add compile snippet
+  ...
+}
+</code></pre>
             </td>
         </tr>
-        {{/sections}}
+        
         </tbody>
     </table>
 </div>

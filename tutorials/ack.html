@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{title}}</title>
+    <title>ack.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -153,11 +153,47 @@
         Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
-                {{#sources}}
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/{{.}}">
-                    {{.}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
                 </a>
-                {{/sources}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
             </div>
         </div>
     </div>
@@ -166,25 +202,58 @@
         <thead>
         <tr>
             <th class="docs">
-                <h1>{{title}}</h1>
+                <h1>ack.scala</h1>
             </th>
             <th class="code"></th>
         </tr>
         </thead>
         <tbody>
-        {{#sections}}
-        <tr id="section_{{index}}">
+        
+        <tr id="section_0">
             <td class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_{{index}}">&#182;</a>
+                    <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                {{{doc}}}
+                
             </td></tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>{{code}}</code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import org.scalatest.FunSuite
+
+trait Ackermann extends Dsl {
+  def a(m: Int): Rep[Int =&gt; Int] = fun { (n: Rep[Int]) =&gt;
+    if (m==0)
+      n+1
+    else if (n==0)
+      a(m-1)(1)
+    else
+      a(m-1)(a(m)(n-1))
+  }
+}
+
+class AckermannTest extends TutorialFunSuite {
+  val under = &quot;ack&quot;
+  def specialize(m: Int): DslDriver[Int,Int] = new DslDriver[Int,Int] with Ackermann {
+    def snippet(n: Rep[Int]): Rep[Int] = a(m)(n)
+  }
+/*
+  Example due to Neil Jones, via Oleg on LtU (http://lambda-the-ultimate.org/node/4039#comment-61431)
+
+  ack(2,n) should specialize to:
+
+  ack_2(n) =  if n=0 then ack_1(1) else  ack_1(ack_2(n-1))
+  ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))
+  ack_0(n) =  n+1
+  test(&quot;specialize ackermann to m=2&quot;) {
+    val ack2 = specialize(2)
+    check(&quot;m2&quot;, ack2.code)
+  }
+}
+</code></pre>
             </td>
         </tr>
-        {{/sections}}
+        
         </tbody>
     </table>
 </div>

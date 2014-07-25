@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>{{title}}</title>
+    <title>re.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -153,11 +153,47 @@
         Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
-                {{#sources}}
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/{{.}}">
-                    {{.}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
                 </a>
-                {{/sources}}
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
             </div>
         </div>
     </div>
@@ -166,25 +202,109 @@
         <thead>
         <tr>
             <th class="docs">
-                <h1>{{title}}</h1>
+                <h1>re.scala</h1>
             </th>
             <th class="code"></th>
         </tr>
         </thead>
         <tbody>
-        {{#sections}}
-        <tr id="section_{{index}}">
+        
+        <tr id="section_0">
             <td class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_{{index}}">&#182;</a>
+                    <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                {{{doc}}}
+                
             </td></tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>{{code}}</code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import org.scalatest.FunSuite
+
+// translated to Scala from
+// http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
+trait RegexpMatcher {
+  //#matchsearch
+  /* search for regexp anywhere in text */
+  def matchsearch(regexp: String, text: String): Boolean = {
+    if (regexp(0) == '^')
+      matchhere(regexp, 1, text, 0)
+    else {
+      var start = -1
+      var found = false
+      while (!found &amp;&amp; start &lt; text.length) {
+        start += 1
+        found = matchhere(regexp, 0, text, start)
+      }
+      found
+    }
+  }
+  //#matchsearch
+
+  //#matchhere
+  /* search for restart of regexp at start of text */
+  def matchhere(regexp: String, restart: Int, text: String, start: Int): Boolean = {
+    if (restart==regexp.length)
+      true
+    else if (regexp(restart)=='$' &amp;&amp; restart+1==regexp.length)
+      start==text.length
+    else if (restart+1 &lt; regexp.length &amp;&amp; regexp(restart+1)=='*')
+      matchstar(regexp(restart), regexp, restart+2, text, start)
+    else if (start &lt; text.length &amp;&amp; matchchar(regexp(restart), text(start)))
+      matchhere(regexp, restart+1, text, start+1)
+    else false
+  }
+  //#matchhere
+
+  //#matchstar
+  /* search for c* followed by restart of regexp at start of text */
+  def matchstar(c: Char, regexp: String, restart: Int, text: String, start: Int): Boolean = {
+    var sstart = start
+    var found = matchhere(regexp, restart, text, sstart)
+    var failed = false
+    while (!failed &amp;&amp; !found &amp;&amp; sstart &lt; text.length) {
+      failed = !matchchar(c, text(sstart))
+      sstart += 1
+      found = matchhere(regexp, restart, text, sstart)
+    }
+    !failed &amp;&amp; found
+  }
+  //#matchstar
+
+  //#matchchar
+  def matchchar(c: Char, t: Char): Boolean = {
+    c == '.' || c == t
+  }
+  //#matchchar
+}
+
+class RegexpMatcherTest extends FunSuite with RegexpMatcher {
+  def testmatch(regexp: String, text: String, expected: Boolean) {
+    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
+      expectResult(expected){matchsearch(regexp, text)}
+    }
+  }
+
+  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
+  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
+  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
+  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
+  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
+  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
+  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
+  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
+  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
+  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
+  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
+}
+</code></pre>
             </td>
         </tr>
-        {{/sections}}
+        
         </tbody>
     </table>
 </div>

@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>stencil.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 22px;
+            color: #252519;
+            margin: 0; padding: 0;
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            /*padding-top: 40px;*/
+            padding-bottom: 15px;
+            color: #000;
+        }
+        #container {
+            position: relative;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;
+            padding: 10px 25px 1px 50px;
+            overflow-x: hidden;
+            vertical-align: top;
+            text-align: left;
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            width: 100%;
+            vertical-align: top;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th class="docs">
+                <h1>stencil.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import scala.virtualization.lms.common.ForwardTransformer
+import scala.reflect.SourceContext
+
+// Shonan Challenge 3.3 Stencil
+// https://groups.google.com/d/msg/stagedhpc/r5L4xGJETwE/1kOdwJo0kgAJ
+
+trait Sliding extends Dsl {
+  def infix_sliding[T:Manifest](n: Rep[Int], f: Rep[Int] =&gt; Rep[T]): Rep[Array[T]] = {
+    val a = NewArray[T](n)
+    sliding(0,n)(i =&gt; a(i) = f(i))
+    a
+  }
+  def infix_sliding(r: Rep[Range]) = new {
+    def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] =
+      sliding(r.start, r.end)(f)
+  }
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit]
+}
+
+trait NoSlidingExp extends DslExp with Sliding {
+  // not actually sliding -- just to have a baseline reference
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+    (start until end) foreach f
+  }
+}
+
+trait SlidingExp extends DslExp with Sliding {
+  object trans extends ForwardTransformer {
+    val IR: SlidingExp.this.type = SlidingExp.this
+  }
+  def log(x: Any): Unit = {
+    System.out.println(&quot;sliding log: &quot;+x)
+  }
+
+  // some arithemetic rewrites to maximize sliding sharing
+  override def int_plus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] = ((lhs,rhs) match {
+    case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y+z)) // (x+y)+z --&gt; x+(y+z)
+    case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y-z)) // (x-y)+z --&gt; x-(y-z)
+    case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_minus(x, unit(-z))
+    case _ =&gt; super.int_plus(lhs,rhs)
+  }).asInstanceOf[Exp[Int]]
+
+  override def int_minus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] = ((lhs,rhs) match {
+    case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y+z)) // (x-y)-z --&gt; x-(y+z)
+    case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y-z)) // (x+y)-z --&gt; x+(y-z)
+    case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_plus(x, unit(-z))
+    case _ =&gt; super.int_minus(lhs,rhs)
+  }).asInstanceOf[Exp[Int]]
+
+  override def numeric_plus[T:Numeric:Manifest](lhs: Exp[T], rhs: Exp[T])(implicit pos: SourceContext): Exp[T] = ((lhs,rhs) match {
+    case (Def(NumericPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_plus(x, unit(y+z)) // (x+y)+z --&gt; x+(y+z)
+    case (Def(NumericMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_minus(x, unit(y-z)) // (x-y)+z --&gt; x-(y-z)
+    case _ =&gt; super.numeric_plus(lhs,rhs)
+  }).asInstanceOf[Exp[T]]
+
+  override def numeric_minus[T:Numeric:Manifest](lhs: Exp[T], rhs: Exp[T])(implicit pos: SourceContext): Exp[T] = ((lhs,rhs) match {
+    case (Def(NumericMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_minus(x, unit(y+z)) // (x-y)-z --&gt; x-(y+z)
+    case (Def(NumericPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_plus(x, unit(y-z)) // (x+y)-z --&gt; x+(y-z)
+    case _ =&gt; super.numeric_minus(lhs,rhs)
+  }).asInstanceOf[Exp[T]]
+    
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+    val i = fresh[Int]
+
+    val save = context
+    // evaluate loop contents f(i)
+    val (r0,stms0) = reifySubGraph(f(i))
+    val (((r1,stms1,subst1),(r2,stms2,subst2)), _) = reifySubGraph {
+      reflectSubGraph(stms0)
+      context = save
+      // evaluate loop contents f(i+1)
+      val ((r1,subst1),stms1) = reifySubGraph(trans.withSubstScope(i -&gt; (i+1)) {
+        stms0.foreach(s=&gt;trans.traverseStm(s))
+        (trans(r0), trans.subst)
+      })
+      val ((r2,stms2,subst2), _) = reifySubGraph {
+        reflectSubGraph(stms1)
+        context = save
+        // evaluate loop contents f(i+2)
+        val ((r2,subst2),stms2) = reifySubGraph(trans.withSubstScope(i -&gt; (i+2)) {
+          stms0.foreach(s=&gt;trans.traverseStm(s))
+          (trans(r0), trans.subst)
+        })
+        (r2,stms2,subst2)
+      }
+      ((r1,stms1,subst1), (r2,stms2,subst2))
+    }
+    context = save
+
+    val defs = stms0.flatMap(_.lhs)
+    // find overlap syms: defined by f(i), used by f(i+1) and f(i+2)
+    val overlap01 = stms1.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+    val overlap02 = stms2.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+
+    if (overlap02.nonEmpty)
+      log(&quot;Overlap beyond a single loop iteration is ignored, since not yet implemented.&quot;)
+
+    val overlap0 = (overlap01++overlap02).distinct
+    val overlap1 = overlap0 map subst1
+    // build a variable for each overlap sym.
+    // init variables by peeling first loop iteration.
+    if (end &gt; start) {
+      val (rX,substX) = trans.withSubstScope(i -&gt; start) {
+        stms0.foreach(s=&gt;trans.traverseStm(s))
+        (trans(r0), trans.subst)
+      }
+      val vars = overlap0 map (x =&gt; var_new(substX(x))(x.tp,x.pos.head))
+      // now generate the loop
+      for (j &lt;- (start + unit(1)) until end) {
+        // read the overlap variables
+        val reads = (overlap0 zip vars) map (p =&gt; (p._1, readVar(p._2)))
+        // emit the transformed loop body
+        val (r,substY1) = trans.withSubstScope((reads:+(i-&gt;(j-unit(1)))): _*) {
+          stms1.foreach(s=&gt;trans.traverseStm(s))
+          (trans(r1), trans.subst)
+        }
+        // write the new values to the overlap vars
+        val writes = (overlap1 zip vars) map (p =&gt; (p._1, var_assign(p._2, substY1(p._1))))
+      }
+    }
+  }
+}
+
+trait SlidingWarmup extends Sliding {
+  def snippet(n: Rep[Int]): Rep[Array[Int]] = {
+    def compute(i: Rep[Int]) = 2*i+3
+    n sliding { i =&gt; compute(i) + compute(i+1) }
+  }
+}
+abstract class SlidingWarmupDriver extends DslDriver[Int,Array[Int]] with SlidingWarmup
+class SlidingWarmupTest extends TutorialFunSuite {
+  val under = &quot;sliding&quot;
+
+  test(&quot;warmup without sliding&quot;) {
+    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
+    check(&quot;0&quot;, sliding0.code)
+  }
+
+  test(&quot;warmup with sliding&quot;) {
+    val sliding1 = new SlidingWarmupDriver with SlidingExp
+    check(&quot;1&quot;, sliding1.code)
+  }
+}
+
+trait Stencil extends Sliding {
+  def snippet(v: Rep[Array[Double]]): Rep[Array[Double]] = {
+    val n = v.length
+    val input = v
+    val output = NewArray[Double](n)
+    def a(j: Rep[Int]) = input(j)
+    def w1(j: Rep[Int]) = a(j) * a(j+1)
+    def wm(j: Rep[Int]) = a(j) - w1(j) + w1(j-1)
+    def w2(j: Rep[Int]) = wm(j) * wm(j+1)
+    def b(j: Rep[Int]) = wm(j) - w2(j) + w2(j-1)
+    for (i &lt;- (2 until n-2).sliding) {
+      output(i) = b(i)
+    }
+    output
+  }
+}
+abstract class StencilDriver extends DslDriver[Array[Double],Array[Double]] with Stencil
+class StencilTest extends TutorialFunSuite {
+  val under = &quot;stencil&quot;
+
+  test(&quot;stencil without sliding&quot;) {
+    val stencil0 = new StencilDriver with NoSlidingExp
+    check(&quot;0&quot;, stencil0.code)
+  }
+
+  test(&quot;stencil with sliding&quot;) {
+    val stencil1 = new StencilDriver with SlidingExp
+    check(&quot;1&quot;, stencil1.code)
+  }
+}
+</code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

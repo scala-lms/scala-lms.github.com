@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>sre.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 22px;
+            color: #252519;
+            margin: 0; padding: 0;
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            /*padding-top: 40px;*/
+            padding-bottom: 15px;
+            color: #000;
+        }
+        #container {
+            position: relative;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;
+            padding: 10px 25px 1px 50px;
+            overflow-x: hidden;
+            vertical-align: top;
+            text-align: left;
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            width: 100%;
+            vertical-align: top;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
+                    re.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
+                    sre.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <tr>
+            <th class="docs">
+                <h1>sre.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                
+            </td></tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import org.scalatest.FunSuite
+
+trait StagedRegexpMatcher extends Dsl {
+  //#matchsearch
+  /* search for regexp anywhere in text */
+  def matchsearch(regexp: String, text: Rep[String]): Rep[Boolean] = {
+    if (regexp(0) == '^')
+      matchhere(regexp, 1, text, 0)
+    else {
+      val start = var_new(unit(-1))
+      val found = var_new(unit(false))
+      while (!found &amp;&amp;&amp; start &lt; text.length) {
+        start += 1
+        found = matchhere(regexp, 0, text, start)
+      }
+      found
+    }
+  }
+  //#matchsearch
+
+  //#matchhere
+  /* search for restart of regexp at start of text */
+  def matchhere(regexp: String, restart: Int, text: Rep[String], start: Rep[Int]): Rep[Boolean] = {
+    if (restart==regexp.length)
+      true
+    else if (regexp(restart)=='$' &amp;&amp; restart+1==regexp.length)
+      start==text.length
+    else if (restart+1 &lt; regexp.length &amp;&amp; regexp(restart+1)=='*')
+      matchstar(regexp(restart), regexp, restart+2, text, start)
+    else if (start &lt; text.length &amp;&amp;&amp; matchchar(regexp(restart), text(start)))
+      matchhere(regexp, restart+1, text, start+1)
+    else false
+  }
+  //#matchhere
+
+  //#matchstar
+  /* search for c* followed by restart of regexp at start of text */
+  def matchstar(c: Char, regexp: String, restart: Int, text: Rep[String], start: Rep[Int]): Rep[Boolean] = {
+    val sstart = var_new(start)
+    val found = var_new(matchhere(regexp, restart, text, sstart))
+    val failed = var_new(unit(false))
+    while (!failed &amp;&amp;&amp; !found &amp;&amp;&amp; sstart &lt; text.length) {
+      failed = !matchchar(c, text(sstart))
+      sstart += 1
+      found = matchhere(regexp, restart, text, sstart)
+    }
+    !failed &amp;&amp;&amp; found
+  }
+  //#matchstar
+
+  //#matchchar
+  def matchchar(c: Char, t: Rep[Char]): Rep[Boolean] = {
+    c == '.' || c == t
+  }
+  //#matchchar
+}
+
+class StagedRegexpMatcherTest extends TutorialFunSuite {
+  val under = &quot;sre&quot;
+  var m = Map.empty[String, DslDriver[String,Boolean]]
+  def cache(k: String, b: =&gt; DslDriver[String,Boolean]): DslDriver[String,Boolean] = {
+    m.get(k) match {
+      case Some(v) =&gt; v
+      case None =&gt;
+        m = m.updated(k, b)
+        m(k)
+    }
+  }
+  def testmatch(regexp: String, text: String, expected: Boolean) {
+    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
+      val snippet = cache(regexp,
+        new DslDriver[String,Boolean] with StagedRegexpMatcher {
+          def snippet(x: Rep[String]) = matchsearch(regexp, x)
+        })
+      check(&quot;_&quot;+regexp.replace(&quot;^&quot;, &quot;_b&quot;).replace(&quot;*&quot;, &quot;_s&quot;).replace(&quot;$&quot;, &quot;_e&quot;),
+            snippet.code)
+      expectResult(expected){snippet.eval(text)}
+    }
+  }
+
+  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
+  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
+  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
+  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
+  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
+  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
+  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
+  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
+  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
+  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
+  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
+}
+</code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>
