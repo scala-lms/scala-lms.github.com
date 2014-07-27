@@ -87,13 +87,14 @@
             outline: 0;
         }
         td.docs, th.docs {
-            max-width: 450px;
+            min-width: 600px;
+            /*max-width: 450px;
             min-width: 450px;
-            min-height: 5px;
+            min-height: 5px;*/
             padding: 10px 25px 1px 50px;
-            overflow-x: hidden;
+            /*overflow-x: hidden;*
             vertical-align: top;
-            text-align: left;
+            text-align: left;*/
         }
         .docs pre {
             margin: 15px 0 15px;
@@ -150,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        Jump To &hellip;
+        sre.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -186,6 +187,10 @@
                     sre.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
                     stencil.html
                 </a>
@@ -200,12 +205,12 @@
 
     <table cellpadding="0" cellspacing="0">
         <thead>
-        <tr>
+        <!--<tr>
             <th class="docs">
                 <h1>sre.scala</h1>
             </th>
             <th class="code"></th>
-        </tr>
+        </tr>-->
         </thead>
         <tbody>
         
@@ -214,8 +219,35 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                
-            </td></tr><tr>
+                <h1>From Interpreter to Compiler</h1>
+<p>A staged interpreter is a compiler. This is useful, because an
+<br  />interpreter is usually much easier to implement than a compiler. In
+<br  />this section, we illustrate how to turn a vanilla interpreter into a
+<br  />compiler, using lightweight modular staging (LMS). The gist is to let
+<br  />LMS generate code for the interpreter specialized to a particular
+<br  />program &ndash; the program is fixed at staging time, while the input(s) to
+<br  />the program may vary in the generated code. Hence, staging an
+<br  />interpreter should be as simple as wrapping the types of expressions
+<br  />that vary in <code>Rep[_]</code> while leaving the types of expressions we want
+<br  />specialized as is.</p>
+<p>As a case study, we stage a simple regular expression matcher. Our
+<br  />vanilla regular expression matcher is invoked on a regular expression
+<br  />string and an input string. The staged regular expression matcher is
+<br  />invoked on a regular expression constant string and a staged input
+<br  />string of type <code>Rep[String]</code>, and generates code specialized to match
+<br  />any input string against the constant regular expression pattern.</p>
+<p>We could further optimize the generated code by additional staged
+<br  />transformations, but here, we only illustrate the basic process of
+<br  />staging an interpreter. This process is widely applicable. For
+<br  />example, we used the same process to stage a bytecode interpreter into
+<br  />a bytecode compiler.</p>
+<h2>Regular Expression Matcher</h2>
+<p>We start with a small regular expression matcher, ported to Scala from
+<br  />a C version, written by Rob Pike and Brian Kernighan
+<br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html</a>.</p>
+
+            </td>
+        </tr><tr>
             <td class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
@@ -314,7 +346,24 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
   testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
   testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
   testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
-}
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_1">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Generated Code</h2>
+<p>As an example, here is the code generated for <code>^ab</code>.</p>
+<p>.. includecode:: ../out/sre__bab.check.scala</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>}
 </code></pre>
             </td>
         </tr>

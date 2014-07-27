@@ -87,13 +87,14 @@
             outline: 0;
         }
         td.docs, th.docs {
-            max-width: 450px;
+            min-width: 600px;
+            /*max-width: 450px;
             min-width: 450px;
-            min-height: 5px;
+            min-height: 5px;*/
             padding: 10px 25px 1px 50px;
-            overflow-x: hidden;
+            /*overflow-x: hidden;*
             vertical-align: top;
-            text-align: left;
+            text-align: left;*/
         }
         .docs pre {
             margin: 15px 0 15px;
@@ -150,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        Jump To &hellip;
+        stencil.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -186,6 +187,10 @@
                     sre.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
                     stencil.html
                 </a>
@@ -200,12 +205,12 @@
 
     <table cellpadding="0" cellspacing="0">
         <thead>
-        <tr>
+        <!--<tr>
             <th class="docs">
                 <h1>stencil.scala</h1>
             </th>
             <th class="code"></th>
-        </tr>
+        </tr>-->
         </thead>
         <tbody>
         
@@ -214,8 +219,12 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                
-            </td></tr><tr>
+                <h1>Sliding Stencil</h1>
+<p>Shonan Challenge 3.3 Stencil
+<br  />https://groups.google.com/d/msg/stagedhpc/r5L4xGJETwE/1kOdwJo0kgAJ</p>
+
+            </td>
+        </tr><tr>
             <td class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 

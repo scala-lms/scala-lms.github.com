@@ -87,13 +87,14 @@
             outline: 0;
         }
         td.docs, th.docs {
-            max-width: 450px;
+            min-width: 600px;
+            /*max-width: 450px;
             min-width: 450px;
-            min-height: 5px;
+            min-height: 5px;*/
             padding: 10px 25px 1px 50px;
-            overflow-x: hidden;
+            /*overflow-x: hidden;*
             vertical-align: top;
-            text-align: left;
+            text-align: left;*/
         }
         .docs pre {
             margin: 15px 0 15px;
@@ -150,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        Jump To &hellip;
+        index.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -186,6 +187,10 @@
                     sre.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
                     stencil.html
                 </a>
@@ -200,12 +205,12 @@
 
     <table cellpadding="0" cellspacing="0">
         <thead>
-        <tr>
+        <!--<tr>
             <th class="docs">
                 <h1>index.scala</h1>
             </th>
             <th class="code"></th>
-        </tr>
+        </tr>-->
         </thead>
         <tbody>
         
@@ -215,21 +220,35 @@
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
                 <h1>Tutorials Overview</h1>
+<p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS),
+<br  />a technique for embedding domain-specific languages (DSL) in Scala,
+<br  />using a runtime code generation approach.</p>
 <p>The following tutorials are available:</p>
 <ul>
-<li><p><a href="ack.html">Ackermann's Function</a></p>
+<li><p><a href="start.html">Getting Started</a>
+<br  />Rep[T] vs T
+<br  />Rep[A => B] vs Rep[A]=>Rep[B]
+<br  />Rep[Range] vs Range</p>
 </li>
-<li><p><a href="shonan.html">Shonan HMM Challenge</a></p>
+<li><p><a href="shonan.html">Shonan HMM Challenge</a>
+<br  />Sparse matrix vector multiplication
+<br  />Selective unrolling and precomputation</p>
 </li>
-<li><p><a href="csv.html">SQL Engine</a></p>
+<li><p><a href="sre.html">Regular Expressions</a>
+<br  />From interpreters to compilers using staging</p>
+</li>
+<li><p><a href="ack.html">Ackermann's Function</a>
+<br  />Turning a recursive function into an automaton</p>
+</li>
+<li><p><a href="csv.html">SQL Engine</a>
+<br  />Efficient data processing</p>
 </li>
 <li><p><a href="stencil.html">Sliding Stencil</a></p>
 </li>
-<li><p><a href="sre.html">Regular Expressions</a></p>
-</li>
 </ul>
 
-            </td></tr><tr>
+            </td>
+        </tr><tr>
             <td class="code">
                 <pre><code class='prettyprint lang-scala'></code></pre>
             </td>

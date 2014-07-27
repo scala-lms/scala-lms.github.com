@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>shonan.scala</title>
+    <title>start.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -151,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        shonan.scala // Jump To &hellip;
+        start.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -207,7 +207,7 @@
         <thead>
         <!--<tr>
             <th class="docs">
-                <h1>shonan.scala</h1>
+                <h1>start.scala</h1>
             </th>
             <th class="code"></th>
         </tr>-->
@@ -219,15 +219,19 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Shonan Challenge</h1>
-<p>In this tutorial we will develop a solution to the HMM problem from the Shonan Challenge.</p>
-<p>For further reference, see:</p>
-<pre><code>- Shonan Challenge for Generative Programming
-  Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13
-  https://www.cs.rutgers.edu/~ccshan/metafx/pepm2013.pdf
-
-- https://github.com/StagedHPC/shonan-challenge
-</code></pre>
+                <h1>Getting Started</h1>
+<h2>Staging</h2>
+<p>What is staging? The idea behind staging is to delay computation of
+<br  />certain expressions, generating code to compute them later. The
+<br  />benefit is <em>abstraction without regret</em>.</p>
+<h2>Lightweight Modular Staging (LMS)</h2>
+<p>Lightweight Modular Staging (LMS) is a staging technique driven by
+<br  />types. The technique has been implemented in Scala, in a framework to
+<br  />build compilers.</p>
+<p>In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
+<br  />because it is purely library based. It is also <em>modular</em>, for two
+<br  />reasons: (1) features can be mixed and matched (2) DSL specification
+<br  />and implementation are separate.</p>
 
             </td>
         </tr><tr>
@@ -235,11 +239,10 @@
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
 import scala.virtualization.lms.common._
-import scala.reflect.SourceContext
 
-class ShonanTest extends TutorialFunSuite {
+class DslApiTest extends TutorialFunSuite {
   val under = &quot;dslapi&quot;
-  val A = scala.Array
+
 
 </code></pre>
             </td>
@@ -250,19 +253,56 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_1">&#182;</a>
                 </div>
-                <p>We first define our static matrix. We notice that some rows are dense,
-<br  />some rows are sparse, and some rows are fully zero.</p>
+                <h3>Rep[T] vs T</h3>
+<p>In LMS, <code>Rep[T]</code> represents a delayed compuation of type <code>T</code>. Thus,
+<br  />during staging, an expression of type <code>Rep[T]</code> becomes part of
+<br  />the generated code, while an expression of bare type <code>T</code> becomes a
+<br  />constant in the generated code. For core Scala features, adding
+<br  /><code>Rep</code> types should be enough to build a program generator, as we
+<br  />will see later.</p>
+<p>Contrast the snippet on the left, where <code>b</code> is a <code>Boolean</code>, with
+<br  />the snippet on the right, where <code>b</code> is a <code>Rep[Boolean]</code>. The
+<br  />expression <code>if (b) 1 else x</code> is executed at staging time when <code>b</code>
+<br  />is a <code>Boolean</code>, while it is delayed causing code to be generated for
+<br  />the <code>if</code> expression when <code>b</code> is a <code>Rep[Boolean]</code> &ndash; indeed, the
+<br  />actual value of <code>b</code> is not known at staging time, but only when the
+<br  />generated code is executed.</p>
 
             </td>
         </tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>  val a =
-    A(A(1, 1, 1, 1, 1), // dense
-      A(0, 0, 0, 0, 0), // null
-      A(0, 0, 1, 0, 0), // sparse
-      A(0, 0, 0, 0, 0),
-      A(0, 0, 1, 0, 1))
+                <pre><code class='prettyprint lang-scala'>  test(&quot;1&quot;) {
+    val snippet = new DslDriver[Int,Int] {
+      //#1
+      def snippet(x: Rep[Int]) = {
+        def compute(b: Boolean): Rep[Int] = {
+          // the if is executed in the first stage
+          if (b) 1 else x
+        }
+        compute(true)+compute(1==1)
+      }
+      //#1
+    }
+    assert(snippet.eval(0) === 2)
+    check(&quot;1&quot;, snippet.code)    
+  }
 
+
+  test(&quot;2&quot;) {
+    val snippet = new  DslDriver[Int,Int] {
+      //#2
+      def snippet(x: Rep[Int]) = {
+        def compute(b: Rep[Boolean]): Rep[Int] = {
+          // the if is deferred to the second stage
+          if (b) 1 else x
+        }
+        compute(x==1)
+      }
+      //#2
+    }
+    assert(snippet.eval(2) === 2)
+    check(&quot;2&quot;, snippet.code)
+  }
 </code></pre>
             </td>
         </tr>
@@ -272,36 +312,14 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
-                <h2>STEP 0: starting point</h2>
-<p>We start with a fully static implementation.</p>
+                <pre><code>  .. includecode:: ../out/dslapi1.check.scala
+  .. includecode:: ../out/dslapi2.check.scala
+</code></pre>
 
             </td>
         </tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1a&quot;) {
-
-    def matrix_vector_prod(a: Array[Array[Int]], v: Array[Int]) = {
-      val n = a.length
-      val v1 = new Array[Int](n)
-
-      for (i &lt;- (0 until n)) {
-        for (j &lt;- (0 until n)) {
-          v1(i) = v1(i) + a(i)(j) * v(j)
-        }
-      }
-      v1
-    }
-
-    // let's run it on some static input:
-
-    val v = A(1,1,1,1,1)
-
-    val v1 = matrix_vector_prod(a, v)
-    val result = v1.mkString(&quot;,&quot;)
-
-    check(&quot;shonan-hmm1a&quot;, result)
-  }
-</code></pre>
+                <pre><code class='prettyprint lang-scala'></code></pre>
             </td>
         </tr>
         
@@ -310,31 +328,35 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
-                <h2>STEP 0.5: static vs dynamic conditional</h2>
-<p>Now we're adding some basic codegen facilities and play
-<br  />with static vs dynamic expressions. Fully static expressions
-<br  />do not show up in generated code. If we change the
-<br  />condition to depend on the (dynamic) input array, an if/else
-<br  />statement will be generated.</p>
+                <h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
+<p>In the previous snippets, we already notice some <em>abstraction without
+<br  />regret</em>: the <code>compute</code> function exists only at staging time, and is
+<br  />not part of the generated code &ndash; more generally, we can freely use
+<br  />abstractions to structure and compose the staged program, but these
+<br  />abstractions are not part of the generated code when their type is a
+<br  />bare <code>T</code> as opposed of a <code>Rep[T]</code>. In the right snippet,
+<br  /><code>compute</code> has the type <code>Rep[Boolean] =&gt; Rep[Int]</code>, not
+<br  /><code>Rep[Boolean =&gt; Int]</code> &ndash; its type already tells us that the function
+<br  />is known at staging time.</p>
 
             </td>
         </tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1b&quot;) {
-    val snippet = new DslDriver[Array[Int],Array[Int]] {
-      def snippet(v: Rep[Array[Int]]) = {
-
-        val x = 100 - 5 //* v0.length
-
-        if (x &gt; 10) {
-          println(&quot;hello&quot;)
-        }
-
-        v
+                <pre><code class='prettyprint lang-scala'>  test(&quot;power&quot;) {
+    val snippet = new DslDriver[Int,Int] {
+      //#power
+      def power(b: Rep[Int], x: Int): Rep[Int] = {
+        if (x == 0) 1
+        else b * power(b, x-1)
       }
+      def snippet(b: Rep[Int]) =
+        power(b, 3)
+      //#power
     }
-    check(&quot;shonan-hmm1b&quot;, snippet.code)
+    assert(snippet.eval(2) === 8)
+    check(&quot;power&quot;, snippet.code)
   }
+
 
 </code></pre>
             </td>
@@ -345,53 +367,41 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h2>STEP 1: Staging the matrix vector product</h2>
-<p>We want to change the mv prod function to take a dynamic vector
-<br  />and a static matrix. We move it into the DslDriver trait so
-<br  />it can use Rep.</p>
-<p>We generate nested loops by default (Rep[Range]). To make that
-<br  />work, we need to lift the static matrix to a Rep value. We
-<br  />do that using <code>staticData</code>.</p>
-<p>Now we can play with the loops shapes: Range loops are computed
-<br  />statically, i.e. unrolled at staging time. Rep[Range] loops cause
-<br  />generation of loop code.</p>
-<p>We can make unrolling decisions in a very fine-grained manner:
-<br  />for dense rows we want to generate a loop, for sparse rows
-<br  />we want to unroll. We just add a condition <code>sparse</code> and
-<br  />either do a Range or Rep[Range] loop.</p>
+                <h3>Rep[Range] vs Range</h3>
+<p>Loops can be unrolled in the first stage, or be generated as loops in
+<br  />the second stage, driven by the type of their condition.</p>
 
             </td>
         </tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1c&quot;) {
-    val snippet = new DslDriver[Array[Int],Array[Int]] {
-      def snippet(v: Rep[Array[Int]]) = {
-
-        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
-          val n = a0.length
-          val a = staticData(a0)
-          val v1 = NewArray[Int](n)
-
-          for (i &lt;- (0 until n):Range) {
-            val sparse = a0(i).count(_ != 0) &lt; 3
-            if (sparse) {
-              for (j &lt;- (0 until n):Range) {
-                v1(i) = v1(i) + a(i).apply(j) * v(j)
-              }
-            } else {                  
-              for (j &lt;- (0 until n):Rep[Range]) {
-                v1(i) = v1(i) + a(i).apply(j) * v(j)
-              }
+                <pre><code class='prettyprint lang-scala'>  test(&quot;range1&quot;) {
+    val snippet = new DslDriver[Int,Unit] {
+      def snippet(x: Rep[Int]) = {
+        comment(&quot;for&quot;, verbose = false) {
+          //#range1
+          for (i &lt;- (0 until 3): Range) {
+            println(i)
           }
-          }
-          v1
+          //#range1
         }
-
-        val v1 = matrix_vector_prod(a, v)
-        v1
       }
     }
-    check(&quot;shonan-hmm1c&quot;, snippet.code)
+    check(&quot;range1&quot;, snippet.code)
+  }
+
+  test(&quot;range2&quot;) {
+    val snippet = new DslDriver[Int,Unit] {
+      def snippet(x: Rep[Int]) = {
+        comment(&quot;for&quot;, verbose = false) {
+          //#range2
+          for (i &lt;- (0 until x): Rep[Range]) {
+            println(i)
+          }
+          //#range2
+        }
+      }
+    }
+    check(&quot;range2&quot;, snippet.code)
   }
 
 </code></pre>
@@ -403,56 +413,148 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
-                <h2>STEP 2: Conditional unrolling</h2>
-<p>The code duplication of the loop body above is not very nice.
-<br  />fortunately, we can create arbitrary staging-time abstractions.
-<br  />We create an auxiliary method unrollIf that captures the
-<br  />conditional unrolling pattern in a general way.
-<br  />The mv prod function no longer needs to express the loop
-<br  />body twice.</p>
-<p>The generated code is identical. &ldquo;abstraction without regret&rdquo; ftw!</p>
+                <pre><code>  .. includecode:: ../out/dslapirange1.check.scala
+     :include: for
+  .. includecode:: ../out/dslapirange2.check.scala
+     :include: for
+</code></pre>
 
             </td>
         </tr><tr>
             <td class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm1d&quot;) {
+                <pre><code class='prettyprint lang-scala'></code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_6">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_6">&#182;</a>
+                </div>
+                <h3>Shonan Challenge</h3>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm&quot;) {
     val snippet = new DslDriver[Array[Int],Array[Int]] {
-      def snippet(v: Rep[Array[Int]]) = {
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_7">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_7">&#182;</a>
+                </div>
+                <p>With this fine-grain control, conditional loop unrolling can be
+<br  />implemented at the DSL user level.</p>
 
-        def unrollIf(c:Boolean,r: Range) = new { def foreach(f: Rep[Int] =&gt; Rep[Unit]) = {
-          if (c) {
-            for (j &lt;- (r.start until r.end):Range) {
-              f(j)
-            }
-          } else {                  
-            for (j &lt;- (r.start until r.end):Rep[Range]) {
-              f(j)
-            }
-          }
-        }}
-
-        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
-          val n = a0.length
-          val a = staticData(a0)
-          val v1 = NewArray[Int](n)
-
-          for (i &lt;- (0 until n):Range) {
-            val sparse = a0(i).count(_ != 0) &lt; 3
-            for (j &lt;- unrollIf(sparse, 0 until n)) {
-              v1(i) = v1(i) + a(i).apply(j) * v(j)
-            }
-          }
-          v1
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>      //#unrollIf
+      def unrollIf(range: Range)(cond: Boolean) = new {
+        def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+          if (cond) for (i &lt;- range) f(i)
+          else for (i &lt;- (range.start until range.end): Rep[Range]) f(i)
         }
+      }
+      //#unrollIf
 
-        val v1 = matrix_vector_prod(a, v)
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_8">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_8">&#182;</a>
+                </div>
+                <p>We can use this conditional loop unrolling to optimize multiplying a
+<br  />matrix known at staging time with a vector. For example, consider a
+<br  />matrix with a mix of dense and sparse rows:</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>      val A = scala.Array
+      val a =
+        //#ex-a
+        A(A(1, 1, 1, 1, 1), // dense
+          A(0, 0, 0, 0, 0), // null
+          A(0, 0, 1, 0, 0), // sparse
+          A(0, 0, 0, 0, 0),
+          A(0, 0, 1, 0, 1))
+        //#ex-a
+
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_9">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_9">&#182;</a>
+                </div>
+                <p>When scanning the columns, we would like to generate a loop for the
+<br  />dense row, and unroll the loop for the sparse rows.</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>      def infix_at(a: Array[Array[Int]], i: Int, j: Rep[Int]): Rep[Int] = {
+        (staticData(a(i)) apply j)
+      }
+
+      def sparse(ai: Array[Int]): Boolean = {
+        ai.filter(_ != 0).length &lt; 3
+      }
+
+      //#matrix_vector_prod
+      def matrix_vector_prod(a: Array[Array[Int]], v: Rep[Array[Int]]) = {
+        val n = a.length
+        val v1 = NewArray[Int](n)
+        for (i &lt;- 0 until n: Range) {
+          comment(&quot;row_&quot; + i) {
+            for (j &lt;- unrollIf(0 until n)(sparse(a(i)))) {
+              v1(i) = v1(i) + a.at(i, j) * v(j)
+            }
+          }
+        }
         v1
       }
+      //#matrix_vector_prod
+
+      def snippet(v: Rep[Array[Int]]) = {
+        matrix_vector_prod(a, v)
+      }
     }
-    check(&quot;shonan-hmm1d&quot;, snippet.code)
+    check(&quot;shonan-hmm&quot;, snippet.code)
   }
 
-}
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_10">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_10">&#182;</a>
+                </div>
+                <p>Let's compare the code generated for a dense vs sparse row.</p>
+<pre><code>  .. includecode:: ../out/dslapishonan-hmm.check.scala
+     :include: row_0
+  .. includecode:: ../out/dslapishonan-hmm.check.scala
+     :include: row_2
+</code></pre>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>}
+
 </code></pre>
             </td>
         </tr>

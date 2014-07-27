@@ -87,13 +87,14 @@
             outline: 0;
         }
         td.docs, th.docs {
-            max-width: 450px;
+            min-width: 600px;
+            /*max-width: 450px;
             min-width: 450px;
-            min-height: 5px;
+            min-height: 5px;*/
             padding: 10px 25px 1px 50px;
-            overflow-x: hidden;
+            /*overflow-x: hidden;*
             vertical-align: top;
-            text-align: left;
+            text-align: left;*/
         }
         .docs pre {
             margin: 15px 0 15px;
@@ -150,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        Jump To &hellip;
+        dslapi.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -186,6 +187,10 @@
                     sre.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
                     stencil.html
                 </a>
@@ -200,12 +205,12 @@
 
     <table cellpadding="0" cellspacing="0">
         <thead>
-        <tr>
+        <!--<tr>
             <th class="docs">
                 <h1>dslapi.scala</h1>
             </th>
             <th class="code"></th>
-        </tr>
+        </tr>-->
         </thead>
         <tbody>
         
@@ -215,7 +220,8 @@
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
                 
-            </td></tr><tr>
+            </td>
+        </tr><tr>
             <td class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
@@ -292,140 +298,6 @@ abstract class DslDriver[A:Manifest,B:Manifest] extends DslSnippet[A,B] with Dsl
     val source = new java.io.StringWriter()
     codegen.emitSource(snippet, &quot;Snippet&quot;, new java.io.PrintWriter(source))
     source.toString
-  }
-}
-class DslApiTest extends TutorialFunSuite {
-  val under = &quot;dslapi&quot;
-  test(&quot;1&quot;) {
-    val snippet = new DslDriver[Int,Int] {
-      //#1
-      def snippet(x: Rep[Int]) = {
-        def compute(b: Boolean): Rep[Int] = {
-          // the if is executed in the first stage
-          if (b) 1 else x
-        }
-        compute(true)+compute(1==1)
-      }
-      //#1
-    }
-    assert(snippet.eval(0) === 2)
-    check(&quot;1&quot;, snippet.code)
-  }
-
-  test(&quot;2&quot;) {
-    val snippet = new  DslDriver[Int,Int] {
-      //#2
-      def snippet(x: Rep[Int]) = {
-        def compute(b: Rep[Boolean]): Rep[Int] = {
-          // the if is deferred to the second stage
-          if (b) 1 else x
-        }
-        compute(x==1)
-      }
-      //#2
-    }
-    assert(snippet.eval(2) === 2)
-    check(&quot;2&quot;, snippet.code)
-  }
-
-  test(&quot;power&quot;) {
-    val snippet = new DslDriver[Int,Int] {
-      //#power
-      def power(b: Rep[Int], x: Int): Rep[Int] = {
-        if (x == 0) 1
-        else b * power(b, x-1)
-      }
-      def snippet(b: Rep[Int]) =
-        power(b, 3)
-      //#power
-    }
-    assert(snippet.eval(2) === 8)
-    check(&quot;power&quot;, snippet.code)
-  }
-
-  test(&quot;range1&quot;) {
-    val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range1
-          for (i &lt;- (0 until 3): Range) {
-            println(i)
-          }
-          //#range1
-        }
-      }
-    }
-    check(&quot;range1&quot;, snippet.code)
-  }
-
-  test(&quot;range2&quot;) {
-    val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range2
-          for (i &lt;- (0 until x): Rep[Range]) {
-            println(i)
-          }
-          //#range2
-        }
-      }
-    }
-    check(&quot;range2&quot;, snippet.code)
-  }
-
-
-
-  // @namin: leaving this in place for the moment in case sphinx depends on it.
-
-  test(&quot;shonan-hmm&quot;) {
-    val snippet = new DslDriver[Array[Int],Array[Int]] {
-      //#unrollIf
-      def unrollIf(range: Range)(cond: Boolean) = new {
-        def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-          if (cond) for (i &lt;- range) f(i)
-          else for (i &lt;- (range.start until range.end): Rep[Range]) f(i)
-        }
-      }
-      //#unrollIf
-      val A = scala.Array
-
-      val a =
-        //#ex-a
-        A(A(1, 1, 1, 1, 1), // dense
-          A(0, 0, 0, 0, 0), // null
-          A(0, 0, 1, 0, 0), // sparse
-          A(0, 0, 0, 0, 0),
-          A(0, 0, 1, 0, 1))
-        //#ex-a
-
-      def infix_at(a: Array[Array[Int]], i: Int, j: Rep[Int]): Rep[Int] = {
-        (staticData(a(i)) apply j)
-      }
-
-      def sparse(ai: Array[Int]): Boolean = {
-        ai.filter(_ != 0).length &lt; 3
-      }
-
-      //#matrix_vector_prod
-      def matrix_vector_prod(a: Array[Array[Int]], v: Rep[Array[Int]]) = {
-        val n = a.length
-        val v1 = NewArray[Int](n)
-        for (i &lt;- 0 until n: Range) {
-          comment(&quot;row_&quot; + i) {
-            for (j &lt;- unrollIf(0 until n)(sparse(a(i)))) {
-              v1(i) = v1(i) + a.at(i, j) * v(j)
-            }
-          }
-        }
-        v1
-      }
-      //#matrix_vector_prod
-
-      def snippet(v: Rep[Array[Int]]) = {
-        matrix_vector_prod(a, v)
-      }
-    }
-    check(&quot;shonan-hmm&quot;, snippet.code)
   }
 }
 </code></pre>

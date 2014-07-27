@@ -87,13 +87,14 @@
             outline: 0;
         }
         td.docs, th.docs {
-            max-width: 450px;
+            min-width: 600px;
+            /*max-width: 450px;
             min-width: 450px;
-            min-height: 5px;
+            min-height: 5px;*/
             padding: 10px 25px 1px 50px;
-            overflow-x: hidden;
+            /*overflow-x: hidden;*
             vertical-align: top;
-            text-align: left;
+            text-align: left;*/
         }
         .docs pre {
             margin: 15px 0 15px;
@@ -150,7 +151,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        Jump To &hellip;
+        ack.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -186,6 +187,10 @@
                     sre.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
                     stencil.html
                 </a>
@@ -200,12 +205,12 @@
 
     <table cellpadding="0" cellspacing="0">
         <thead>
-        <tr>
+        <!--<tr>
             <th class="docs">
                 <h1>ack.scala</h1>
             </th>
             <th class="code"></th>
-        </tr>
+        </tr>-->
         </thead>
         <tbody>
         
@@ -214,8 +219,12 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                
-            </td></tr><tr>
+                <h1>Ackermann's Function</h1>
+<p>Turning a recursive function into an automaton, i.e. a set of mutually
+<br  />recursive functions.</p>
+
+            </td>
+        </tr><tr>
             <td class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
@@ -237,15 +246,25 @@ class AckermannTest extends TutorialFunSuite {
   def specialize(m: Int): DslDriver[Int,Int] = new DslDriver[Int,Int] with Ackermann {
     def snippet(n: Rep[Int]): Rep[Int] = a(m)(n)
   }
-/*
-  Example due to Neil Jones, via Oleg on LtU (http://lambda-the-ultimate.org/node/4039#comment-61431)
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_1">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <p>Example due to Neil Jones, via Oleg on LtU (http://lambda-the-ultimate.org/node/4039#comment-61431)</p>
+<p>ack(2,n) should specialize to:</p>
+<p>ack_2(n) =  if n=0 then ack_1(1) else  ack_1(ack_2(n-1))
+<br  />ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))
+<br  />ack_0(n) =  n+1</p>
 
-  ack(2,n) should specialize to:
-
-  ack_2(n) =  if n=0 then ack_1(1) else  ack_1(ack_2(n-1))
-  ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))
-  ack_0(n) =  n+1
-  test(&quot;specialize ackermann to m=2&quot;) {
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;specialize ackermann to m=2&quot;) {
     val ack2 = specialize(2)
     check(&quot;m2&quot;, ack2.code)
   }
