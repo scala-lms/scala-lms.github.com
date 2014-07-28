@@ -175,6 +175,10 @@
                     index.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/main.html">
+                    main.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
                     re.html
                 </a>
@@ -277,18 +281,6 @@ trait SlidingExp extends DslExp with Sliding {
     case _ =&gt; super.int_minus(lhs,rhs)
   }).asInstanceOf[Exp[Int]]
 
-  override def numeric_plus[T:Numeric:Manifest](lhs: Exp[T], rhs: Exp[T])(implicit pos: SourceContext): Exp[T] = ((lhs,rhs) match {
-    case (Def(NumericPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_plus(x, unit(y+z)) // (x+y)+z --&gt; x+(y+z)
-    case (Def(NumericMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_minus(x, unit(y-z)) // (x-y)+z --&gt; x-(y-z)
-    case _ =&gt; super.numeric_plus(lhs,rhs)
-  }).asInstanceOf[Exp[T]]
-
-  override def numeric_minus[T:Numeric:Manifest](lhs: Exp[T], rhs: Exp[T])(implicit pos: SourceContext): Exp[T] = ((lhs,rhs) match {
-    case (Def(NumericMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_minus(x, unit(y+z)) // (x-y)-z --&gt; x-(y+z)
-    case (Def(NumericPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; numeric_plus(x, unit(y-z)) // (x+y)-z --&gt; x+(y-z)
-    case _ =&gt; super.numeric_minus(lhs,rhs)
-  }).asInstanceOf[Exp[T]]
-    
   def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
     val i = fresh[Int]
 
