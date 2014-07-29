@@ -267,11 +267,10 @@
 </ol>
 <p><a name="sec:221"></a></p>
 <h1>Generative Programming Basics</h1>
-<p>Previous staging approaches either work directly with strings that
-<br  />represent concrete program syntax or make use of quasiquoting to
-<br  />compose abstract syntax trees. We examine both approaches in turn,
-<br  />with an eye on how linguistic reuse improves productivity and
-<br  />safety for the multi-stage programmer.</p>
+<p>Previous staging approaches either work directly with strings that represent
+<br  />concrete program syntax or make use of quasiquoting to compose abstract syntax
+<br  />trees. We examine both approaches in turn, with an eye on how linguistic reuse
+<br  />improves productivity and safety for the multi-stage programmer.</p>
 <h2>Program Generation with Strings</h2>
 <p>As a simple example, let us turn the power function:</p>
 <pre><code>def power(b: Double, n: Int): Double = 
@@ -284,114 +283,103 @@
 <p>As result of an invocation we obtain:</p>
 <pre><code>power("x",4) // "(x * (x * (x * (x * 1.0)))"
 </code></pre>
-<p>However there is a problem: We can produce arbitrary strings that might not be valid code.
-<br  />It is very easy to make subtle mistakes:</p>
+<p>However there is a problem: We can produce arbitrary strings that might not be
+<br  />valid code.  It is very easy to make subtle mistakes:</p>
 <pre><code>def power(b: String, n: Int): String = 
   if (n == 0) "1.0" else "b * " + power(b, n - 1) + ")"
 </code></pre>
-<p>We have accidentally omitted a parenthesis, so the result is not syntactically well
-<br  />formed code. Furthermore, the literal identifier \code{b} is part of the output:</p>
+<p>We have accidentally omitted a parenthesis, so the result is not syntactically
+<br  />well formed code. Furthermore, the literal identifier <code>b</code> is part of the
+<br  />output:</p>
 <pre><code>power("x",4) // "b * b * b * b * 1.0)))"
 </code></pre>
 <p>This code will not compile and even if we fix the syntax, the code is no
-<br  />longer well scoped. The free
-<br  />identifier <code>b</code> can lead to variable capture when the code is
-<br  />spliced in somewhere else.</p>
-<p>We have seen two problems, syntax correctness and scope correctness.
-<br  />Two other problems are type correctness and value correctness.
-<br  />If we cannot guarantee to generate valid programs, we can
-<br  />much less guarantee that programs are well-typed or compute
-<br  />correct results.</p>
+<br  />longer well scoped. The free  identifier <code>b</code> can lead to variable capture when
+<br  />the code is  spliced in somewhere else.</p>
+<p>We have seen two problems, syntax correctness and scope correctness.  Two
+<br  />other problems are type correctness and value correctness. If we cannot
+<br  />guarantee to generate valid programs, we can much less guarantee that programs
+<br  />are well-typed or compute correct results.</p>
 <p><a name="sec:220quasi"></a></p>
 <h2>Program Generation with Quasi-Quotes</h2>
-<p>Strings model concrete syntax, but we can also use abstract
-<br  />syntax. This idea is inspired by Lisp's ''''code as data'' model.
-<br  />We start with a slightly more convenient string notation, denoted by
-<br  /><code>s"..."</code> quotes:</p>
+<p>Strings model concrete syntax, but we can also use abstract syntax. This idea
+<br  />is inspired by Lisp's ''''code as data'' model.  We start with a slightly more
+<br  />convenient string notation, denoted by <code>s"..."</code> quotes:</p>
 <pre><code>def power(b: String, n: Int): String = 
   if (n == 0) s"1.0" else s"($b * ${ power(b, n - 1) })"
 </code></pre>
-<p>The notation <code>${ ... }</code> denotes a hole in the string, to be filled by
-<br  />the string result of evaluating the enclosed expression.</p>
-<p>The same idea applies to abstract syntax. Let <code>[[ ... ]]</code>
-<br  />denote the AST of the enclosed expression, and let <code>Tree</code> be
-<br  />the type of AST nodes. Holes will require
-<br  />an expression of type <code>Tree</code>:</p>
+<p>The notation <code>${ ... }</code> denotes a hole in the string, to be filled by the
+<br  />string result of evaluating the enclosed expression.</p>
+<p>The same idea applies to abstract syntax. Let <code>[[ ... ]]</code> denote the AST of
+<br  />the enclosed expression, and let <code>Tree</code> be the type of AST nodes. Holes will
+<br  />require an expression of type <code>Tree</code>:</p>
 <pre><code>def power(b: Tree, n: Int): Tree = 
   if (n == 0) [[ 1.0 ]] else [[$b * ${ power(b, n - 1) } ]]"
 </code></pre>
 <p>Now we have a program generator that assembles AST nodes.</p>
 <h2>Syntactic Correctness through Deep Reuse of Syntax</h2>
-<p>The multi-stage language compiler parses the whole program and builds
-<br  />ASTs for all expressions, quoted or not, at once. Thus we obtain syntax
-<br  />correctness.
-<br  />However the multi-stage language compiler must know about the syntax
-<br  />of the object language. This is trivial if meta-language and
-<br  />object language are the same. Otherwise it is slightly more difficult
+<p>The multi-stage language compiler parses the whole program and builds  ASTs
+<br  />for all expressions, quoted or not, at once. Thus we obtain syntax
+<br  />correctness. However the multi-stage language compiler must know about the
+<br  />syntax of the object language. This is trivial if meta-language and object
+<br  />language are the same. Otherwise it is slightly more difficult
 <br  /><a href="mainland07quasiquoting">(*)</a>.</p>
-<p>The \code{Tree} type can be left abstract. Some implementations
-<br  />hide the exact data structures to guarantee safety of optimizations
-<br  />on object code. Silently modifying trees with rewrites that
-<br  />maintain semantic but not structural equality (e.g.\ beta reduction)
-<br  />can change the behavior of programs that inspect the
-<br  />tree structure <a href="DBLP:conf/pepm/Taha00">(*)</a>. In general, optimizations should
-<br  />not change the result of a program.</p>
+<p>The <code>Tree</code> type can be left abstract. Some implementations  hide the exact
+<br  />data structures to guarantee safety of optimizations on object code. Silently
+<br  />modifying trees with rewrites that  maintain semantic but not structural
+<br  />equality (e.g. beta reduction) can change the behavior of programs that
+<br  />inspect the tree structure <a href="DBLP:conf/pepm/Taha00">(*)</a>. In general,
+<br  />optimizations should not change the result of a program.</p>
 <h2>Scope Correctness through Deep Reuse of Scope</h2>
-<p>The multi-stage compiler can bind identifiers at the definition
-<br  />site of the quote. This avoids variable capture and ensures
-<br  />scope correctness (hygiene).</p>
-<p>Another possible issue is \emph{scope extrusion}. This happens when
-<br  />a variable bound in quoted code escapes through a hole:</p>
+<p>The multi-stage compiler can bind identifiers at the definition site of the
+<br  />quote. This avoids variable capture and ensures scope correctness (hygiene).</p>
+<p>Another possible issue is <em>scope extrusion</em>. This happens when a variable
+<br  />bound in quoted code escapes through a hole:</p>
 <pre><code>var x: Tree;
 $[[$ val y = 7; $\$${ x = y }$]]$
 </code></pre>
 <p>Scope extrusion can be prevented by appropriate type systems
-<br  /><a href="DBLP:conf/pldi/WestbrookRIYAT10,DBLP:conf/pepm/KameyamaKS09">(*)</a>,
-<br  />which are beyond the scope of this thesis.
-<br  />Scope extrusion is a real problem for code generators
-<br  />that imperatively manage staged program fragments.
-<br  />For generators expressed in a functional style it it
-<br  />far less of an issue, regardless of whether the
-<br  />object program uses effects or not.</p>
+<br  /><a href="DBLP:conf/pldi/WestbrookRIYAT10,DBLP:conf/pepm/KameyamaKS09">(*)</a>, which are
+<br  />beyond the scope of this thesis. Scope extrusion is a real problem for code
+<br  />generators that imperatively manage staged program fragments. For generators
+<br  />expressed in a functional style it it far less of an issue, regardless of
+<br  />whether the object program uses effects or not.</p>
 <h2>Type Correctness through Deep Reuse of Types</h2>
-<p>With syntax and scoping out of the way, we turn our attention
-<br  />to type correctness. Fortunately, type correctness falls out
-<br  />naturally if parametric types are available. We just replace
-<br  />type \code{Tree} with \code{Tree[T]}:</p>
+<p>With syntax and scoping out of the way, we turn our attention to type
+<br  />correctness. Fortunately, type correctness falls out naturally if parametric
+<br  />types are available. We just replace type <code>Tree</code> with <code>Tree[T]</code>:</p>
 <pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = 
 </code></pre>
-<p>Now the type system ensures that \code{power} is only
-<br  />applied to AST nodes that compute \code{Double} values
-<br  />in the next stage.</p>
-<p>Note that the use of parametric types alone does not prevent scope
-<br  />extrusion, which can also be seen as a type error in the sense of
-<br  />a well-typed multi-stage program ''going wrong'' <a href="DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03">(*)</a>.
-<br  />Thus we do not obtain a guarantee that \emph{all}
-<br  />generated programs type check, but the slightly weaker assurance
-<br  />that all generated programs that are well-formed are also type
-<br  />correct.</p>
+<p>Now the type system ensures that <code>power</code> is only applied to AST nodes that
+<br  />compute <code>Double</code> values in the next stage.</p>
+<p>Note that the use of parametric types alone does not prevent scope extrusion,
+<br  />which can also be seen as a type error in the sense of a well-typed multi-
+<br  />stage program ''going wrong''
+<br  /><a href="DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03">(*)</a>.  Thus we do not obtain
+<br  />a guarantee that <em>all</em>  generated programs type check, but the slightly
+<br  />weaker assurance  that all generated programs that are well-formed are also
+<br  />type  correct.</p>
 <h2>Value Correctness is an Open Problem</h2>
 <p><a name="sec:221valcorr"></a></p>
-<p>The remaining big problem is what we (somewhat vaguely) call \emph{value correctness}
-<br  />or more generally preservation of program semantics:
-<br  />How can we be reasonably certain that a program computes the same result after
-<br  />adding staging annotations?
-<br  />We cannot expect a strong guarantee in all cases for reasons of
-<br  />nontermination but what is troubling is that there are many practical cases
-<br  />where staging annotations change a program's behavior quite drastically.
-<br  />This fact is well documented in the literature [(*)](techreport/EckhardtKSTK04,DBLP:journals/scp/CohenDGHKP06,
-<br  />DBLP:conf/gpce/CaretteK05,DBLP:conf/pepm/SwadiTKP06,DBLP:conf/esop/InoueT12).</p>
-<p>The problem manifests itself both with strings and with trees.
-<br  />The root cause is that both approaches are based on syntactic
-<br  />expansion, irrespective of semantics such as order of execution.</p>
+<p>The remaining big problem is what we (somewhat vaguely) call <em>value
+<br  />correctness</em> or more generally preservation of program semantics:  How can we
+<br  />be reasonably certain that a program computes the same result after adding
+<br  />staging annotations?  We cannot expect a strong guarantee in all cases for
+<br  />reasons of  nontermination but what is troubling is that there are many
+<br  />practical cases  where staging annotations change a program's behavior quite
+<br  />drastically. This fact is well documented in the literature
+<br  /><a href="techreport/EckhardtKSTK04,DBLP:journals/scp/CohenDGHKP06,DBLP:conf/gpce/CaretteK05,DBLP:conf/pepm/SwadiTKP06,DBLP:conf/esop/InoueT12">(*)</a>.</p>
+<p>The problem manifests itself both with strings and with trees. The root cause
+<br  />is that both approaches are based on syntactic expansion, irrespective of
+<br  />semantics such as order of execution.</p>
 <p>Using the regular, unstaged power implementation:</p>
 <pre><code>def power(b: Double, n: Int): Double = ...
 
 val x = computeA()       // computeA executed here
 power(computeB() + x, 4) // computeB executed before calling power (cbv)
 </code></pre>
-<p>Both compute functions will be executed once, in order.
-<br  />Afterwards, power will be applied to the result.</p>
+<p>Both compute functions will be executed once, in order. Afterwards, power will
+<br  />be applied to the result.</p>
 <p>Let us compare this with the staged implementation:</p>
 <pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = ...
 
@@ -404,20 +392,18 @@ power($[[$computeB() + $\$$x$]]$, 4)
   ((computeB() + computeA()) *
    ((computeB() + computeA()) * 1.0))))"
 </code></pre>
-<p>In this case, the computation has been duplicated $n$ times and
-<br  />the order of the function calls has been reversed.
-<br  />Effectively we ignore all
-<br  />bindings and follow a call-by-name policy even though power
-<br  />declares its arguments as call-by-value. If either of the compute
-<br  />functions depends on side effects the staged function computation will
-<br  />produce a very different result. Imagine for example:</p>
+<p>In this case, the computation has been duplicated $n$ times and  the order of
+<br  />the function calls has been reversed.  Effectively we ignore all bindings and
+<br  />follow a call-by-name policy even though power declares its arguments as call-
+<br  />by-value. If either of the compute functions depends on side effects the
+<br  />staged function computation will produce a very different result. Imagine for
+<br  />example:</p>
 <pre><code>def computeA() = readNextInputValue()
 </code></pre>
 <p>We clearly want to read only one value, not four.</p>
-<p>Even if both functions are
-<br  />pure, it will be much more expensive to compute the result.
-<br  />If we applied staging to obtaining better performance we have
-<br  />not achieved our goal.</p>
+<p>Even if both functions are pure, it will be much more expensive to compute the
+<br  />result. If we applied staging to obtaining better performance we have not
+<br  />achieved our goal.</p>
 <p>As another example, let us switch to a better algorithm:</p>
 <pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = 
   if (n == 0) $[[$ 1.0 $]]$
@@ -427,123 +413,115 @@ power($[[$computeB() + $\$$x$]]$, 4)
 <p>Result:</p>
 <pre><code>power($[[$x$]]$) // (((x*1.0)*(x*1.0))*((x*1.0)*(x*1.0)))
 </code></pre>
-<p>Staging has turned the more efficient algorithm into a less
-<br  />efficient one. This effect of staging undoing binding and memoization
-<br  />is widely known <a href="DBLP:conf/pepm/SwadiTKP06,techreport/EckhardtKSTK04">(*)</a>.</p>
+<p>Staging has turned the more efficient algorithm into a less efficient one.
+<br  />This effect of staging undoing binding and memoization is widely known
+<br  /><a href="DBLP:conf/pepm/SwadiTKP06,techreport/EckhardtKSTK04">(*)</a>.</p>
 <h2>Let Insertion as a Remedy</h2>
-<p>One way of fixing the order of staged expressions is to insert
-<br  />let-bindings in strategic places. This is frequently done by
-<br  />separate front ends. Staging effectively becomes an
-<br  />''assembly language'' for code generation.
-<br  />The front end can assemble pieces of generated code using
-<br  />explicit side effects, or the code generators are written
-<br  />in monadic style or continuation passing style (CPS), in
-<br  />which case the monadic bind operation will insert let-bindings
-<br  />to maintain the desired evaluation order <a href="DBLP:conf/pepm/SwadiTKP06">(*)</a>.
-<br  />Effectful code generators are much more likely to cause
-<br  />scope extrusion. Explicit monadic style or CPS complicate
-<br  />code generators a lot. This dilemma is described as an ''agonizing trade-off'', due to which one
-<br  />''cannot achieve clarity, safety, and efficiency at the same time'' <a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.
-<br  />Only very recently have type-systems been devised to handle both staging and
-<br  />effects <a href="DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>.
+<p>One way of fixing the order of staged expressions is to insert let-bindings in
+<br  />strategic places. This is frequently done by separate front ends. Staging
+<br  />effectively becomes an ''assembly language'' for code generation.  The front
+<br  />end can assemble pieces of generated code using explicit side effects, or the
+<br  />code generators are written in monadic style or continuation passing style
+<br  />(CPS), in which case the monadic bind operation will insert let-bindings to
+<br  />maintain the desired evaluation order <a href="DBLP:conf/pepm/SwadiTKP06">(*)</a>.
+<br  />Effectful code generators are much more likely to cause scope extrusion.
+<br  />Explicit monadic style or CPS complicate code generators a lot. This dilemma
+<br  />is described as an ''agonizing trade-off'', due to which one ''cannot achieve
+<br  />clarity, safety, and efficiency at the same time''
+<br  /><a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>. Only very recently have type-systems been
+<br  />devised to handle both staging and effects
+<br  /><a href="DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>.
 <br  />They are not excessively restrictive but not without restrictions either.
-<br  />Mint <a href="DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>,
-<br  />a multi-stage extension of Java, restricts non-local operations within escapes
-<br  />to final classes which excludes much of the standard Java library.
-<br  />Languages that support both staging
-<br  />and first class delimited continuations can mitigate this
-<br  />overhead but front ends that encapsulate the staging
-<br  />primitives are still needed <a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.</p>
-<p>In the partial evaluation community, specialization of effectful programs
-<br  />has been achieved by inserting let-bindings eagerly for each effectful
-<br  />statement <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>,
-<br  />achieving on-the-fly conversion to administrative normal form
-<br  />(ANF, <a href="DBLP:conf/pldi/FlanaganSDF93">(*)</a>.
-<br  />As we will show below, a simplified variant of this approach naturally
-<br  />extends to staging with and without quasiquotes.</p>
+<br  />Mint <a href="DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>, a multi-stage extension of Java,
+<br  />restricts non-local operations within escapes  to final classes which excludes
+<br  />much of the standard Java library. Languages that support both staging  and
+<br  />first class delimited continuations can mitigate this overhead but front ends
+<br  />that encapsulate the staging  primitives are still needed
+<br  /><a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.</p>
+<p>In the partial evaluation community, specialization of effectful programs has
+<br  />been achieved by inserting let-bindings eagerly for each effectful  statement
+<br  /><a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>, achieving on-the-fly
+<br  />conversion to administrative normal form  (ANF,
+<br  /><a href="DBLP:conf/pldi/FlanaganSDF93">(*)</a>. As we will show below, a simplified
+<br  />variant of this approach naturally  extends to staging with and without
+<br  />quasiquotes.</p>
 <h1>The LMS Way</h1>
 <p><a name="sec:222"></a></p>
-<p>We first show how to maintain value correctness through deep reuse
-<br  />of evaluation order. The key idea is similar to that employed in
-<br  />partial evaluation <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>
-<br  />and applies to both quasiquoting and
-<br  />LMS. Our presentation differs from the partial evaluation literature in
-<br  />that it is independent of any partial evaluation mechanics such as CPS
-<br  />conversion and expressed in a simple, purely operational way.
-<br  />Continuing with quasiquoting, we show how we can remove
-<br  />syntactic overhead and arrive at a more restricted object language
-<br  />by providing a typed API over staged \code{Rep[T]} values
-<br  />that hides the internal implementation.
-<br  />At this point, quasiquoting becomes an implementation detail
-<br  />that is no longer strictly needed because the higher level
-<br  />object language interface has taken over most of the staging
-<br  />guarantees. Staging can be implemented as a library, without
-<br  />specific language support. Linguistic reuse is
-<br  />enabled by lifting operations from type \code{T} to \code{Rep[T]}.
-<br  />The object language can be
-<br  />divided into reusable components. Since there is only a single
-<br  />shared \code{Rep[T]} type, no layerings or translations
-<br  />between components are necessary.
-<br  />Deep reuse of type inference enables a form of semi-automatic local BTA
-<br  />since method overloading will select either staged or unstaged operations
-<br  />depending on the types. In many cases, methods can be staged by just
-<br  />changing their parameter types.</p>
+<p>We first show how to maintain value correctness through deep reuse of
+<br  />evaluation order. The key idea is similar to that employed in partial
+<br  />evaluation <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a> and applies to
+<br  />both quasiquoting and LMS. Our presentation differs from the partial
+<br  />evaluation literature in that it is independent of any partial evaluation
+<br  />mechanics such as CPS  conversion and expressed in a simple, purely
+<br  />operational way. Continuing with quasiquoting, we show how we can remove
+<br  />syntactic overhead and arrive at a more restricted object language by
+<br  />providing a typed API over staged <code>Rep[T]</code> values that hides the internal
+<br  />implementation. At this point, quasiquoting becomes an implementation detail
+<br  />that is no longer strictly needed because the higher level object language
+<br  />interface has taken over most of the staging guarantees. Staging can be
+<br  />implemented as a library, without  specific language support. Linguistic reuse
+<br  />is enabled by lifting operations from type <code>T</code> to <code>Rep[T]</code>. The object
+<br  />language can be divided into reusable components. Since there is only a single
+<br  />shared <code>Rep[T]</code> type, no layerings or translations between components are
+<br  />necessary.  Deep reuse of type inference enables a form of semi-automatic
+<br  />local BTA since method overloading will select either staged or unstaged
+<br  />operations depending on the types. In many cases, methods can be staged by
+<br  />just changing their parameter types.</p>
 <h2>Value Correctness through Deep Reuse of Evaluation Order</h2>
 <p><a name="sec220:evalOrder"></a></p>
 <p>The key idea is to treat quoted fragments as context-sensitive statements,
-<br  />not context-free expressions. This means that we will
-<br  />need to explicitly \textit{perform} a statement. We continue the description
-<br  />with strings as the representation type since it is the most basic.
-<br  />Performing a statement will register the side effects of this statement in the
-<br  />current context. The counterpart to \textit{perform} is \textit{accumulate}, which defines such
-<br  />a context and returns a program fragment that captures all the effects within
+<br  />not context-free expressions. This means that we will need to explicitly
+<br  /><em>perform</em> a statement. We continue the description  with strings as the
+<br  />representation type since it is the most basic.  Performing a statement will
+<br  />register the side effects of this statement in the current context. The
+<br  />counterpart to <em>perform</em> is <em>accumulate</em>, which defines such a
+<br  />context and returns a program fragment that captures all the effects within
 <br  />the context. To make sure that all code fragments are treated in this way we
 <br  />introduce the following typings:</p>
 <pre><code>type Code
 def perform(stm: String): Code
 def accumulate(res: =&gt; Code): String
 </code></pre>
-<p>Note the by-name argument of accumulate. The \code{Code} type and the method
+<p>Note the by-name argument of accumulate. The <code>Code</code> type and the method
 <br  />implementations can remain abstract for the moment.</p>
 <p>We can put perform and accumulate to use in the power example as follows:</p>
 <pre><code>def power(b: Code, n: Int): Code = 
   if (n == 0) perform("1.0") else 
   perform("(" + accumulate { b } + " * " + accumulate { power(b, n - 1) } + ")")
 </code></pre>
-<p>We define perform and accumulate in the following way to perform automatic eager
-<br  />let insertion. The private constructor \code{code} builds a \code{Code} object from a string:</p>
+<p>We define perform and accumulate in the following way to perform automatic
+<br  />eager let insertion. The private constructor <code>code</code> builds a <code>Code</code> object
+<br  />from a string:</p>
 <pre><code>accumulate { E[ perform("str") ] } 
     $\longrightarrow$ "{ val fresh = str; " + accumulate { E[ code("fresh") ] } + "}"
 accumulate { code("str") }         
     $\longrightarrow$ "str"
 </code></pre>
-<p>Where \code{E} is an accumulate-free evaluation context and \code{fresh} a fresh identifier.
-<br  />These rules can be implemented using one piece of mutable state in a
-<br  />straightforward way.</p>
+<p>Where <code>E</code> is an accumulate-free evaluation context and <code>fresh</code> a fresh
+<br  />identifier. These rules can be implemented using one piece of mutable state in
+<br  />a  straightforward way.</p>
 <p>We are reusing the execution order of the meta language: In the meta language
-<br  />we execute perform whenever we encounter an object program expression.
-<br  />If we force the object program to replay the order of the perform calls
-<br  />by inserting a let binding for each of them, we are sure to execute
-<br  />the performed statements in the right order.
-<br  />Whenever we have a hole to fill in an object program fragment, we use
-<br  />accumulate to gather all statements performed while computing the
-<br  />fragment to splice into the hole.</p>
-<p>Perform and accumulate form a reflect/reify pair that translates between
-<br  />a syntactic and a semantic layer. Alternatively, perform could be
-<br  />called reflectEffects, accumulate reifyEffects. This hints at the view
-<br  />that we are embedding perform and accumulate in the (invisible) computation
-<br  />monad of the meta language using Filinski's notion
-<br  />of monadic reflection <a href="DBLP:conf/popl/Filinski94,DBLP:conf/popl/Filinski10">(*)</a>.
-<br  />Accumulate is a left inverse of perform with respect to extensional equality ($\equiv$)
-<br  />of the generated code:</p>
+<br  />we execute perform whenever we encounter an object program expression.  If we
+<br  />force the object program to replay the order of the perform calls  by
+<br  />inserting a let binding for each of them, we are sure to execute the performed
+<br  />statements in the right order. Whenever we have a hole to fill in an object
+<br  />program fragment, we use accumulate to gather all statements performed while
+<br  />computing the fragment to splice into the hole.</p>
+<p>Perform and accumulate form a reflect/reify pair that translates between a
+<br  />syntactic and a semantic layer. Alternatively, perform could be called
+<br  />reflectEffects, accumulate reifyEffects. This hints at the view that we are
+<br  />embedding perform and accumulate in the (invisible) computation  monad of the
+<br  />meta language using Filinski's notion of monadic reflection
+<br  /><a href="DBLP:conf/popl/Filinski94,DBLP:conf/popl/Filinski10">(*)</a>.  Accumulate is a
+<br  />left inverse of perform with respect to extensional equality ($\equiv$)  of
+<br  />the generated code:</p>
 <pre><code>accumulate { perform("a") } $\longrightarrow^{*}$ "{ val fresh = a; fresh }"       $\equiv$     "a"
 </code></pre>
-<p>If structural equality is desired, a simple special case can be added to
-<br  />the above definition to directly translate
-<br  />\code{accumulate(perform(&ldquo;a&rdquo;))} to \lstinline{&ldquo;a&rdquo;}.
-<br  />Within a suitable context, perform is also a left inverse
-<br  />of accumulate: Performing a set of accumulated statements together
-<br  />is the same as just performing the statements individually.</p>
+<p>If structural equality is desired, a simple special case can be added to  the
+<br  />above definition to directly translate  <code>accumulate(perform("a"))</code> to <code>a</code>.
+<br  />Within a suitable context, perform is also a left inverse of accumulate:
+<br  />Performing a set of accumulated statements together  is the same as just
+<br  />performing the statements individually.</p>
 <p>Clearly, using perform and accumulate manually is tedious. However we can
 <br  />incorporate them entirely inside the quasi quotation / interpolation syntax:</p>
 <pre><code>s" foo $\$${ bar } baz " $\longrightarrow$ " foo " + bar + " baz "  // regular interpolation
@@ -564,7 +542,7 @@ def perform(stm: Tree[T]): Code[T]
 def accumulate(res: =&gt; Code[T]): Tree[T]
 </code></pre>
 <p>We put the modified quasiquotes to test by invoking power
-<br  />on the example from the previous Section~\ref{sec:221valcorr}:</p>
+<br  />on the example from the <a href="#sec:221valcorr">previous Section</a>:</p>
 <pre><code>def power(b: Code[T], n: Int): Code[T] = ...
 
 val x = $[[$computeA()$]]$
@@ -586,49 +564,40 @@ val x7 = x3 * x6
 val x8 = x3 * x7
 x8
 </code></pre>
-<p>It is easy to see that this is the correct sequencing of statements.
-<br  />No computation is duplicated. Likewise, if we use
-<br  />the improved algorithm, we actually get better
-<br  />performance.</p>
-<p>We have removed the need for monadic or side-effecting
-<br  />front-ends (in this case, in other cases they
-<br  />may still be needed but never to perform let insertion).
-<br  />Since we have extended the core staging primitives
-<br  />with a controlled form of side effect, we have
-<br  />removed the need for uncontrolled side effects in the
-<br  />generator. This makes otherwise common errors such
-<br  />as scope extrusion much less likely.</p>
+<p>It is easy to see that this is the correct sequencing of statements. No
+<br  />computation is duplicated. Likewise, if we use the improved algorithm, we
+<br  />actually get better performance.</p>
+<p>We have removed the need for monadic or side-effecting front-ends (in this
+<br  />case, in other cases they may still be needed but never to perform let
+<br  />insertion).  Since we have extended the core staging primitives with a
+<br  />controlled form of side effect, we have removed the need for uncontrolled side
+<br  />effects in the generator. This makes otherwise common errors such as scope
+<br  />extrusion much less likely.</p>
 <h2>Removing Syntactic Overhead</h2>
-<p>We have seen how we can improve staging based on
-<br  />quasiquotes or direct string generation.
-<br  />Now we turn to other approaches of delineating embedded
-<br  />object programs. Our aim is embedding domain specific
-<br  />compilers. We want object languages tailored to specific
-<br  />applications, with custom compiler components.
-<br  />The ''one size fits all'' approach of having the
-<br  />same meta and object language is not ideal
-<br  />for this purpose. In our case, we would have to inspect
-<br  />Scala ASTs and reject or possibly interpret constructs
-<br  />that have no correspondence in the object language
-<br  />(type, class or method definitions, etc).</p>
-<p>The staged power implementations with quasi quotes (Sections~\ref{sec:220quasi},\ref{sec:221valcorr})
-<br  />look OK but they do contain a fair bit of syntactic noise.
-<br  />Also, we might want stronger guarantees about the staged
-<br  />code, for example that it does not use a particular
-<br  />language feature, which we know is detrimental to
-<br  />performance. What is more, we might want to generate code
-<br  />in a different language (JavaScript, CUDA, SQL).</p>
-<p>We already hide the internal code representation from
-<br  />client programs. There are good reasons to also hide the full power of
-<br  />arbitrary program composition / quasi quoting from client programs.</p>
+<p>We have seen how we can improve staging based on  quasiquotes or direct string
+<br  />generation. Now we turn to other approaches of delineating embedded object
+<br  />programs. Our aim is embedding domain specific  compilers. We want object
+<br  />languages tailored to specific applications, with custom compiler components.
+<br  />The ''one size fits all'' approach of having the same meta and object language
+<br  />is not ideal for this purpose. In our case, we would have to inspect Scala
+<br  />ASTs and reject or possibly interpret constructs that have no correspondence
+<br  />in the object language (type, class or method definitions, etc).</p>
+<p>The staged power implementations with quasi quotes look OK but they do contain
+<br  />a fair bit of syntactic noise. Also, we might want stronger guarantees about
+<br  />the staged code, for example that it does not use a particular language
+<br  />feature, which we know is detrimental to performance. What is more, we might
+<br  />want to generate code in a different language (JavaScript, CUDA, SQL).</p>
+<p>We already hide the internal code representation from client programs. There
+<br  />are good reasons to also hide the full power of  arbitrary program composition
+<br  />/ quasi quoting from client programs.</p>
 <p>Programs, such as power, use quasiquotes for two purposes: lifting primitives
 <br  />and operations:</p>
 <pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
   if (n == 0) q"1.0" else  q"($\$$b * $\$${ power(b, n - 1) } )"
 </code></pre>
-<p>We already identify object code via \code{Code[T]} types.
-<br  />Instead of quasiquotes we can employ other ways of lifting the necessary
-<br  />operations on type \code{T} to type \code{Code[T]}:</p>
+<p>We already identify object code via <code>Code[T]</code> types. Instead of quasiquotes we
+<br  />can employ other ways of lifting the necessary  operations on type <code>T</code> to type
+<br  /><code>Code[T]</code>:</p>
 <pre><code>implicit def liftDouble(x: Double): Code[Double] = q"x"
 def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
 </code></pre>
@@ -636,52 +605,47 @@ def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
 <pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
   if (n == 0) liftDouble(1.0) else infix_*(b, power(b, n - 1))
 </code></pre>
-<p>But we can simplify further. In fact, the Scala compiler will do most of
-<br  />the work for us and we can write just this:</p>
+<p>But we can simplify further. In fact, the Scala compiler will do most of  the
+<br  />work for us and we can write just this:</p>
 <pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
   if (n == 0) 1.0 else b * power(b, n - 1)
 </code></pre>
-<p>Apart from the \code{Code[_]} types, we have re-engineered exactly
-<br  />the regular, unstaged power function! All other traces of staging
-<br  />annotations are gone.</p>
-<p>We are relying on Scala's support for implicit conversions (views)
-<br  />and Scala-Virtualized support for infix methods. Other
-<br  />expressive languages provide similar features.</p>
+<p>Apart from the <code>Code[_]</code> types, we have re-engineered exactly the regular,
+<br  />unstaged power function! All other traces of staging annotations are gone.</p>
+<p>We are relying on Scala's support for implicit conversions (views) and Scala-
+<br  />Virtualized support for infix methods. Other expressive languages provide
+<br  />similar features.</p>
 <h2>Staging as a Library and Modular Definition of Object Languages</h2>
-<p>With the object language definition given by method signatures
-<br  />we can implement staging as a library, without dedicated language support
-<br  />and with roughly the same guarantees as a multi-stage language with
-<br  />quasi quotation. Furthermore, we can easily generate code in another
-<br  />target language, for example emit JavaScript from staged Scala expressions.
-<br  />Given that the multi-stage program is in control
-<br  />of defining the object language we can model additional guarantees
-<br  />about the absence of certain operations from staged code, simply
-<br  />by not including these operations in the object language interface.</p>
-<p>The core idea is to delegate correctness issues to the implementations
-<br  />of the lifted operations, i.e.\ the implementation of the object language interface.
-<br  />Client code can access staging only through the object language API, so
-<br  />if the implementation is correct, the interface ensures correctness
-<br  />of the client code.</p>
-<p>We can use any representation we like for staged expressions.
-<br  />For the sake of simplicity we will stick to strings. Where we have
-<br  />used type \code{Code[T]} above, we will use \code{Rep[T]} from now
-<br  />on because we want to allude to thinking more about the
-<br  />\emph{representation} of a \code{T} value in the next stage and
-<br  />less about composing code fragments.</p>
-<p>Where quasiquoting allowed the full language to be staged,
-<br  />we now have to explicitly ''white-list'' all operations we want
-<br  />to make available. Clearly there is a tradeoff, as explicit
-<br  />white-listing of operations can be tedious.
-<br  />However we can remedy the white-listing effort to a large
-<br  />extent by providing libraries of reusable components that
-<br  />contain sets of lifted operations from which different
-<br  />flavors of object languages can be assembled.
-<br  />It is also possible to lift whole traits or classes
-<br  />using reflection <a href="DBLP:conf/ecoop/KossakowskiARO12">(*)</a>.</p>
-<p>We can define a simple object language \code{MyStagedLanguage} as follows,
-<br  />using \code{private} access qualifiers to ensure that the staging primitives
-<br  />perform and accumulate are inaccessible to client code outside of package
-<br  />\code{internal}:</p>
+<p>With the object language definition given by method signatures we can
+<br  />implement staging as a library, without dedicated language support and with
+<br  />roughly the same guarantees as a multi-stage language with  quasi quotation.
+<br  />Furthermore, we can easily generate code in another target language, for
+<br  />example emit JavaScript from staged Scala expressions.  Given that the multi-
+<br  />stage program is in control of defining the object language we can model
+<br  />additional guarantees about the absence of certain operations from staged
+<br  />code, simply by not including these operations in the object language
+<br  />interface.</p>
+<p>The core idea is to delegate correctness issues to the implementations of the
+<br  />lifted operations, i.e. the implementation of the object language interface.
+<br  />Client code can access staging only through the object language API, so if the
+<br  />implementation is correct, the interface ensures correctness  of the client
+<br  />code.</p>
+<p>We can use any representation we like for staged expressions. For the sake of
+<br  />simplicity we will stick to strings. Where we have used type <code>Code[T]</code> above,
+<br  />we will use <code>Rep[T]</code> from now on because we want to allude to thinking more
+<br  />about the <em>representation</em> of a <code>T</code> value in the next stage and less
+<br  />about composing code fragments.</p>
+<p>Where quasiquoting allowed the full language to be staged, we now have to
+<br  />explicitly ''white-list'' all operations we want to make available. Clearly
+<br  />there is a tradeoff, as explicit white-listing of operations can be tedious.
+<br  />However we can remedy the white-listing effort to a large extent by providing
+<br  />libraries of reusable components that contain sets of lifted operations from
+<br  />which different flavors of object languages can be assembled. It is also
+<br  />possible to lift whole traits or classes using reflection
+<br  /><a href="DBLP:conf/ecoop/KossakowskiARO12">(*)</a>.</p>
+<p>We can define a simple object language <code>MyStagedLanguage</code> as follows,  using
+<br  /><code>private</code> access qualifiers to ensure that the staging primitives  perform and
+<br  />accumulate are inaccessible to client code outside of package <code>internal</code>:</p>
 <pre><code>package internal
 trait Base extends EmbeddedControls {
   type Rep[T]
@@ -700,14 +664,14 @@ trait IfThenElse extends Base {
 }
 trait MyStagedLanguage extends LiftPrimitives with Arith with IfThenElse
 </code></pre>
-<p>Note that we invoke accumulate only for by-name parameters. All others are already
-<br  />object code values, so evaluating them is a no-op and cannot have side effects.
-<br  />In doing so we silently assume a sensible \code{toString} operation on \code{Rep[T]}.
-<br  />If we do not want to make this assumption then we need accumulate calls everywhere
-<br  />a \code{Rep[T]} value is converted to a string representation.</p>
-<p>Client code just needs access to an object of type \code{MyStagedLanguage} to
-<br  />call methods on it. Common ways to achieve this include path-dependent
-<br  />types and imports:</p>
+<p>Note that we invoke accumulate only for by-name parameters. All others are
+<br  />already object code values, so evaluating them is a no-op and cannot have side
+<br  />effects. In doing so we silently assume a sensible <code>toString</code> operation on
+<br  /><code>Rep[T]</code>. If we do not want to make this assumption then we need accumulate
+<br  />calls everywhere a <code>Rep[T]</code> value is converted to a string representation.</p>
+<p>Client code just needs access to an object of type <code>MyStagedLanguage</code> to call
+<br  />methods on it. Common ways to achieve this include path-dependent types and
+<br  />imports:</p>
 <pre><code>val p: MyStagedLanguage = ...
 import p._
 def power(b: Rep[Double], n: Int): Rep[Double] = ...
@@ -720,52 +684,51 @@ def power(b: Rep[Double], n: Int): Rep[Double] = ...
   def power(b: Rep[Double], n: Int): Rep[Double] = ...
 }
 </code></pre>
-<p>In the following we briefly revisit the various static guarantees
-<br  />and show how they are fulfilled in LMS.</p>
+<p>In the following we briefly revisit the various static guarantees  and show
+<br  />how they are fulfilled in LMS.</p>
 <h3>Syntax correctness through Embedding as Methods</h3>
-<p>Generating syntactically well formed programs is delegated to
-<br  />methods implementing the object language interface. Client code never
-<br  />assembles pieces of code directly. If clients only
-<br  />use the API methods, and their implementations produce syntax correct
-<br  />code, overall syntax correctness follows.</p>
+<p>Generating syntactically well formed programs is delegated to  methods
+<br  />implementing the object language interface. Client code never assembles pieces
+<br  />of code directly. If clients only  use the API methods, and their
+<br  />implementations produce syntax correct code, overall syntax correctness
+<br  />follows.</p>
 <h3>Scope Correctness through Deep Reuse Of Val Bindings</h3>
-<p>The staging primitives perform eager let insertion and perform will
-<br  />assign a fresh identifier to each and every subexpression encountered,
-<br  />essentially producing on object program in administrative normal form (ANF).
-<br  />This removes the need for explicit val bindings in object code. Instead,
-<br  />programmers can just use val bindings in the meta program. This is
-<br  />an example of deep linguistic reuse, as the ''feature'' of val bindings
-<br  />is translated away.</p>
-<p>As for scope correctness, we have not encountered any binders in object code so far.
-<br  />Below in Section~\ref{sec:220functions} we will introduce staged functions
-<br  />using higher order abstract syntax (HOAS) <a href="DBLP:conf/pldi/PfenningE88">(*)</a>:</p>
+<p>The staging primitives perform eager let insertion and perform will assign a
+<br  />fresh identifier to each and every subexpression encountered, essentially
+<br  />producing on object program in administrative normal form (ANF). This removes
+<br  />the need for explicit val bindings in object code. Instead, programmers can
+<br  />just use val bindings in the meta program. This is an example of deep
+<br  />linguistic reuse, as the ''feature'' of val bindings is translated away.</p>
+<p>As for scope correctness, we have not encountered any binders in object code
+<br  />so far. <a href="#sec:220functions">Below</a> we will introduce staged
+<br  />functions  using higher order abstract syntax (HOAS)
+<br  /><a href="DBLP:conf/pldi/PfenningE88">(*)</a>:</p>
 <pre><code>def lambda[A,B](f: Rep[A] =&gt; Rep[B]): Rep[A=&gt;B]
 lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
 </code></pre>
 <p>The essence of HOAS is to reuse meta language bindings to implement object
-<br  />language bindings. Unless subverted by explicit scope extrusion,
-<br  />the reuse of meta language bindings ensures scope correctness of
-<br  />object programs.</p>
+<br  />language bindings. Unless subverted by explicit scope extrusion,  the reuse of
+<br  />meta language bindings ensures scope correctness of  object programs.</p>
 <h3>Type Correctness through Typed Embedding (Deep Reuse of Types)</h3>
-<p>The object language API exposes only typed methods. If the implementations
-<br  />of these methods produce type correct code, then overall type correctness
+<p>The object language API exposes only typed methods. If the implementations of
+<br  />these methods produce type correct code, then overall type correctness
 <br  />follows.</p>
 <h3>Value Correctness through Deep Reuse of Evaluation Order</h3>
 <p>The perform and accumulate abstraction has been described at length
-<br  />in Section~\ref{sec220:evalOrder}.</p>
+<br  /><a href="#sec220:evalOrder">above</a>.</p>
 <h2>Functions and Recursion</h2>
 <p><a name="sec:220functions"></a></p>
-<p>Many features can be added to the object language in a way that is analogous to
-<br  />what we have seen above but some require a bit more thought. In this section
-<br  />we will take a closer look at
-<br  />staged functions.
-<br  />Basic support for staged function definitions and function applications
-<br  />can be defined in terms of a simple higher-order abstract syntax (HOAS) <a href="DBLP:conf/pldi/PfenningE88">(*)</a>
-<br  />representation, similar to those of Carette et al.\ <a href="DBLP:journals/jfp/CaretteKS09">(*)</a>
-<br  />and Hofer et al. <a href="DBLP:conf/gpce/HoferORM08">(*)</a>.</p>
-<p>The idea is to provide a \code{lambda} operation that transforms present-stage
-<br  />functions over staged values (type \code{Rep[A] => Rep[B]}) to staged
-<br  />function values (type \code{Rep[A=>B]}).</p>
+<p>Many features can be added to the object language in a way that is analogous
+<br  />to  what we have seen above but some require a bit more thought. In this
+<br  />section  we will take a closer look at staged functions. Basic support for
+<br  />staged function definitions and function applications can be defined in terms
+<br  />of a simple higher-order abstract syntax (HOAS)
+<br  /><a href="DBLP:conf/pldi/PfenningE88">(*)</a> representation, similar to those of Carette
+<br  />et al. <a href="DBLP:journals/jfp/CaretteKS09">(*)</a>  and Hofer et al.
+<br  /><a href="DBLP:conf/gpce/HoferORM08">(*)</a>.</p>
+<p>The idea is to provide a <code>lambda</code> operation that transforms present-stage
+<br  />functions over staged values (type <code>Rep[A] =&gt; Rep[B]</code>) to staged function
+<br  />values (type <code>Rep[A=&gt;B]</code>).</p>
 <pre><code>trait Functions extends Base {
   def lambda[A,B](f: Rep[A] =&gt; Rep[B]): Rep[A=&gt;B]
   def infix_apply[A,B](f: Rep[A=&gt;B], x: Rep[A]): Rep[B]
@@ -778,88 +741,78 @@ lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
   else n * fac(n - 1)
 }
 </code></pre>
-<p>As opposed to the earlier power example, an invocation \code{fac(m)} will not
-<br  />inline the definition of \code{fac} but result in an actual function call in
-<br  />the generated code.</p>
-<p>However the HOAS representation has the disadvantage of being
-<br  />opaque: there is no immediate way to ''look into'' a Scala function object.
-<br  />If we want to treat functions in the same way as other program constructs, we
-<br  />need a way to transform the HOAS encoding into our string representation.
-<br  />We can implement \code{lambda(f)} to call</p>
+<p>As opposed to the earlier power example, an invocation <code>fac(m)</code> will not
+<br  />inline the definition of <code>fac</code> but result in an actual function call in  the
+<br  />generated code.</p>
+<p>However the HOAS representation has the disadvantage of being opaque: there is
+<br  />no immediate way to ''look into'' a Scala function object. If we want to treat
+<br  />functions in the same way as other program constructs, we need a way to
+<br  />transform the HOAS encoding into our string representation. We can implement
+<br  /><code>lambda(f)</code> to call</p>
 <pre><code>accumulate { f(fresh[A]) }
 </code></pre>
 <p>which will unfold the function definition into a block that represents the
-<br  />entire computation defined by the function (assuming that \code{fresh[A]} creates
-<br  />a fresh symbol of type \code{A}).
-<br  />But eagerly expanding function definitions is problematic.
-<br  />For recursive functions, the result would be infinite, i.e.\ the computation will not
-<br  />terminate.
-<br  />What we would like to do instead is to detect recursion and generate a finite
-<br  />representation that makes the recursive call explicit.
-<br  />However this is difficult because recursion might be very indirect:</p>
+<br  />entire computation defined by the function (assuming that <code>fresh[A]</code> creates a
+<br  />fresh symbol of type <code>A</code>). But eagerly expanding function definitions is
+<br  />problematic. For recursive functions, the result would be infinite, i.e. the
+<br  />computation will not terminate. What we would like to do instead is to detect
+<br  />recursion and generate a finite  representation that makes the recursive call
+<br  />explicit. However this is difficult because recursion might be very indirect:</p>
 <pre><code>def foo(x: Rep[Int]) = {
   val f = (x: Rep[Int]) =&gt; foo(x + 1)
   val g = lambda(f)
   g(x)
 }
 </code></pre>
-<p>Each incarnation of \code{foo} creates a new function \code{f};
-<br  />unfolding will thus create unboundedly many different function objects.</p>
-<p>To detect cycles, we have to \emph{compare} those functions.
-<br  />This, of course, is undecidable in the general case of taking equality to be
-<br  />defined extensionally, i.e.\ saying that two functions are equal if they
-<br  />map equal inputs to equal outputs.
-<br  />The standard reference equality, by contrast,
-<br  />is too weak for our purpose:</p>
+<p>Each incarnation of <code>foo</code> creates a new function <code>f</code>; unfolding will thus
+<br  />create unboundedly many different function objects.</p>
+<p>To detect cycles, we have to <em>compare</em> those functions. This, of course,
+<br  />is undecidable in the general case of taking equality to be defined
+<br  />extensionally, i.e. saying that two functions are equal if they map equal
+<br  />inputs to equal outputs. The standard reference equality, by contrast,  is too
+<br  />weak for our purpose:</p>
 <pre><code>def adder(x:Int) = (y: Int) =&gt; x + y
 adder(3) == adder(3)
 $\hookrightarrow$ false
 </code></pre>
-<p>However, we can approximate extensional equality by intensional
-<br  />(i.e.\ structural) equality, which is sufficient in most cases
-<br  />because recursion will cycle through a well defined code path
-<br  />in the program text.
-<br  />Testing intensional equality amounts to checking if two
-<br  />functions are defined at the same syntactic location in the source
-<br  />program and whether all data referenced by their free variables is equal.
-<br  />Fortunately, the implementation of first-class functions as closure
-<br  />objects offers (at least in principle) access to a ''defunctionalized''
-<br  />data type representation on which equality can easily be checked.
-<br  />A bit of care must be taken though, because the structure can be cyclic.
-<br  />On the JVM there is a particularly neat trick.
-<br  />We can serialize the function objects into a byte array and compare
-<br  />the serialized representations:</p>
+<p>However, we can approximate extensional equality by intensional (i.e.
+<br  />structural) equality, which is sufficient in most cases because recursion will
+<br  />cycle through a well defined code path in the program text.  Testing
+<br  />intensional equality amounts to checking if two functions are defined at the
+<br  />same syntactic location in the source program and whether all data referenced
+<br  />by their free variables is equal. Fortunately, the implementation of first-
+<br  />class functions as closure objects offers (at least in principle) access to a
+<br  />''defunctionalized''  data type representation on which equality can easily be
+<br  />checked. A bit of care must be taken though, because the structure can be
+<br  />cyclic. On the JVM there is a particularly neat trick.  We can serialize the
+<br  />function objects into a byte array and compare the serialized representations:</p>
 <pre><code>serialize(adder(3)) == serialize(adder(3))
 $\hookrightarrow$ true
 </code></pre>
-<p>With this method of testing equality, we can implement \emph{controlled}
-<br  />unfolding. Unfolding functions only once at the definition site and associating
-<br  />a fresh symbol with the function being unfolded allows us to construct a
-<br  />block that contains a recursive call to the symbol we created. Thus,
-<br  />we can create the expected representation for the factorial function
+<p>With this method of testing equality, we can implement <em>controlled</em>
+<br  />unfolding. Unfolding functions only once at the definition site and
+<br  />associating a fresh symbol with the function being unfolded allows us to
+<br  />construct a block that contains a recursive call to the symbol we created.
+<br  />Thus, we can create the expected representation for the factorial function
 <br  />above.</p>
-<p>\subsection{Semi-Automatic BTA through Deep Reuse of Type Inference}
-<br  />Given a method or function implementation:</p>
+<h2>Semi-Automatic BTA through Deep Reuse of Type Inference</h2>
+<p>Given a method or function implementation:</p>
 <pre><code>def power(b: _, n: Int) = 
   if (n == 0) 1.0 else b * power(b, n - 1)
 </code></pre>
-<p>Scala's type inference can determine whether the operations
-<br  />and the result will be staged or not. We just have to provide
-<br  />the binding time for parameter \code{b}. Note that staging \code{n}
-<br  />would require explicit use of \code{lambda} because there
-<br  />is no static criterion to stop the recursion.</p>
-<p>In some cases we need to be conservative, for example for mutable
-<br  />objects:</p>
+<p>Scala's type inference can determine whether the operations and the result
+<br  />will be staged or not. We just have to provide  the binding time for parameter
+<br  /><code>b</code>. Note that staging <code>n</code> would require explicit use of <code>lambda</code> because
+<br  />there is no static criterion to stop the recursion.</p>
+<p>In some cases we need to be conservative, for example for mutable objects:</p>
 <pre><code>var i = 0
 if (c)    // c: Rep[Boolean]
   i += 1
 </code></pre>
-<p>The variable \code{i} must be lifted because writes depend
-<br  />on dynamic control flow. We can accomplish this by
-<br  />implementing the virtualized var constructor to always
-<br  />lift variable declarations, even if the initial
-<br  />right-hand side is a static value. Packaged up in
-<br  />a trait, it can be selectively imported:</p>
+<p>The variable <code>i</code> must be lifted because writes depend  on dynamic control
+<br  />flow. We can accomplish this by implementing the virtualized var constructor
+<br  />to always lift variable declarations, even if the initial right-hand side is a
+<br  />static value. Packaged up in a trait, it can be selectively imported:</p>
 <pre><code>trait MyProg { this: LiftVariables =&gt;
   ... // all variables are lifted in this scope
 }
@@ -867,24 +820,22 @@ if (c)    // c: Rep[Boolean]
 <h2>Generating and Loading Executable Code</h2>
 <p><a name="sec:230codegen"></a></p>
 <p>Code generation in LMS is an explicit operation. For the common case where
-<br  />generated code is to be loaded immediately into the running program,
-<br  />trait \code{Compile} provides a suitable interface in form of the abstract
-<br  />method \code{compile}:</p>
+<br  />generated code is to be loaded immediately into the running program,  trait
+<br  /><code>Compile</code> provides a suitable interface in form of the abstract  method
+<br  /><code>compile</code>:</p>
 <pre><code>trait Compile extends Base {
   def compile[A,B](f: Rep[A] =&gt; Rep[B]): A=&gt;B
 }
 </code></pre>
-<p>The contract of \code{compile} is to ''unstage'' a function from
-<br  />staged to staged values into a function operating on
-<br  />present-stage values that can be used just like any other
-<br  />function object in the running program.
-<br  />Of course this only works for functions that do not reference
-<br  />externally bound \code{Rep[T]} values,
-<br  />otherwise the generate code will not compile due to free identifiers.
-<br  />The given encoding into Scala's type system does not
-<br  />prevent this kind of error.</p>
-<p>For generating Scala code, an implementation of the compilation
-<br  />interface is provided by trait \code{CompileScala}:</p>
+<p>The contract of <code>compile</code> is to ''unstage'' a function from staged to staged
+<br  />values into a function operating on  present-stage values that can be used
+<br  />just like any other function object in the running program. Of course this
+<br  />only works for functions that do not reference externally bound <code>Rep[T]</code>
+<br  />values, otherwise the generate code will not compile due to free identifiers.
+<br  />The given encoding into Scala's type system does not prevent this kind of
+<br  />error.</p>
+<p>For generating Scala code, an implementation of the compilation interface is
+<br  />provided by trait <code>CompileScala</code>:</p>
 <pre><code>trait CompileScala extends Compile {
   def compile[A,B](f: Rep[A] =&gt; Rep[B]) = {
     val x = fresh[A]
@@ -898,12 +849,11 @@ if (c)    // c: Rep[Boolean]
   }
 }
 </code></pre>
-<p>The overall compilation logic of \code{CompileScala} is
-<br  />relatively simple: emit a class and \code{apply}-method declaration
-<br  />header, emit instructions for each definition node according to
-<br  />the schedule, close the source file, invoke the Scala compiler,
-<br  />load the generated class file and return a newly
-<br  />instantiated object of that class.</p>
+<p>The overall compilation logic of <code>CompileScala</code> is relatively simple: emit a
+<br  />class and <code>apply</code>-method declaration header, emit instructions for each
+<br  />definition node according to  the schedule, close the source file, invoke the
+<br  />Scala compiler, load the generated class file and return a newly instantiated
+<br  />object of that class.</p>
 
             </td>
         </tr><tr>
