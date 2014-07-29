@@ -1,0 +1,2425 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>04_atwork.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 22px;
+            color: #252519;
+            margin: 0; padding: 0;
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            /*padding-top: 40px;*/
+            padding-bottom: 15px;
+            color: #000;
+        }
+        #container {
+            position: relative;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            min-width: 600px;
+            /*max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;*/
+            padding: 10px 25px 1px 50px;
+            /*overflow-x: hidden;*
+            vertical-align: top;
+            text-align: left;*/
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            width: 100%;
+            vertical-align: top;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        04_atwork.scala // Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
+                    01_overview.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/02_basics.html">
+                    02_basics.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/03_compiler.html">
+                    03_compiler.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/04_atwork.html">
+                    04_atwork.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
+                    regex.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <!--<tr>
+            <th class="docs">
+                <h1>04_atwork.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>-->
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                <h1>Overview</h1>
+<ol>
+<li>Intro: Abstraction Without Regret</li>
+<li>Common Compiler Optimizations</li>
+<li>Delite: An End-to-End System for Embedded Parallel DSLs<ol>
+<li>Building a Simple DSL</li>
+<li>Code Generation</li>
+<li>The Delite Compiler Framework and Runtime</li>
+</ol>
+</li>
+<li>Control Abstraction<ol>
+<li>Leveraging Higher-Order Functions in the Generator</li>
+<li>Using Continuations in the Generator to Implement Backtracking</li>
+<li>Using Continuations in the Generator to Generate Async Code Patterns<ol>
+<li>CPS and Staging</li>
+<li>CPS for Interruptible Traversals</li>
+<li>Defining the Ajax API</li>
+<li>CPS for Parallelism</li>
+</ol>
+</li>
+<li>Guarantees by Construction</li>
+</ol>
+</li>
+<li>Data Abstraction<ol>
+<li>Static Data Structures</li>
+<li>Dynamic Data Structures with Partial Evaluation</li>
+<li>Generic Programming with Type Classes</li>
+<li>Unions and Inheritance</li>
+<li>Struct of Array and Other Data Format Conversions</li>
+<li>Loop Fusion and Deforestation</li>
+<li>Extending the Framework</li>
+<li>Lowering Transforms}</li>
+</ol>
+</li>
+<li>Case Studies<ol>
+<li>OptiML Stream Example<ol>
+<li>Downsampling in Bioinformatics</li>
+</ol>
+</li>
+<li>OptiQL Struct Of Arrays Example</li>
+<li>Fast Fourier Transform Example<ol>
+<li>Implementing Optimizations</li>
+<li>Running the Generated Code</li>
+</ol>
+</li>
+<li>Regular Expression Matcher Example</li>
+</ol>
+</li>
+</ol>
+<h1>(Chapter 0) Intro: Abstraction Without Regret</h1>
+<p>\label{chap:400}</p>
+<p>LMS is a dynamic multi-stage programming approach: We have the full Scala language
+<br  />at our disposal to compose fragments of object code. In fact, DSL programs are program
+<br  />\emph{generators} that produce an object program IR when run.
+<br  />DSL or library authors and application programmers can exploit this multi-level nature
+<br  />to perform computations explicitly at staging time, so that the generated program does
+<br  />not pay a runtime cost.
+<br  />Multi-stage programming shares some similarities with partial evaluation \cite{jones93partial},
+<br  />but instead of an automatic binding-time analysis, the programmer makes
+<br  />binding times explicit in the program.
+<br  />We have seen how LMS uses \code{Rep} types for this purpose:
+<br  />\begin{listing}
+<br  />val s: Int = &hellip;      // a static value: computed at staging time
+<br  />val d: Rep[Int] = &hellip; // a dynamic value: computed when generated program is run
+<br  />\end{listing}</p>
+<p>Unlike with automatic partial evaluation, the programmer obtains a guarantee about
+<br  />which expressions will be evaluated at staging time.</p>
+<p>While moving \emph{computations} from run time to staging time is an interesting
+<br  />possibility, many computations actually depend on dynamic input and cannot be done
+<br  />before the input is available.
+<br  />Nonetheless, explicit staging can be used to \emph{combine} dynamic computations more
+<br  />efficiently.
+<br  />Modern programming languages provide indispensable constructs for abstracting and
+<br  />combining program functionality. Without higher-order features such as first-class
+<br  />functions or object and module systems, software development at scale would not be possible.
+<br  />However, these abstraction mechanisms have a cost and make it much harder for the
+<br  />compiler to generate efficient code.</p>
+<p>Using explicit staging, we can use abstraction in the generator stage to remove
+<br  />abstraction in the generated program. This holds both for control (e.g.\ functions, continuations)
+<br  />and data abstractions (e.g.\ objects, boxing). Some of the material in this chapter
+<br  />is taken from \cite{DBLP:journals/corr/abs-1109-0778}.</p>
+<h1>Common Compiler Optimizations</h1>
+<p>We have seen in Part~\ref{part:P2} how many classic compiler optimizations can be
+<br  />applied to the IR generated from embedded programs in a straightforward way.
+<br  />Among those generic optimizations are common subexpression elimination, dead
+<br  />code elimination, constant folding and code motion. Due to the structure of the IR,
+<br  />these optimizations all
+<br  />operate in an essentially global way, at the level of domain operations.
+<br  />An important difference to regular general-purpose compilers is that
+<br  />IR nodes carry information about effects they incur (see Section~\ref{sec:321}).
+<br  />This permits to use quite
+<br  />precise dependency tracking that provides the code generator with a lot of
+<br  />freedom to group and rearrange operations. Consequently, optimizations like
+<br  />common subexpression elimination and dead code elimination will
+<br  />easily remove complex DSL operations that contain internal control-flow and
+<br  />may span many lines of source code.</p>
+<p>Common subexpression elimination (CSE) / global value numbering (GVN) for
+<br  />pure nodes is handled by \code{toAtom}: whenever the \code{Def} in question has
+<br  />been encountered before, its existing symbol is returned instead of a new
+<br  />one (see Section~\ref{sec:320cse}). Since the operation is pure, we do not need to check via data flow analysis
+<br  />whether its result is available on the current path. Instead we just insert a
+<br  />dependency and let the later code motion pass (see Section~\ref{sec:320codemotion})
+<br  />schedule the operation in a correct order.
+<br  />Thus, we achieve a similar effect as partial redundancy
+<br  />elimination (PRE~\cite{DBLP:journals/toplas/KennedyCLLTC99}) but in a simpler way.</p>
+<p>Based on frequency information for block expression, code motion will hoist
+<br  />computation out of loops and push computation into conditional branches.
+<br  />Dead code elimination is trivially included.  Both optimizations are coarse
+<br  />grained and work on the level of domain operations. For example, whole data
+<br  />parallel loops will happily be hoisted out of other loops.</p>
+<p>Consider the following user-written code:
+<br  />\begin{listing}
+<br  />v1 map { x =>
+<br  />val s = sum(v2.length) { i => v2(i) }
+<br  />x/s
+<br  />}
+<br  />\end{listing}
+<br  />This snippet scales elements in a vector \code{v1} relative to the sum
+<br  />of \code{v2}'s elements. Without any extra work, the generic code motion
+<br  />transform places the calculation of \code{s} (which is itself a loop) outside
+<br  />the loop over \code{v1} because it
+<br  />does not depend on the loop variable \code{x}.
+<br  />\begin{listing}
+<br  />val s = sum(v2.length) { i => v2(i) }
+<br  />v1 map { x =>
+<br  />x/s
+<br  />}
+<br  />\end{listing}</p>
+<h1>Delite: An End-to-End System for Embedded Parallel DSLs</h1>
+<p>\label{sec:delite}</p>
+<p>This section gives an overview of our approach to developing and executing
+<br  />embedded DSLs in parallel and on heterogeneous devices. A more thorough
+<br  />description of Delite can be found in Section~\ref{chap:600delite} of Part~\ref{part:P4}.</p>
+<p>Delite seeks to alleviate the burden of building a high performance
+<br  />DSL by providing reusable infrastructure. Delite DSLs are embedded in
+<br  />Scala using LMS. On top of this layer, Delite is structured into a
+<br  />\emph{framework} and a \emph{runtime} component.  The framework provides
+<br  />primitives for parallel operations such as \code{map} or \code{reduce} that DSL
+<br  />authors can use to define higher-level operations. Once a DSL author uses
+<br  />Delite operations, Delite handles code generating to multiple platforms (e.g.
+<br  />Scala and CUDA), and handles difficult but common issues such as device
+<br  />communication and synchronization. These capabilities are enabled by exploiting
+<br  />the domain-specific knowledge and restricted semantics of the DSL compiler.</p>
+<h2>Building a Simple DSL</h2>
+<p>\label{subsec:lms}</p>
+<p>On the surface, DSLs implemented on top of Delite appear very similar to
+<br  />purely-embedded (i.e.\ library only) Scala-based DSLs.
+<br  />However, a key aspect of LMS and hence Delite is that DSLs are split in two parts,
+<br  />\emph{interface} and \emph{implementation}. Both parts can be assembled from components in
+<br  />the form of Scala traits.
+<br  />DSL programs are written in terms of
+<br  />the DSL interface, agnostic of the implementation. Part of each DSL interface is an abstract
+<br  />type constructor \code{Rep[_]} that is used to wrap types in DSL programs.
+<br  />For example, DSL programs use \code{Rep[Int]} wherever a regular program would
+<br  />use \code{Int}. The DSL operations defined in the DSL interface (most of them are
+<br  />abstract methods) are all expressed in terms of \code{Rep} types.</p>
+<p>The DSL \emph{implementation} provides a concrete instantiation of \code{Rep} as
+<br  />expression trees (or graphs). The DSL operations left abstract in the interface are
+<br  />implemented to create an expression representation of the operation.
+<br  />Thus, as a result of executing the DSL program, we obtain an analyzable
+<br  />representation of the very DSL program which we will refer to as IR
+<br  />(intermediate representation).</p>
+<p>To substantiate the description, let us consider an example step by step.
+<br  />A simple (and rather pointless) program that calculates the average of
+<br  />100 random numbers, written in a prototypical DSL \code{MyDSL} that includes numeric
+<br  />vectors and basic console IO could look like this:
+<br  />\begin{slisting}
+<br  />object HelloWorldRunner extends MyDSLApplicationRunner with HelloWorld
+<br  />trait HelloWorld extends MyDSLApplication {</p>
+<pre><code>def main() = {
+  val v = Vector.rand(100)
+  println("today's lucky number is: ")
+  println(v.avg)
+}
+</code></pre>
+<p>}
+<br  />\end{slisting}
+<br  />Programs in our sample DSL live within traits that inherit from \code{MyDSLApplication},
+<br  />with method \code{main} as the entry point.</p>
+<p>\code{MyDSLApplication} is a trait provided by the DSL that defines the DSL interface.
+<br  />In addition to the actual DSL program, there is a singleton object that inherits
+<br  />from \code{MyDSLApplicationRunner} and mixes in the trait that contains the program.
+<br  />As the name implies, this object will be responsible for directing the
+<br  />staged execution of the DSL application.</p>
+<p>Here is the definition of \code{MyDSL}'s components encountered so far:
+<br  />\begin{slisting}
+<br  />trait MyDSLApplication extends DeliteApplication with MyDSL
+<br  />trait MyDSLApplicationRunner extends DeliteApplicationRunner with MyDSLExp</p>
+<p>trait MyDSL extends ScalaOpsPkg with VectorOps
+<br  />trait MyDSLExp extends ScalaOpsPkgExp with VectorOpsExp with MyDSL
+<br  />\end{slisting}</p>
+<p>\code{MyDSLApplicationRunner} inherits
+<br  />the mechanics for invoking code generation from DeliteApplication. We discuss how
+<br  />Delite provides these facilities in section~\ref{subsec:delite}.
+<br  />We observe a structural split in the inheritance hierarchy that is rather fundamental:
+<br  />\code{MyDSL} defines the DSL \emph{interface}, \code{MyDSLExp} the \emph{implementation}.
+<br  />A DSL program is written with respect to the interface but it knows nothing
+<br  />about the implementation. The main reason for this separation is safety.
+<br  />If a DSL program could observe its own structure, optimizing rewrites
+<br  />that maintain semantic but not structural equality of DSL expressions
+<br  />could no longer be applied safely.\footnote{In fact, this is the main
+<br  />reason why MSP languages do not allow inspection of staged code at all \cite{DBLP:conf/pepm/Taha00}.}
+<br  />Our sample DSL includes a set of common Scala operations that are provided
+<br  />by the core LMS library as trait \code{ScalaOpsPkg}. These operations
+<br  />include conditionals, loops, variables and also \code{println}.
+<br  />On top of this set of generic things that are inherited from Scala,
+<br  />the DSL contains vectors and associated operations.
+<br  />The corresponding interface is defined as follows:</p>
+<p>\begin{slisting}
+<br  />trait VectorOps extends Base {
+<br  />abstract class Vector[T]                    // placeholder (&ldquo;phantom&rdquo;) type
+<br  />object Vector {</p>
+<pre><code>def rand(n: Rep[Int]) = vector_rand(n)    // invoked as: Vector.rand(n)
+</code></pre>
+<p>}
+<br  />def vector_rand(n: Rep[Int]): Rep[Vector[Double]]
+<br  />def infix_length[T](v: Rep[Vector[T]]): Rep[Int]      // invoked as: v.length
+<br  />def infix_sum[T:Numeric](v: Rep[Vector[T]]): Rep[T]   // invoked as: v.sum
+<br  />def infix_avg[T:Numeric](v: Rep[Vector[T]]): Rep[T]   // invoked as: v.avg
+<br  />&hellip;
+<br  />}
+<br  />\end{slisting}</p>
+<p>There is an abstract class \code{Vector[T]} for vectors with element type \code{T}. The notation
+<br  />\code{T:Numeric} means that \code{T} may only range over numeric types such as \code{Int} or \code{Double}.
+<br  />Operations on vectors are not declared as instance methods of \code{Vector[T]} but as external functions over
+<br  />values of type \code{Rep[Vector[T]]}.</p>
+<p>Returning to our sample DSL, this is the definition of \code{VectorOpsExp}, the
+<br  />implementation counterpart to the interface defined above in \code{VectorOps}:</p>
+<p>\begin{slisting}
+<br  />trait VectorOpsExp extends DeliteOpsExp with VectorOps {
+<br  />case class VectorRand[T](n: Exp[Int]) extends Def[Vector[Double]]
+<br  />case class VectorLength[T](v: Exp[Vector[T]]) extends Def[Int]</p>
+<p>case class VectorSum[T:Numeric](v: Exp[Vector[T]]) extends DeliteOpLoop[Exp[T]] {</p>
+<pre><code>val range = v.length
+val body = DeliteReduceElem[T](v)(_ + _) // scalar addition (impl not shown)
+</code></pre>
+<p>}</p>
+<p>def vector_rand(n: Rep[Int]) = VectorRand(n)
+<br  />def infix_length[T](v: Rep[Vector[T]]) = VectorLength(v)
+<br  />def infix_sum[T:Numeric](v: Rep[Vector[T]]) = VectorSum(v)
+<br  />def infix_avg[T:Numeric](v: Rep[Vector[T]]) = v.sum / v.length
+<br  />&hellip;
+<br  />}
+<br  />\end{slisting}
+<br  />The constructor \code{rand} and the function \code{length} are implemented as
+<br  />new plain IR nodes (extending \code{Def}). Operation \code{avg} is implemented directly in terms of \code{sum}
+<br  />and \code{length} whereas \code{sum} is implemented as a \code{DeliteOpLoop}
+<br  />with a \code{DeliteReduceElem} body.
+<br  />These special classes of structured IR nodes are provided by the Delite framework
+<br  />and are inherited via \code{DeliteOpsExp}.</p>
+<h2>Code Generation</h2>
+<p>\label{subsec:codegen}</p>
+<p>The LMS framework provides a code generation infrastructure that includes a program scheduler
+<br  />and a set of base code generators. The program scheduler uses the data
+<br  />and control dependencies encoded by IR nodes to determine the sequence of nodes that should be
+<br  />generated to produce the result of a block.
+<br  />%The scheduler performs code motion optimizations,
+<br  />%including hoisting computation out of loops and pushing it into conditionals when possible. Since programs
+<br  />%are scheduled only by their dependencies, dead code is also eliminated at this stage.
+<br  />After the scheduler has determined a schedule, it invokes
+<br  />the code generator on each node in turn. There is one \emph{code generator} object
+<br  />per target platform (e.g. Scala, CUDA, C++) that mixes together traits that describe how to generate
+<br  />platform-specific code for each IR node. This organization makes it easy for DSL authors to modularly extend the base code generators;
+<br  />they only have to define additional traits to be mixed in with the base generator.</p>
+<p>Therefore, DSL designers only have to add code generators for their own
+<br  />domain-specific types. They inherit the common functionality of scheduling and
+<br  />callbacks to the generation methods, and can also build on top of code
+<br  />generator traits that have already been defined. In many cases, though, DSL authors do not
+<br  />have to write code generators at all; the next section describes how Delite
+<br  />takes over this responsibility for most operations.</p>
+<h2>The Delite Compiler Framework and Runtime</h2>
+<p>\label{subsec:delite}</p>
+<p>On top of the LMS framework that provides the basic means to construct IR nodes
+<br  />for DSL operations, the Delite Compiler Framework provides high-level
+<br  />representations of execution patterns through \code{DeliteOp} IR, which
+<br  />includes a set of common parallel execution patterns (e.g. map, zipWith,
+<br  />reduce).</p>
+<p>\code{DeliteOp} extends \code{Def}, and DSL operations may extend one of the
+<br  />\code{DeliteOps} that best describes the operation.  For example, since
+<br  />\code{VectorSum} has the semantics of iterating over the elements of the input
+<br  />Vector and adding them to reduce to a single value, it can be
+<br  />implemented by extending \code{DeliteOpLoop} with a reduction operation as its
+<br  />body. This significantly reduces the amount of work in implementing a
+<br  />DSL operation since the DSL developers only need to specify the
+<br  />necessary fields of the \code{DeliteOp} (\code{range} and \code{body} in the case of
+<br  />\code{DeliteOpLoop}) instead of fully implementing the operation.</p>
+<p>\code{DeliteOpLoop}s are intended as parallel for-loops. Given an
+<br  />integer index range, the runtime guarantees to execute the loop body exactly once
+<br  />for each index but does not guarantee any execution order.
+<br  />Mutating global state from within a loop is only safe at disjoint indexes.
+<br  />There are specialized constructs to define loop bodies for map and reduce patterns (\code{DeliteCollectElem}, \code{DeliteReduceElem})
+<br  />that transform a collection of elements point-wise or perform aggregation.
+<br  />An optional predicate can be added to perform filter-style operations, i.e.\ select or aggregate only those
+<br  />elements for which the predicate is true. All loop constructs can be fused into
+<br  />\code{DeliteOpLoops} that do several operations at once.</p>
+<p>Given the relaxed ordering guarantees, the framework can automatically generate
+<br  />efficient parallel code for \code{DeliteOps}, targeting heterogeneous parallel hardware.
+<br  />Therefore, DSL developers can easily implement parallel DSL operations by
+<br  />extending one of the parallel \code{DeliteOps}, and only focus on the
+<br  />language design without knowing the low-level details of the target
+<br  />hardware.</p>
+<p>The Delite Compiler Framework currently supports Scala, C++, and CUDA targets.
+<br  />The framework provides code generators for each target in addition to a main
+<br  />generator (\emph{Delite generator}) that controls them. The \emph{Delite generator} iterates
+<br  />over the list of available target generators to emit the target-specific
+<br  />kernels. By generating multiple target implementations of the kernels and
+<br  />deferring the decision of which one to use, the framework provides the runtime with
+<br  />enough flexibility in scheduling the kernels based on dynamic information such as
+<br  />resource availability and input size. In addition to the kernels, the
+<br  />Delite generator also generates the \emph{Delite Execution Graph} (DEG) of the
+<br  />application. The DEG is a high-level representation of the program that
+<br  />encodes all necessary information for its execution, including
+<br  />the list of inputs, outputs, and interdependencies of all kernels.
+<br  />After all the kernels are generated, the Delite Runtime starts analyzing the
+<br  />DEG and emits execution plans for each target hardware. Further details are
+<br  />available in Section~\ref{chap:600delite} of Part~\ref{part:P4}.</p>
+<h1>(Chapter 1) Control Abstraction</h1>
+<p>\label{chap:450}</p>
+<p>Among the most useful control abstractions are
+<br  />higher order functions.  We can implement support for higher order functions in
+<br  />DSLs while keeping the generated IR strictly first order. This vastly simplifies
+<br  />the compiler implementation and makes optimizations much more effective since
+<br  />the compiler does not have to reason about higher order control flow.
+<br  />We can implement a higher order function \code{foreach} over Vectors
+<br  />as follows:
+<br  />\begin{listing}
+<br  />def infix_foreach[A](v: Rep[Vector[A]])(f: Rep[A] => Rep[Unit]) = {
+<br  />var i = 0; while (i < v.length) { f(v(i)); i += 1 }
+<br  />}
+<br  />// example:
+<br  />Vector.rand(100) foreach { i => println(i) }
+<br  />\end{listing}
+<br  />The generated code from the example will be strictly first order, consisting
+<br  />of the unfolded definition of \code{foreach} with the application
+<br  />of \code{f} substituted with the \code{println}
+<br  />statement:
+<br  />\begin{listing}
+<br  />while (i < v.length) { println(v(i)); i += 1 }
+<br  />\end{listing}
+<br  />The unfolding is guaranteed by the Scala type system since \code{f} has type
+<br  />\code{Rep[A]=>Rep[Unit]}, meaning it will be executed statically but it
+<br  />operates on staged values.
+<br  />In addition to simplifying the compiler, the generated code does not
+<br  />pay any extra overhead. There are no closure allocations and
+<br  />no inlining problems \cite{cliffinlining}.</p>
+<p>Other higher order functions like \code{map} or \code{filter} could be expressed
+<br  />on top of foreach. Section~\ref{subsec:lms} and Chapter~\ref{chap:600delite} show how actual Delite DSLs implement
+<br  />these operations as data parallel loops.  The rest of this chapter shows how other control
+<br  />structures such as continuations can be supported in the same way.</p>
+<h1>Leveraging Higher-Order Functions in the Generator</h1>
+<p>Higher-order functions are extremely useful to structure programs but also
+<br  />pose a significant obstacle for compilers, recent
+<br  />advances on higher-order control-flow analysis notwithstanding \cite{DBLP:conf/esop/VardoulakisS10,DBLP:journals/corr/abs-1007-4268}.
+<br  />While we would like to retain the structuring aspect for DSL programs,
+<br  />we would like to avoid higher-order control flow in generated code.
+<br  />Fortunately, we can use higher-order functions in the generator stage to
+<br  />compose first-order DSL programs.</p>
+<p>Consider the following program that prints the number of elements greater than 7 in some vector:
+<br  />\begin{listing}
+<br  />val xs: Rep[Vector[Int]] = &hellip;
+<br  />println(xs.count(x => x > 7))
+<br  />\end{listing}</p>
+<p>The program makes essential use of a higher-order function \code{count} to
+<br  />count the number of elements in a vector that fulfill a predicate given as
+<br  />a function object.
+<br  />Ignoring
+<br  />for the time being that we would likely want to use a \code{DeliteOp} for
+<br  />parallelism, a good and natural way to implement \code{count} would be to
+<br  />first define a higher-order function \code{foreach} to iterate over vectors,
+<br  />as shown at the beginning of the chapter:
+<br  />\begin{listing}
+<br  />def infix_foreach[A](v: Rep[Vector[A]])(f: Rep[A] => Rep[Unit]) = {
+<br  />var i: Rep[Int] = 0
+<br  />while (i &lt; v.length) {</p>
+<pre><code>f(v(i))
+i += 1
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>The actual counting can then be implemented in terms of the traversal:
+<br  />\begin{listing}
+<br  />def infix_count[A](v: Rep[Vector[A]])(f: Rep[A] => Rep[Boolean]) = {
+<br  />var c: Rep[Int] = 0
+<br  />v foreach { x => if (f(x)) c += 1 }
+<br  />c
+<br  />}
+<br  />\end{listing}</p>
+<p>It is important to note that \code{infix_foreach} and \code{infix_count}
+<br  />are static methods, i.e.\ calls will happen at staging time and result
+<br  />in inserting the computed DSL code in the place of the call.
+<br  />Likewise, while the argument vector \code{v} is a dynamic
+<br  />value, the function argument \code{f} is again static. However, \code{f} operates
+<br  />on dynamic values, as made explicit by its type \code{Rep[A] => Rep[Boolean]}.
+<br  />By contrast, a dynamic function value would have type \code{Rep[A => B]}.</p>
+<p>This means that the code generated for the example program will look roughly
+<br  />like this, assuming that vectors are represented as arrays in the generated code:</p>
+<p>\begin{listing}
+<br  />val v: Array[Int] = &hellip;
+<br  />var c = 0
+<br  />var i = 0
+<br  />while (i < v.length) {
+<br  />val x = v(i)
+<br  />if (x > 7)</p>
+<pre><code>c += 1
+</code></pre>
+<p>i += 1
+<br  />}
+<br  />println(c)
+<br  />\end{listing}</p>
+<p>All traces of higher-order control flow have been removed and the program is
+<br  />strictly first-order. Moreover, the programmer can be sure that the DSL program
+<br  />is composed in the desired way.</p>
+<p>This issue of higher-order functions is a real problem for regular Scala
+<br  />programs executed on the JVM. The Scala collection library uses essentially the
+<br  />same \code{foreach} and count \code{abstractions} as above and the JVM, which applies
+<br  />optimizations based on per-call-site profiling, will identify the call site \emph{within} \code{foreach} as
+<br  />a hot spot. However, since the number of distinct functions called from foreach is
+<br  />usually large, inlining or other optimizations cannot be applied and every iteration
+<br  />step pays the overhead of a virtual method call \cite{cliffinlining}.</p>
+<h1>Using Continuations in the Generator to Implement Backtracking</h1>
+<p>\label{sec:450bam}</p>
+<p>Apart from pure performance improvements, we can use functionality of the generator stage
+<br  />to enrich the functionality of DSLs without any work on the DSL-compiler side. As an example
+<br  />we consider adding backtracking nondeterministic computation to a DSL using a simple variant of
+<br  />McCarthy's \code{amb} operator \cite{McCarthy63abasis}. Here is a nondeterministic program that uses \code{amb}
+<br  />to find pythagorean triples from three given vectors:
+<br  />\begin{listing}
+<br  />val u,v,w: Rep[Vector[Int]] = &hellip;
+<br  />nondet {
+<br  />val a = amb(u)
+<br  />val b = amb(v)
+<br  />val c = amb(w)
+<br  />require(a<em>a + b</em>b == c*c)
+<br  />println(&ldquo;found:&ldquo;)
+<br  />println(a,b,c)
+<br  />}
+<br  />\end{listing}</p>
+<p>We can use Scala's support for delimited continuations \cite{DBLP:conf/icfp/RompfMO09}
+<br  />and the associated control operators \code{shift} and \code{reset} \cite{DBLP:journals/mscs/DanvyF92,DBLP:conf/lfp/DanvyF90} to implement
+<br  />the necessary primitives.
+<br  />The scope delimiter \code{nondet} is just the regular \code{reset}. The other operators are defined
+<br  />as follows:</p>
+<p>\begin{listing}
+<br  />def amb[T](xs: Rep[Vector[T]]): Rep[T] @cps[Rep[Unit]] = shift { k =>
+<br  />xs foreach k
+<br  />}
+<br  />def require(x: Rep[Boolean]): Rep[Unit] @cps[Rep[Unit]] = shift { k =>
+<br  />if (x) k() else ()
+<br  />}
+<br  />\end{listing}</p>
+<p>Since the implementation of \code{amb} just calls the previously defined method \code{foreach}, the
+<br  />generated code will be first-order and consist of three nested \code{while} loops:
+<br  />%\setlength{\columnseprule}{0.5pt}
+<br  />\begin{multicols}{3}
+<br  />\begin{listing}
+<br  />val u,v,w:Rep[Vector[Int]]=&hellip;
+<br  />var i = 0
+<br  />while (i < u.length) {
+<br  />val a = u(i)
+<br  />val a2 = a*a
+<br  />var j = 0
+<br  />while (j &lt; v.length) {</p>
+<pre><code>val b = v(j)
+val b2 = b*b
+val a2b2 = a2+b2
+var k = 0
+while (k &lt; w.length) {
+  val c = w(k)
+  val c2 = c*c
+  if (a2b2 == c2) {
+    println("found:")
+    println(a,b,c)
+  }
+  k += 1
+}
+j += 1
+</code></pre>
+<p>}
+<br  />i += 1
+<br  />}
+<br  />\end{listing}
+<br  />\end{multicols}</p>
+<p>Besides the advantage of not having to implement \code{amb} as part of the DSL compiler,
+<br  />all common optimizations that apply to plain \code{while} loops are automatically applied to the
+<br  />unfolded backtracking implementation. For example, the loop invariant hoisting performed by code motion has
+<br  />moved the computation of \code{a<em>a} and \code{b</em>b} out of the innermost loop.</p>
+<p>The given implementation of \code{amb} is not the only possibility, though. For
+<br  />situations where we know the number of choices (but not necessarily the actual values) for
+<br  />a particular invocation of \code{amb} at staging time, we can implement an
+<br  />alternative operator that takes a (static) list of
+<br  />dynamic values and unfolds into specialized code paths for each option at compile
+<br  />time:</p>
+<p>\begin{listing}
+<br  />def bam[T](xs: List[Rep[T]]): Rep[T] @cps[Rep[Unit]] = shift { k =>
+<br  />xs foreach k
+<br  />}
+<br  />\end{listing}</p>
+<p>Here, \code{foreach} is not a DSL operation but a plain traversal of the static
+<br  />argument list xs. The \code{bam} operator must be employed with some care because
+<br  />it incurs the risk of code explosion. However, static specialization of
+<br  />nondeterministic code paths can be beneficial if it allows aborting many paths early
+<br  />based on static criteria or merging computation between paths.</p>
+<p>\begin{listing}
+<br  />val u: Rep[Vector[Int]] = &hellip;
+<br  />nondet {
+<br  />val a = amb(u)
+<br  />val b = bam(List(x1), List(x2))
+<br  />val c = amb(v)
+<br  />require(a + c = f(b))  // assume f(b) is expensive to compute
+<br  />println(&ldquo;found:&ldquo;)
+<br  />println(a,b,c)
+<br  />}
+<br  />\end{listing}</p>
+<p>If this example was implemented as three nested loops, \code{f(x1)} and \code{f(x2)} would
+<br  />need to be computed repeatedly in each iteration of the second loop as they depend on the
+<br  />loop-bound variable \code{b}. However, the use of \code{bam} will
+<br  />remove the loop over \code{x1,x2} and expose the expensive computations as
+<br  />redundant so that code motion can extract them from the loop:</p>
+<p>\begin{listing}
+<br  />val fx1 = f(x1)
+<br  />val fx2 = f(x2)
+<br  />while (&hellip;) { // iterate over u
+<br  />while (&hellip;) { // iterate over v</p>
+<pre><code>if (a + c == fx1) // found
+</code></pre>
+<p>}
+<br  />while (&hellip;) { // iterate over v</p>
+<pre><code>if (a + c == fx2) // found
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>In principle, the two adjacent inner loops could be subjected to the loop fusion optimization discussed
+<br  />in Section~\ref{sec:360fusionComp}. This would remove the duplicate traversal of \code{v}.
+<br  />In this particular case fusion is currently not applied since it would change the order of the
+<br  />side-effecting \code{println} statements.</p>
+<h1>Using Continuations in the Generator to Generate Async Code Patterns</h1>
+<p>\label{sec:cpsAsync}</p>
+<p>The previous section used continuations that were completely translated away during generation. In this section,
+<br  />we will use a CPS-transformed program generator to generate code that is in CPS.
+<br  />While the previous section generated only loops, we will generate actual functions in this section, using
+<br  />the mechanisms described in Section~\ref{sec:220functions}. The example is taken from~\cite{DBLP:conf/ecoop/KossakowskiARO12} and concerned with generating JavaScript but the techniques apply to any target.\credits{Design (mostly) by the author, impl. and
+<br  />presentation by Grzegorz Kossakowski and Nada Amin}</p>
+<p>A callback-driven programming style is pervasive in JavaScript programs. Because of lack of thread support, callbacks are used for I/O,
+<br  />scheduling and event-handling. For example, in an Ajax call (Asynchronous JavaScript and XML), one has to provide a callback that will be called once the requested data arrives
+<br  />from the server. This style of programming is known to be unwieldy in more complicated scenarios. To give a specific example, let us consider a
+<br  />scenario where we have an array of Twitter account names and we want to ask Twitter for the latest tweets of each account. Once we obtain the
+<br  />tweets of all users, we would like to log that fact in a console.</p>
+<p>We implement this program both directly in JavaScript and in the embedded JavaScript DSL \cite{DBLP:conf/ecoop/KossakowskiARO12}. Let us start by implementing logic that fetches tweets for a single user by using
+<br  />the jQuery library for Ajax calls:</p>
+<p>%\lstset{basicstyle=\ttfamily\scriptsize}
+<br  />%\begin{figure}
+<br  />\setlength{\columnseprule}{0.5pt}
+<br  />%\begin{changemargin}{-1.5cm}{-1.5cm}
+<br  />\begin{multicols}{2}
+<br  />\begin{lstlisting}[language=JavaScript,caption=Fetching tweets in JavaScript,label=code:js:twitter_fetch]
+<br  />function fetchTweets(user, callback) {
+<br  />jQuery.ajax({</p>
+<pre><code>url: "http://api.twitter.com/1/"
+ + "statuses/user_timeline.json/",
+type: "GET",
+dataType: "jsonp",
+data: {
+  screen_name: user,
+  include_rts: true,
+  count: 5,
+  include_entities: true
+},
+success: callback
+</code></pre>
+<p>})
+<br  />}
+<br  />\end{lstlisting}
+<br  />\begin{lstlisting}[escapechar=|,caption=Fetching tweets in DSL,label=code:twitter_fetch]
+<br  />def fetchTweets(user: Rep[String]) =
+<br  />(ajax.get { new JSLiteral {</p>
+<pre><code>val url = "http://api.twitter.com/1/"
+      + "statuses/user_timeline.json"
+val `type` = "GET"
+val dataType = "jsonp"
+val data = new JSLiteral {
+  val screen_name = user
+  val include_rts = true
+  val count = 5
+  val include_entities = true
+}
+</code></pre>
+<p>}
+<br  />}).as[TwitterResponse]
+<br  />type TwitterResponse =
+<br  />Array[JSLiteral {val text: String}]
+<br  />\end{lstlisting}
+<br  />\end{multicols}
+<br  />%\end{changemargin}
+<br  />%\end{figure}</p>
+<p>Note that the JavaScript version takes a callback as second argument that will
+<br  />be used to process the fetched tweets. We provide the rest of the
+<br  />logic that iterates over array of users and makes Ajax requests:</p>
+<p>%\begin{figure}
+<br  />%\begin{changemargin}{-0.7cm}{-0.7cm}
+<br  />%\noindent\begin{minipage}{\textwidth}
+<br  />\setlength{\columnseprule}{0.5pt}
+<br  />\begin{multicols}{2}
+<br  />\begin{lstlisting}[language=JavaScript,caption=Twitter example in JavaScript,label=code:js:twitter_example]
+<br  />var processed = 0
+<br  />var users = [&ldquo;gkossakowski&rdquo;,
+<br  />&ldquo;odersky&rdquo;, &ldquo;adriaanm&rdquo;]
+<br  />users.forEach(function (user) {
+<br  />console.log(&ldquo;fetching " + user)
+<br  />fetchTweets(user, function(data) {</p>
+<pre><code>console.log("finished " + user)
+data.forEach(function (t) {
+  console.log("fetched " + t.text)
+})
+processed += 1
+if (processed == users.length) {
+  console.log("done")
+}
+</code></pre>
+<p>})
+<br  />})
+<br  />\end{lstlisting}
+<br  />\begin{lstlisting}[escapechar=|,caption=Twitter example in DSL,label=code:twitter_example]
+<br  />val users = array(&ldquo;gkossakowski&rdquo;,
+<br  />&ldquo;odersky&rdquo;, &ldquo;adriaanm&rdquo;)
+<br  />for (user <- users.parSuspendable) {
+<br  />console.log(&ldquo;fetching " + user)
+<br  />val tweets = fetchTweets(user)
+<br  />console.log(&ldquo;finished " + user)
+<br  />for (t &lt;- tweets)</p>
+<pre><code>console.log("fetched " + t.text)
+</code></pre>
+<p>}
+<br  />console.log(&ldquo;done&rdquo;)</p>
+<p>|$\quad$|
+<br  />\end{lstlisting}
+<br  />\end{multicols}
+<br  />%\end{minipage}
+<br  />%\end{changemargin}
+<br  />%\end{figure}</p>
+<p>%\lstset{basicstyle=\ttfamily}</p>
+<p>Because of the inverted control flow of callbacks, synchronization between callbacks has to be handled manually. Also, the inverted control flow
+<br  />leads to a code structure that is distant from the programmer's intent. Notice that the in JavaScript version, the call to console that prints
+<br  /><code>done" is put inside of the foreach loop. If it was put it after the loop, we would get</code>done'' printed \emph{before} any Ajax call has been
+<br  />made leading to counterintuitive behavior.</p>
+<p>As an alternative to the callback-driven programming style, one can use an explicit monadic style, possibly sugared by a Haskell-like
+<br  />``do''-notation. However, this requires rewriting possibly large parts of a program into monadic style when a single async operation is added.
+<br  />Another possibility is to automatically transform the program into continuation passing style (CPS), enabling the programmer to express the
+<br  />algorithm in a straightforward, sequential way and creating all the necessary callbacks and book-keeping code automatically. Links~\cite{links}
+<br  />uses this approach. However, a whole-program CPS transformation can cause performance degradation, code size blow-up, and stack overflows. In
+<br  />addition, it is not clear how to interact with existing non-CPS libraries as the whole program needs to adhere to the CPS style. Here we use a
+<br  />\emph{selective} CPS transformation, which precisely identifies expressions
+<br  />that need to be CPS transformed.</p>
+<p>In fact, the Scala compiler already does selective, \code{@suspendable} type-annotation-driven CPS transformations of Scala programs~\cite{DBLP:conf/icfp/RompfMO09,DBLP:conf/lfp/DanvyF90,DBLP:journals/mscs/DanvyF92}.
+<br  />We show how this mechanism can be used for transforming our DSL code before staging and stripping out
+<br  />most CPS abstractions at staging time. The generated JavaScript code does not contain any CPS-specific code but is written in CPS-style by use of JavaScript anonymous functions.</p>
+<h2>CPS and Staging</h2>
+<p>As an example, we will consider a seemingly blocking \code{sleep} method implemented in a non-blocking, asynchronous style. In JavaScript, there are no threads and there is no notion of blocking. However the technique is useful in other circumstances as well, for example when using thread pools, as no thread is being blocked during the sleep period. Let us see how our CPS transformed \code{sleep} method can be used:
+<br  />\begin{lstlisting}
+<br  />def foo() = {
+<br  />sleep(1000)
+<br  />println(&ldquo;Called foo&rdquo;)
+<br  />}
+<br  />reset {
+<br  />println(&ldquo;look, Ma &hellip;&ldquo;)
+<br  />foo()
+<br  />sleep(1000)
+<br  />println(&rdquo; no callbacks!&ldquo;)
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>We define \code{sleep} to use JavaScript's asynchronous \code{setTimeout} function, which takes an explicit callback:
+<br  />\begin{lstlisting}
+<br  />def sleep(delay: Rep[Int]) = shift { k: (Rep[Unit]=>Rep[Unit]) =>
+<br  />window.setTimeout(lambda(k), delay)
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>The \code{setTimeout} method expects an argument of type \code{Rep[Unit=>Unit]} i.e.\ a staged function of type
+<br  />\code{Unit=>Unit}. The \code{shift} method offers us a function of type \code{Rep[Unit]=>Rep[Unit]}, so we need to reify it to obtain the
+<br  />desired representation. The reification is achieved by the \code{fun} function (called \code{lambda} in \ref{sec:220functions}) provided by our framework and performed at staging time.</p>
+<p>It is important to note that reification preserves function composition. Specifically, let \code{f: Rep[A] => Rep[B]} and \code{g: Rep[B] =>
+<br  />Rep[C]} then {\tt\small lambda(g compose f) == (lambda(g) compose lambda(f))} where we consider two reified functions to be equal if they yield the same
+<br  />observable effects at runtime. That property of function reification is at the core of reusing the continuation monad in our DSL. Thanks to the
+<br  />fact that the continuation monad composes functions, we can just insert reification at some places (like in a \code{sleep}) and make sure that we
+<br  />reify \emph{effects} of the continuation monad without the need to reify the monad itself.</p>
+<p>%Note that the continuation monad (as implemented in Scala) include exception handling. We don't go into details how reification of exception handling can be achieved as it is not essential to understanding how CPS transformation from host language is being reused at DSL level. It is sufficient to say that exception handling in CPS context can be done with a bit of technical work that does not require any new tools or abstractions apart from what we present here.</p>
+<p>% i like the section, because it demystifies how continuation monad works with virtualization by just reducing its preservation to the preservation of function composition. Is that really all there is it to?
+<br  />% outstanding comments:
+<br  />% - i swapped g and f to make the types work out. please verify.
+<br  />% - &hellip;continuation monad mostly composes functions&hellip;: does it do anything else? if so, why are you glossing over it? this 'mostly' gives a feeling that you're hiding something, and is the only reason why the section is not entirely satisfying as an explanation.
+<br  />% - &hellip; and make sure that we reify &hellip;: replace by just ''to reify''?</p>
+<h2>CPS for Interruptible Traversals</h2>
+<p>We need to be able to interrupt our execution while traversing an array in order to implement
+<br  />the functionality from listing \ref{code:twitter_example}. Let us consider a simplified example where we want to
+<br  />sleep during each iteration. We present both JavaScript and DSL code that achieves that
+<br  />(listings~\ref{code:js:sleep_iter}~\&amp;~\ref{code:sleep_iter}).
+<br  />%
+<br  />Both programs, when executed, will print the following output:
+<br  />\begin{lstlisting}
+<br  />//pause for 1s
+<br  />1
+<br  />//pause for 2s
+<br  />2
+<br  />//pause for 3s
+<br  />3
+<br  />done
+<br  />\end{lstlisting}</p>
+<p>\begin{figure}
+<br  />%\lstset{basicstyle=\ttfamily\scriptsize}
+<br  />%\begin{changemargin}{-0.7cm}{-0.7cm}
+<br  />\setlength{\columnseprule}{0.5pt}
+<br  />\begin{multicols}{2}
+<br  />\begin{lstlisting}[caption=JavaScript,label=code:js:sleep_iter]
+<br  />var xs = [1, 2, 3]
+<br  />var i = 0
+<br  />var msg = null
+<br  />function f1() {
+<br  />if (i &lt; xs.length) {</p>
+<pre><code>window.setTimeout(f2, xs[i]*1000)
+msg = xs[i]
+i++
+</code></pre>
+<p>}
+<br  />}
+<br  />function f2() {
+<br  />console.log(msg)
+<br  />f1()
+<br  />}
+<br  />f1()
+<br  />\end{lstlisting}
+<br  />\begin{lstlisting}[escapechar=|,caption=DSL,label=code:sleep_iter]
+<br  />val xs = array(1, 2, 3)
+<br  />// shorthand for xs.suspendable.foreach
+<br  />for (x <- xs.suspendable) {
+<br  />sleep(x * 1000)
+<br  />console.log(String.valueOf(x))
+<br  />}
+<br  />log(&ldquo;done&rdquo;)</p>
+<p>|$\quad$|
+<br  />\end{lstlisting}
+<br  />\end{multicols}
+<br  />%\end{changemargin}
+<br  />\lstset{basicstyle=\ttfamily}
+<br  />\end{figure}</p>
+<p>In the DSL code, we use a \code{suspendable} variant of arrays, which is achieved through an implicit conversion from regular arrays:
+<br  />\begin{lstlisting}
+<br  />implicit def richArray(xs: Rep[Array[A]]) = new {
+<br  />def suspendable: SArrayOps[A] = new SArrayOps<a href="xs">A</a>
+<br  />}
+<br  />\end{lstlisting}
+<br  />The idea behind \code{suspendable} arrays is that iteration over them can be interrupted.
+<br  />We will have a closer look at how to achieve that with the help of CPS. The \code{suspendable}
+<br  />method returns a new instance of the \code{SArrayOps} class defined here:</p>
+<p>\begin{lstlisting}[caption=Suspendable foreach,label=code:suspendable_foreach]
+<br  />class SArrayOps(xs: Rep[Array[A]]) {
+<br  />def foreach(yld: Rep[A] => Rep[Unit] @suspendable):</p>
+<pre><code>Rep[Unit] @suspendable = {
+  var i = 0
+  suspendableWhile(i &lt; xs.length) { yld(xs(i)); i += 1 }
+}
+</code></pre>
+<p>}
+<br  />\end{lstlisting}
+<br  />Note that one cannot use while loops in CPS but we can simulate them with recursive functions.
+<br  />Let us see how regular while loop can be simulated with a recursive function:
+<br  />\begin{lstlisting}
+<br  />def recursiveWhile(cond: => Boolean)(body: => Unit): Unit = {
+<br  />def rec = () => if (cond) { body; rec() } else {}
+<br  />rec()
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>By adding CPS-related declarations and control abstractions, we implement \code{suspendableWhile}:</p>
+<p>\begin{lstlisting}
+<br  />def suspendableWhile(cond: => Rep[Boolean])(
+<br  />body: => Rep[Unit] @suspendable): Rep[Unit] @suspendable =
+<br  />shift { k =></p>
+<pre><code>def rec = fun { () =&gt;
+  if (cond) reset { body; rec() } else { k() }
+}
+rec()
+</code></pre>
+<p>}
+<br  />\end{lstlisting}</p>
+<h2>Defining the Ajax API</h2>
+<p>With the abstractions for interruptible loops and traversals at hand,
+<br  />what remains to complete the Twitter example from the beginning of the section
+<br  />is the actual Ajax request/response cycle.</p>
+<p>The Ajax interface component provides a type \code{Request} that captures the
+<br  />request structure expected by the underlying JavaScript/jQuery implementation and the
+<br  />necessary object and method definitions to enable the use of \code{ajax.get} in user
+<br  />code:
+<br  />\begin{lstlisting}
+<br  />trait Ajax extends JS with CPS {
+<br  />type Request = JSLiteral {</p>
+<pre><code>val url: String
+val `type`: String
+val dataType: String
+val data: JSLiteral
+</code></pre>
+<p>}
+<br  />type Response = Any
+<br  />object ajax {</p>
+<pre><code>def get(request: Rep[Request]) = ajax_get(request)
+</code></pre>
+<p>}
+<br  />def ajax_get(request: Rep[Request]): Rep[Response] @suspendable
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>Notice that the \code{Request} type is flexible enough to support an arbitrary object literal
+<br  />type for the \code{data} field through subtyping. The \code{Response} type alias points at \code{Any}
+<br  />which means that it is the user's responsibility to either use \code{dynamic} or
+<br  />perform an explicit cast to the expected data type.</p>
+<p>The corresponding implementation component implements \code{ajax_get} to capture a
+<br  />continuation, reify it as a staged function using \code{fun} and store it in an \code{AjaxGet} IR node.
+<br  />\begin{lstlisting}
+<br  />trait AjaxExp extends JSExp with Ajax {
+<br  />case class AjaxGet(request: Rep[Request],</p>
+<pre><code>success: Rep[Response =&gt; Unit]) extends Def[Unit]
+</code></pre>
+<p>def ajax_get(request: Rep[Request]): Rep[Response] @suspendable =</p>
+<pre><code>shift { k =&gt;
+  reflectEffect(AjaxGet(request, lambda(k)))
+}
+</code></pre>
+<p>}
+<br  />\end{lstlisting}</p>
+<p>During code generation, we emit code to attach the captured continuation as a
+<br  />callback function in the \code{success} field of the request object:
+<br  />\begin{lstlisting}
+<br  />trait GenAjax extends JSGenBase {
+<br  />val IR: AjaxExp
+<br  />import IR._
+<br  />override def emitNode(sym: Sym[Any], rhs: Def[Any])(</p>
+<pre><code>implicit stream: PrintWriter) = rhs match {
+  case AjaxGet(req, succ) =&gt; 
+    stream.println(quote(req) + ".success = " + quote(succ)) 
+    emitValDef(sym, "jQuery.ajax(" + quote(req) + ")")
+case _ =&gt; super.emitNode(sym, rhs)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>It is interesting to note that, since the request already has the right structure for the \code{jQuery.ajax} function,
+<br  />we can simply pass it to the framework-provided \code{quote} method, which knows how to generate JavaScript
+<br  />representations of any \code{JSLiteral}.</p>
+<p>The Ajax component completes the functionality required to run the Twitter example with one caveat:
+<br  />The outer loop in listing \ref{code:twitter_example} uses \code{parSuspendable} to traverse arrays
+<br  />instead of the \code{suspendable} traversal variant we have defined in listing \ref{code:suspendable_foreach}.</p>
+<p>In fact, if we change the code to use \code{suspendable} instead of \code{parSuspendable} and run the
+<br  />generated JavaScript program, we will get following output printed to the JavaScript console:
+<br  />\begin{lstlisting}
+<br  />fetching gkossakowski
+<br  />finished fetching gkossakowski
+<br  />fetched [&hellip;]
+<br  />fetched [&hellip;]
+<br  />fetching odersky
+<br  />finished fetching odersky
+<br  />fetched [&hellip;]
+<br  />fetched [&hellip;]
+<br  />fetching adriaanm
+<br  />finished fetching adriaanm
+<br  />fetched [&hellip;]
+<br  />fetched [&hellip;]
+<br  />done
+<br  />\end{lstlisting}</p>
+<p>Notice that all Ajax requests were done sequentially. Specifically,
+<br  />there was just one Ajax request active at a given time; when the
+<br  />callback to process one request is called, it would resume the
+<br  />continuation to start another request, and so on. In many cases this
+<br  />is exactly the desired behavior, however, we will most likely
+<br  />want to perform our Ajax request in parallel.</p>
+<h2>CPS for Parallelism</h2>
+<p>The goal of this section is to implement a parallel variant of the
+<br  />\code{foreach} method from listing~\ref{code:suspendable_foreach}. We will start
+<br  />with defining a few primitives like futures and dataflow cells.
+<br  />We start with cells, which we
+<br  />decide to define in JavaScript, as another example of
+<br  />integrating external libraries with our DSL:</p>
+<p>\begin{lstlisting}[language=JavaScript,caption=JavaScript-based implementation of a non-blocking Cell]
+<br  />function Cell() {
+<br  />this.value = undefined
+<br  />this.isDefined = false
+<br  />this.queue = []
+<br  />this.get = function (k) {</p>
+<pre><code>if (this.isDefined) {
+  k(this.value)
+} else {
+  this.queue.push(k)
+}
+</code></pre>
+<p>}
+<br  />this.set = function (v) {</p>
+<pre><code>if (this.isDefined) {
+  throw "can't set value twice"
+} else {
+  this.value = v
+  this.isDefined = true
+  this.queue.forEach(function (f) { 
+    f(v) //non-trivial spawn could be used here
+  })
+}
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>A cell object allows us to track dependencies between values. Whenever the \code{get} method is
+<br  />called and the value is not in the cell yet, the continuation will be added to a queue so it
+<br  />can be suspended until the value arrives. The \code{set} method takes care of resuming queued
+<br  />continuations. We expose \code{Cell} as external library using our typed API mechanism
+<br  />and we use it for implementing an abstraction for futures.</p>
+<p>\begin{lstlisting}
+<br  />def createCell(): Rep[Cell[A]]
+<br  />trait Cell[A]
+<br  />trait CellOps[A] {
+<br  />def get(k: Rep[A => Unit]): Rep[Unit]
+<br  />def set(v: Rep[A]): Rep[Unit]
+<br  />}
+<br  />implicit def repToCellOps(x: Rep[Cell[A]]): CellOps[A] =
+<br  />repProxy<a href="x">Cell[A],CellOps[A]</a></p>
+<p>def spawn(body: => Rep[Unit] @suspendable): Rep[Unit] = {
+<br  />reset(body) //non-trivial implementation uses</p>
+<pre><code>          //trampolining to prevent stack overflows
+</code></pre>
+<p>}
+<br  />def future(body: => Rep[A] @suspendable) = {
+<br  />val cell = createCell<a href="">A</a>
+<br  />spawn { cell.set(body) }
+<br  />cell
+<br  />}
+<br  />\end{lstlisting}</p>
+<p>The last bit of general functionality we need is \code{RichCellOps} that ties \code{Cell}s
+<br  />and continuations together inside of our DSL.</p>
+<p>\begin{lstlisting}
+<br  />class RichCellOps(cell: Rep[Cell[A]]) {
+<br  />def apply() = shift { k: (Rep[A] => Rep[Unit]) =></p>
+<pre><code>cell.get(lambda(k))
+</code></pre>
+<p>}
+<br  />}
+<br  />implicit def richCellOps(x: Rep[Cell[A]]): RichCell[A] =
+<br  />new RichCellOps(x)
+<br  />\end{lstlisting}</p>
+<p>It is worth noting that \code{RichCellOps} is not reified so it will be dropped at
+<br  />staging time and its method will get inlined whenever used. Also, it contains CPS-specific
+<br  />code that allows us to capture the continuation. The \code{fun} function reifies the captured continuation.</p>
+<p>We are ready to present the parallel version of \code{foreach} defined in listing \ref{code:suspendable_foreach}.</p>
+<p>\begin{lstlisting}
+<br  />def foreach(yld: Rep[A] => Rep[Unit] @suspendable):
+<br  />Rep[Unit] @suspendable = {</p>
+<pre><code>val futures = xs.map(x =&gt; future(yld(x)))
+futures.suspendable.foreach(_.apply())
+</code></pre>
+<p>}
+<br  />\end{lstlisting}</p>
+<p>We instantiate each future separately so they can be executed in parallel.
+<br  />As a second step we make sure that all futures are evaluated before we leave the \code{foreach}
+<br  />method by forcing evaluation of each future and ``waiting'' for its completion.
+<br  />Thanks to CPS transformations, all of that will be implemented in a non-blocking style.</p>
+<p>The only difference between the parallel and serial versions of the
+<br  />Twitter example~\ref{code:twitter_example} is the use of \code{parSuspendable}
+<br  />instead of \code{suspendable} so the parallel implementation of the \code{foreach}
+<br  />method is used. The rest of the code stays the same. It is easy to switch
+<br  />between both versions, and users are free to make their choice according
+<br  />to their needs and performance requirements.</p>
+<h1>Guarantees by Construction</h1>
+<p>Making staged functions explicit through the use of \code{lambda}
+<br  />(as described in Section~\ref{sec:220functions})
+<br  />enables tight control over how functions are structured and composed.
+<br  />For example, functions with multiple
+<br  />parameters can be specialized for a subset of the parameters.
+<br  />Consider the following implementation of Ackermann's function:
+<br  />\begin{slisting}
+<br  />def ack(m: Int): Rep[Int=>Int] = lambda { n =></p>
+<pre><code>if (m == 0) n+1 else
+if (n == 0) ack(m-1)(1) else
+ack(m-1)(ack(m)(n-1))
+</code></pre>
+<p>}
+<br  />\end{slisting}
+<br  />Calling \code{ack(m)(n)} will produce a set of mutually recursive
+<br  />functions, each specialized to a particular value of \code{m}
+<br  />(example \code{m}=2):</p>
+<p>\begin{slisting}
+<br  />def ack_2(n: Int) = if (n == 0) ack_1(1) else ack_1(ack_2(n-1))
+<br  />def ack_1(n: Int) = if (n == 0) ack_0(1) else ack_0(ack_1(n-1))
+<br  />def ack_0(n: Int) = n+1
+<br  />acc_2(n)
+<br  />\end{slisting}</p>
+<p>In essence, this pattern implements what is known as ``polyvariant specialization''
+<br  />in the partial evaluation community. But unlike automatic partial evaluation,
+<br  />which might or might not be able to discover the \emph{right} specialization,
+<br  />the use of staging provides a strong guarantee about the structure of the
+<br  />generated code.</p>
+<p>Other strong guarantees can be achieved by restricting the interface
+<br  />of function definitions. Being of type \code{Rep[A=>B]}, the result
+<br  />of \code{lambda} is a first-class value in the generated code that
+<br  />can be stored or passed around in arbitrary ways.
+<br  />However we might want to avoid higher-order control flow in generated
+<br  />code for efficiency reasons, or to simplify subsequent analysis passes.
+<br  />In this case, we can define a new function constructor \code{fundef} as
+<br  />follows:
+<br  />\begin{slisting}
+<br  />def fundef[A,B](f: Rep[A] => Rep[B]): Rep[A] => Rep[B] =</p>
+<pre><code>(x: Rep[A]) =&gt; lambda(f).apply(x)
+</code></pre>
+<p>\end{slisting}
+<br  />Using \code{fundef} instead of \code{lambda} produces a restricted
+<br  />function that can only be applied but not passed around in
+<br  />the generated code (type \code{Rep[A]=>Rep[B]}). At the same time, a
+<br  />result of \code{fundef} is still a first class value in the code
+<br  />\emph{generator}.
+<br  />If we do not expose \code{lambda} and \code{apply} at all to client
+<br  />code, we obtain a guarantee that each function call site unambiguously
+<br  />identifies the function definition being called and no closure
+<br  />objects will need to be created at runtime.</p>
+<h1>(Chapter 2) Data Abstraction</h1>
+<p>\label{chap:455data-abstraction}</p>
+<p>High level data structures are a cornerstone of modern programming
+<br  />and at the same time stand in the way of compiler optimizations.</p>
+<p>As a running example we consider implementing a complex number datatype in a DSL.
+<br  />The usual approach of languages executed on the JVM is to represent every non-primitive value as
+<br  />a heap-allocated reference object. The space overhead, reference indirection as well as the
+<br  />allocation and garbage collection cost are a burden for performance critical code.
+<br  />Thus, we want to be sure that our complex numbers can be manipulated as efficiently
+<br  />as two individual doubles. In the following, we explore different ways to achieve that.</p>
+<h1>Static Data Structures</h1>
+<p>\label{subsubsec:complexA}</p>
+<p>The simplest approach is to implement complex numbers as a fully static data type, that
+<br  />only exists at staging time. Only the actual \code{Double}s that constitute the
+<br  />real and imaginary components of a complex number are dynamic values:</p>
+<p>\begin{listing}
+<br  />case class Complex(re: Rep[Double], im: Rep[Double])
+<br  />def infix<em>+(a: Complex, b: Complex) =
+<br  />Complex(a.re + b.re, a.im + b.im)
+<br  />def infix</em><em>(a: Complex, b: Complex) =
+<br  />Complex(a.re</em>b.re - a.im<em>b.im, a.re</em>b.im + a.im*b.re)
+<br  />\end{listing}</p>
+<p>Given two complex numbers \code{c1,c2}, an expression like
+<br  />\begin{listing}
+<br  />c1 + 5 * c2  // assume implicit conversion from Int to Complex
+<br  />\end{listing}
+<br  />will generate code that is free of \code{Complex} objects and only contains arithmetic
+<br  />on \code{Double}s.</p>
+<p>However the ways we can use \code{Complex} objects are rather limited. Since they
+<br  />only exists at staging time we cannot, for example, express dependencies on dynamic
+<br  />conditions:</p>
+<p>\begin{listing}
+<br  />val test: Rep[Boolean] = &hellip;
+<br  />val c3 = if (test) c1 else c2 // type error: c1/c2 not a Rep type
+<br  />\end{listing}</p>
+<p>It is worthwhile to point out that nonetheless, purely static data structures
+<br  />have important use cases. To give an example, the fast fourier transform (FFT) \cite{cooley1965algorithm}
+<br  />is branch-free for a fixed input size. The definition of complex numbers
+<br  />given above can be used to implement a staged FFT that computes the well-known
+<br  />butterfly shaped computation circuits from the textbook Cooley-Tukey recurrences
+<br  />(see Section~\ref{sec:Afft}).</p>
+<p>To make complex numbers work across conditionals,
+<br  />we have have to split the control flow explicitly (another option would be
+<br  />using mutable variables).
+<br  />There are multiple ways to achieve this splitting.
+<br  />We can either duplicate the test and create a single
+<br  />result object:</p>
+<p>\begin{listing}
+<br  />val test: Rep[Boolean] = &hellip;
+<br  />val c3 = Complex(if (test) c1.re else c2.re, if (test) c1.im else c2.im)
+<br  />\end{listing}</p>
+<p>Alternatively we can use a single test and duplicate the rest of the program:</p>
+<p>\begin{listing}
+<br  />val test: Rep[Boolean] = &hellip;
+<br  />if (test) {
+<br  />val c3 = c1
+<br  />// rest of program
+<br  />} else {
+<br  />val c3 = c2
+<br  />// rest of program
+<br  />}
+<br  />\end{listing}</p>
+<p>While it is awkward to apply this transformation manually, we can use continuations (much like
+<br  />for the \code{bam} operator in Section~\ref{sec:450bam}) to generate two specialized computation paths:</p>
+<p>\begin{listing}
+<br  />def split[A](c: Rep[Boolean]) = shift { k: (Boolean => A) =>
+<br  />if (c) k(true) else k(false) // &ldquo;The Trick&rdquo;
+<br  />}
+<br  />val test: Rep[Boolean] = &hellip;
+<br  />val c3 = if (split(test)) c1 else c2
+<br  />\end{listing}</p>
+<p>The generated code will be identical to the manually duplicated, specialized version above.</p>
+<h1>Dynamic Data Structures with Partial Evaluation</h1>
+<p>\label{sec:455struct}</p>
+<p>We observe that we can increase the amount of statically possible computation (in a sense,
+<br  />applying binding-time improvements) for dynamic values with domain-specific rewritings:
+<br  />\begin{listing}
+<br  />val s: Int = &hellip;            // static
+<br  />val d: Rep[Int] = &hellip;       // dynamic</p>
+<p>val x1 = s + s + d          // left assoc: s + s evaluated statically,</p>
+<pre><code>                        // one dynamic addition
+</code></pre>
+<p>val x2 = s + (d + s)        // naively: two dynamic additions,</p>
+<pre><code>                        // using pattern rewrite: only one
+</code></pre>
+<p>\end{listing}</p>
+<p>In computing \code{x1}, there is only one dynamic addition because the left associativity of
+<br  />the plus operator implies that the two static values will be added together at staging time.
+<br  />Computing \code{x2} will incur two dynamic additions, because both additions have at least
+<br  />one dynamic summand. However we can add rewriting rules that first replace \code{d+c}
+<br  />(\code{c} denoting a dynamic value that is know to be a static constant, i.e.\ an IR
+<br  />node of type \code{Const}) with \code{c+d} and then \code{c+(c+d)} with \code{(c+c)+d}.
+<br  />The computation \code{c+c} can again be performed statically.</p>
+<p>We have seen in Section~\ref{sec:361struct} how we can define a generic
+<br  />framework for data structures that follows a similar spirit.
+<br  />The interface for field accesses \code{field} pattern matches
+<br  />on its argument and, if that is a \code{Struct} creation, looks up the desired value
+<br  />from the embedded hash map.</p>
+<p>An implementation of complex numbers in terms of \code{Struct} could look like this:
+<br  />\begin{listing}
+<br  />trait ComplexOps extends ComplexBase with ArithOps {
+<br  />def infix_+(x: Rep[Complex], y: Rep[Complex]): Rep[Complex] =</p>
+<pre><code>Complex(x.re + y.re, x.im + y.im)
+</code></pre>
+<p>def infix_*(x: Rep[Complex], y: Rep[Complex]): Rep[Complex] =</p>
+<pre><code>Complex(a.re*b.re - ...)
+</code></pre>
+<p>}
+<br  />trait ComplexBase extends Base {
+<br  />class Complex
+<br  />def Complex(re: Rep[Double], im: Rep[Double]): Rep[Complex]
+<br  />def infix_re(c: Rep[Complex]): Rep[Double]
+<br  />def infix_im(c: Rep[Complex]): Rep[Double]
+<br  />}
+<br  />trait ComplexStructExp extends ComplexBase with StructExp {
+<br  />def Complex(re: Rep[Double], im: Rep[Double]) =</p>
+<pre><code>struct[Complex](classTag("Complex"), Map("re"-&gt;re, "im"-&gt;im))
+</code></pre>
+<p>def infix_re(c: Rep[Complex]): Rep[Double] = field<a href="c," title="re">Double</a>
+<br  />def infix_im(c: Rep[Complex]): Rep[Double] = field<a href="c," title="im">Double</a>
+<br  />}
+<br  />\end{listing}</p>
+<p>Note how complex arithmetic is defined completely within the interface trait \code{ComplexOps},
+<br  />which inherits double arithmetic from \code{ArithOps}. Access to the components via
+<br  />\code{re} and \code{im} is implemented using \code{struct}.</p>
+<p>Using virtualized record types (see Section~\ref{sec:211struct}) that map to \code{struct} internally,
+<br  />we can express the type definition more conveniently as
+<br  />\begin{listing}
+<br  />class Complex extends Struct { val re: Double, val im: Double }
+<br  />\end{listing}
+<br  />and remove the need for methods \code{infix_re} and \code{infix_im}. The
+<br  />Scala-Virtualized compiler will automatically provide staged field accesses like
+<br  />\code{c.re} and \code{c.im}. It is still useful to add a simplified constructor
+<br  />method
+<br  />\begin{listing}
+<br  />def Complex(r: Rep[Double], i: Rep[Double]) =
+<br  />new Complex { val re = re; val im = im }
+<br  />\end{listing}
+<br  />to enable using \code{Complex(re,im)} instead of the \code{new Complex}
+<br  />syntax.</p>
+<p>In contrast to the completely static implementation of complex numbers presented in
+<br  />Section~\ref{subsubsec:complexA} above, complex numbers are a fully dynamic
+<br  />DSL type now. The previous restrictions are gone and we can write the following
+<br  />code without compiler error:
+<br  />\begin{listing}
+<br  />val c3 = if (test) c1 else c2
+<br  />println(c3.re)
+<br  />\end{listing}</p>
+<p>The conditional \code{ifThenElse} is overridden to split itself for each field
+<br  />of a struct. Internally the above will be represented as:
+<br  />\begin{listing}
+<br  />val c3re = if (test) c1re else c2re
+<br  />val c3im = if (test) c1im else c2im   // removed by dce
+<br  />val c3 = Complex(c3re, c3im)          // removed by dce
+<br  />println(c3re)
+<br  />\end{listing}
+<br  />The computation of the imaginary component as well as the struct creation for
+<br  />the result of the conditional are never used and thus they will be removed
+<br  />by dead code elimination.</p>
+<h1>Generic Programming with Type Classes</h1>
+<p>The type class pattern \cite{DBLP:conf/popl/WadlerB89}, which decouples
+<br  />data objects from generic dispatch, fits naturally with a staged
+<br  />programming model as type class instances can be implemented as
+<br  />static objects.</p>
+<p>%DSL operations that can be statically dispatched are more amenable to the
+<br  />%optimizations discussed in the previous sections.  Useful methods for
+<br  />%abstracting over data representations include OO-style inheritance and type
+<br  />%classes \cite{DBLP:conf/popl/WadlerB89}.</p>
+<p>%\subsection{Type Classes}
+<br  />%We discuss type classes first.
+<br  />Extending the Vector example, we might want to be able to add vectors that contain
+<br  />numeric values. We can use a lifted variant of the \code{Numeric} type class from the Scala library
+<br  />\begin{listing}
+<br  />class Numeric[T] {
+<br  />def num_plus(a: Rep[T], b: Rep[T]): Rep[T]
+<br  />}
+<br  />\end{listing}
+<br  />and provide a type class instance for complex numbers:
+<br  />\begin{listing}
+<br  />implicit def complexIsNumeric = new Numeric[Complex] {
+<br  />def num_plus(a: Rep[Complex], b: Rep[Complex]) = a + b
+<br  />}
+<br  />\end{listing}</p>
+<p>Generic addition on Vectors is straightforward, assuming we
+<br  />have a method \code{zipWith} already defined:
+<br  />\begin{listing}
+<br  />def infix_+[T:Numeric](a: Rep[Vector[T]], b: Rep[Vector[T]]) = {
+<br  />val m = implicitly[Numeric[T]] // access type class instance
+<br  />a.zipWith(b)((u,v) => m.num_plus(u,v))
+<br  />}
+<br  />\end{listing}
+<br  />With that definition at hand we can add a type class instance
+<br  />for numeric vectors:
+<br  />\begin{listing}
+<br  />implicit def vecIsNumeric[T:Numeric] = new Numeric[Vector[T]] {
+<br  />def num_plus(a: Rep[Vector[T]], b: Rep[Vector[T]]) = a + b
+<br  />\end{listing}
+<br  />which allows us to pass, say, a \code{Rep[Vector[Complex]]} to any function
+<br  />that works over generic types \code{T:Numeric} including vector addition
+<br  />itself. The same holds for nested vectors of type \code{Rep[Vector[Vector[Complex]]]}.
+<br  />Usually, type classes are implemented by passing an implicit dictionary, the
+<br  />type class instance, to generic functions. Here, type classes are a purely
+<br  />stage-time concept. All generic code is specialized to the concrete types and no
+<br  />type class instances exist (and hence no virtual dispatch occurs) when the
+<br  />DSL program is run.</p>
+<p>An interesting extension of the type class model is the notion of polytypic
+<br  />staging, studied on top of LMS \cite{slesarenko12polytypic}.</p>
+<h1>Unions and Inheritance</h1>
+<p>\label{sec:455inherit}</p>
+<p>The struct abstraction from Section~\ref{sec:361struct} can be extended to sum types and
+<br  />inheritance using a tagged union approach \cite{nystrom11firepile,DBLP:conf/fsttcs/JonesLKC08}.
+<br  />We add a \code{clzz} field to each struct that refers to
+<br  />an expression that defines the object's class. Being a regular struct field,
+<br  />it is subject to all common optimizations.
+<br  />We extend the complex number example with two subclasses:
+<br  />\begin{listing}
+<br  />abstract class Complex
+<br  />class Cartesian extends Complex with Struct { val re: Double, val im: Double }
+<br  />class Polar extends Complex with Struct { val r: Double, val phi: Double }
+<br  />\end{listing}
+<br  />Splitting transforms work as before: e.g.\ conditional expressions are forwarded to the
+<br  />fields of the struct. But now the result struct will contain the union of the fields found
+<br  />in the two branches, inserting null values as appropriate. A conditional is created for
+<br  />the \code{clzz} field only if the exact class is not known at staging time.
+<br  />As an example, the expression
+<br  />\begin{listing}
+<br  />val a = Cartesian(1.0, 2.0); val b = Polar(3.0, 4.0)
+<br  />if (x > 0) a else b
+<br  />\end{listing}
+<br  />produces this generated code:
+<br  />\begin{listing}
+<br  />val (re, im, r, phi, clzz) =
+<br  />if (x > 0) (1.0, 2.0, null, null, classOf[Cartesian])
+<br  />else (null, null, 3.0, 4.0, classOf[Polar])
+<br  />struct(&ldquo;re&rdquo;->re, &ldquo;im&rdquo;->im, &ldquo;r&rdquo;->r, &ldquo;phi&rdquo;->phi, &ldquo;clzz&rdquo;->clzz)
+<br  />\end{listing}</p>
+<p>The \code{clzz} fields allows virtual dispatch via type tests and type casting,
+<br  />e.g.\ to convert any complex number to its cartesian representation:
+<br  />\begin{listing}
+<br  />def infix_toCartesian(c: Rep[Complex]): Rep[Cartesian] =
+<br  />if (c.isInstanceOf[Cartesian]) c.asInstanceOf[Cartesian]
+<br  />else { val p = c.asInstanceOf[Polar]</p>
+<pre><code>Cartesian(p.r * cos(p.phi), p.r * sin(p.phi)) }
+</code></pre>
+<p>\end{listing}
+<br  />Appropriate rewrites ensure that if the argument is known to be
+<br  />a Cartesian, the conversion is a no-op. The type test that
+<br  />inspects the clzz field is only generated if the type cannot
+<br  />be determined statically. If the clzz field is never used
+<br  />it will be removed by DCE.</p>
+<h1>Struct of Array and Other Data Format Conversions</h1>
+<p>\label{sec:455structUse}</p>
+<p>There is another particularly interesting use case for the splitting of data structures:
+<br  />Let us assume we want to create a vector of
+<br  />complex numbers. Just as with the if-then-else example above, we can override the vector
+<br  />constructors such that a \code{Vector[Cartesian]} is represented as a struct that contains
+<br  />two separate arrays, one for the real and one for the imaginary components. A more
+<br  />general \code{Vector[Complex]} that contains both polar and cartesian values will
+<br  />be represented as five arrays, one for each possible data field plus the \code{clzz} tag
+<br  />for each value.
+<br  />In fact, we have expressed our conceptual array of structs as a struct of arrays (AoS to SoA transform,
+<br  />see Section~\ref{sec:360soa}).
+<br  />This data layout is beneficial in many cases. Consider for example calculating complex
+<br  />conjugates (i.e.\ swapping the sign of the imaginary components) over a vector of complex numbers.
+<br  />\begin{listing}
+<br  />def conj(c: Rep[Complex]) = if (c.isCartesian) {
+<br  />val c2 = c.toCartesian; Cartesian(c2.re, -c2.im)
+<br  />} else {
+<br  />val c2 = c.toPolar; Polar(c2.r, -c2.phi)
+<br  />}
+<br  />\end{listing}
+<br  />To make the test case more interesting we perform the calculation only in one branch
+<br  />of a conditional.
+<br  />\begin{listing}
+<br  />val vector1 = &hellip; // only Cartesian values
+<br  />if (test) {
+<br  />vector1.map(conj)
+<br  />} else {
+<br  />vector1
+<br  />}
+<br  />\end{listing}
+<br  />All the real parts remain unchanged so the array holding them need not be touched at all.
+<br  />Only the imaginary parts have to be transformed, cutting the total required memory bandwidth
+<br  />in half. Uniform array operations like this are also a much better fit for SIMD execution.
+<br  />The generated intermediate code is:
+<br  />\begin{listing}
+<br  />val vector1re = &hellip;
+<br  />val vector1im = &hellip;
+<br  />val vector1clzz = &hellip; // array holding classOf[Cartesian] values
+<br  />val vector2im = if (test) {
+<br  />Array.fill(vector1size) { i => -vector1im(i) }
+<br  />} else {
+<br  />vector1im
+<br  />}
+<br  />struct(ArraySoaTag(Complex,vector1size),
+<br  />Map(&ldquo;re&rdquo;->vector1re, &ldquo;im&rdquo;->vector2im, &ldquo;clzz&rdquo;->vector1clzz))
+<br  />\end{listing}
+<br  />Note how the conditionals for the \code{re} and \code{clzz} fields have been eliminated since
+<br  />the fields do not change (the initial array contained cartesian numbers only). If the
+<br  />struct expression will not be referenced in the final code, dead code elimination removes the
+<br  />\code{clzz} array.</p>
+<p>In the presence of conditionals that produce array elements of different types, it can be
+<br  />beneficial to use a sparse representation for arrays that make up the result struct-of-array,
+<br  />similar to the approach in Data Parallel Haskell~\cite{DBLP:conf/fsttcs/JonesLKC08}. Of course
+<br  />no choice of layout is optimal in all cases, so the usual sparse versus dense tradeoffs
+<br  />regarding memory use and access time apply here as well.</p>
+<p>We conclude this section by taking note that we can actually guarantee that no dynamic \code{Complex} or
+<br  />\code{Struct} object is ever created just by not implementing code generation logic for \code{Struct}
+<br  />and \code{Field} IR nodes and signaling an error instead. This is a good example of a performance-oriented
+<br  />DSL compiler rejecting a program as ill-formed because it cannot be executed in the desired,
+<br  />efficient way.</p>
+<h1>Loop Fusion and Deforestation</h1>
+<p>\label{subsec:fusion}</p>
+<p>Building complex bulk operations out of simple ones often leads to inefficient generated code.  For example consider the simple vector code</p>
+<p>\begin{listing}
+<br  />val a: Rep[Double] = &hellip;
+<br  />val x: Rep[Vector[Double]] = &hellip;
+<br  />val y: Rep[Vector[Double]] = &hellip;</p>
+<p>a*x+y
+<br  />\end{listing}</p>
+<p>Assuming we have provided the straightforward loop-based implementations of scalar-times-vector and vector-plus-vector, the resulting code for
+<br  />this program will perform two loops and allocate a temporary vector to store \code{a<em>x}.  A more efficient implementation will only use
+<br  />a single loop (and no temporary vector allocations) to compute \code{a</em>x(i)+y(i)}.</p>
+<p>In addition to operations that are directly dependent as illustrated above, side-by-side operations also appear frequently.
+<br  />As an example, consider a DSL that provides mean and variance methods.</p>
+<p>\begin{listing}
+<br  />def mean(x: Rep[Vector[Double]]) =</p>
+<pre><code>sum(x.length) { i =&gt; x(i) } / x.length
+</code></pre>
+<p>def variance(x: Rep[Vector[Double]]) =</p>
+<pre><code>sum(x.length) { i =&gt; square(x(i)) } / x.length - square(mean(x))
+</code></pre>
+<p>val data = &hellip;</p>
+<p>val m = mean(data)
+<br  />val v = variance(data)
+<br  />\end{listing}</p>
+<p>The DSL developer wishes to provide these two functions separately, but many applications will compute both the mean and variance of a
+<br  />dataset together.  In this case we again want to perform all the work with a single pass over \code{data}.  In both of the above example situations,
+<br  />fusing the operations into a single loop greatly improves cache behavior and reduces the total number of loads and stores required.
+<br  />It also creates coarser-grained functions out of fine-grained ones, which will likely improve parallel scalability.</p>
+<p>Our framework handles all situations like these two examples uniformly and for all DSLs.  Any non-effectful loop IR node
+<br  />is eligible for fusing with other loops.  In order to handle all the interesting loop fusion cases, the fusing algorithm uses
+<br  />simple and general criteria: It fuses all pairs of loops where either both loops have the exact same size or one loop iterates over
+<br  />a data structure the other loop creates, as long as fusing will not create any cyclic dependencies. The exact rules are
+<br  />presented in Section~\ref{sec:360fusionComp}.
+<br  />When it finds two eligible loops the algorithm creates a new loop with a body composed of both of the original bodies.
+<br  />Merging loop bodies includes array contraction, i.e.\ the fusing transform modifies dependencies so that all results produced
+<br  />within a loop iteration are consumed directly rather than by reading an output data structure.
+<br  />%In the case of groupBy operations, contraction also works across hash tables.
+<br  />Whenever this renders an output data structure unnecessary (it does not escape the fused loop) it is removed automatically by dead code elimination.
+<br  />All DeliteOpLoops are parallel loops, which allows the fused loops to be parallelized in the same manner as the original loops.</p>
+<p>The general heuristic is to apply fusion greedily wherever possible. For dominantly imperative code more
+<br  />refined heuristics might be needed \cite{DBLP:conf/sc/BelterJKS09}.
+<br  />However, our loop abstractions are dominantly functional and
+<br  />many loops create new data structures. Removing intermediate data buffers,
+<br  />which are potentially large and many of which are used only once is clearly a win,
+<br  />so fusing seems to be beneficial in almost all cases.</p>
+<p>Our fusion mechanism is similar but not identical to deforestation \cite{DBLP:journals/tcs/Wadler90} and related
+<br  />approaches \cite{DBLP:conf/icfp/CouttsLS07}.
+<br  />Many of these approaches only consider expressions that are directly dependent (vertical fusion), whereas we
+<br  />are able to handle both dependent and side-by-side expressions (horizontal fusion) with one general mechanism.  This is critical for situations such as the
+<br  />mean and variance example, where the only other efficient alternative would be to explicitly create a composite function that returns
+<br  />both results simultaneously.  This solution additionally requires the application writer to always remember to use the composite version
+<br  />when appropriate.  It is generally difficult to predict all likely operation compositions as well as onerous to provide efficient, specialized
+<br  />implementations of them.  Therefore fusion is key for efficient compositionality in both applications and DSL libraries.</p>
+<h1>Extending the Framework</h1>
+<p>A framework for building DSLs must be easily extensible in order for the DSL developer to exploit domain
+<br  />knowledge starting from a general-purpose IR design.  Consider a simple DSL for linear algebra with a
+<br  />Vector type.  Now we want to add norm and dist functions to the DSL. The first possible implementation
+<br  />is to simply implement the functions as library methods.</p>
+<p>\begin{listing}
+<br  />def norm[T:Numeric](v: Rep[Vector[T]]) = {
+<br  />sqrt(v.map(j => j*j).sum)
+<br  />}
+<br  />def dist[T:Numeric](v1: Rep[Vector[T]], v2: Rep[Vector[T]]) = {
+<br  />norm(v1 - v2)
+<br  />}
+<br  />\end{listing}</p>
+<p>Whenever the dist method is called the implementation will be added to the application IR in terms of vector subtraction,
+<br  />vector map, vector sum, etc. (assuming each of these methods is built-in to the language rather than also being provided
+<br  />as a library method).  This version is very straightforward to write but the knowledge that the application wishes to
+<br  />find the distance between two vectors is lost.</p>
+<p>By defining norm explicitly in the IR implementation trait (where Rep[T] = Exp[T]) we gain ability to perform pattern matching
+<br  />on the IR nodes that compose the arguments.</p>
+<p>\begin{listing}
+<br  />override def norm[T:Numeric](v: Exp[Vector[T]]) = v match {
+<br  />case Def(ScalarTimesVector(s,u)) => s * norm(u)
+<br  />case Def(ZeroVector(n)) => 0
+<br  />case _ => super.norm(v)
+<br  />}
+<br  />\end{listing}</p>
+<p>In this example there are now three possible implementations of \code{norm}.  The first case factors scalar-vector multiplications out
+<br  />of \code{norm} operations, the second short circuits the norm of a ZeroVector to be simply the constant 0, and the third falls back
+<br  />on the default implementation defined above.  With this method we can have a different implementation of \code{norm} for each
+<br  />\emph{occurrence} in the application.</p>
+<p>An even more powerful alternative is to implement \code{norm} and \code{dist} as custom IR nodes.  This enables the DSL to include these nodes
+<br  />when optimizing the application via pattern matching and IR rewrites as illustrated above.  For example, we can add a rewrite
+<br  />rule for calculating the norm of a unit vector: if  $v_1 = \frac{v}{\|v\|}$ then $\left\|v_1\right\|=1$.
+<br  />In order to implement this optimization we need to add cases both for the new \code{norm} operation as well as to the
+<br  />existing scalar-times-vector operation to detect the first half of the pattern.</p>
+<p>\begin{listing}
+<br  />case class VectorNorm[T](v: Exp[Vector[T]]) extends Def[T]
+<br  />case class UnitVector[T](v: Exp[Vector[T]]) extends Def[Vector[T]]</p>
+<p>override def scalar_times_vector[T:Numeric](s: Exp[T], v: Exp[Vector[T]]) =
+<br  />(s,v) match {
+<br  />case (Def(Divide(Const(1), Def(VectorNorm(v1)))), v2)</p>
+<pre><code>if v1 == v2 =&gt; UnitVector(v)
+</code></pre>
+<p>case <em> => super.scalar_times_vector(s,v)
+<br  />}
+<br  />override def norm[T:Numeric](v: Exp[Vector[T]]) = v match {
+<br  />case Def(UnitVector(v1)) => 1
+<br  />case </em> => super.norm(v)
+<br  />}
+<br  />\end{listing}</p>
+<p>In this example the scalar-times-vector optimization requires vector-norm to exist as an IR node to detect\footnote{The \code{==}
+<br  />operator tests structural equality of IR nodes.
+<br  />The test is cheap because we only need to look at symbols, one level deep.
+<br  />Value numbering/CSE ensures that intensionally equal IR nodes get assigned the same symbol.}  and short-circuit
+<br  />the operation to simply create and mark unit vectors.  The vector-norm optimization then detects unit vectors and short circuits the norm operation
+<br  />to simply add the constant 1 to the IR.  In every other case it falls back on the default implementation, which is to create a new \code{VectorNorm} IR node.</p>
+<p>The default constructor for \code{VectorNorm} uses delayed rewriting (see Section~\ref{sec:330delayed})
+<br  />to specify the desired lowering of the IR node:
+<br  />\begin{listing}
+<br  />def norm[T:Numeric](v: Rep[Vector[T]]) = VectorNorm(v) atPhase(lowering) {
+<br  />sqrt(v.map(j => j*j).sum)
+<br  />}
+<br  />\end{listing}
+<br  />The right hand side of this translation is exactly the initial norm implementation we started with.</p>
+<h1>Lowering Transforms</h1>
+<p>In our running example, we would like to treat linear algebra
+<br  />operations symbolically first,
+<br  />with individual IR nodes like \code{VectorZeros} and \code{VectorPlus}.
+<br  />In Figure~\ref{fig:vectorImpl}, the smart constructor \code{vec_plus} implements a
+<br  />rewrite that simplifies \code{v+zero} to \code{v}. CSE, DCE, etc. will all
+<br  />be performed on these high level nodes.</p>
+<p>After all those optimizations are applied, we want to
+<br  />transform our operations to the low-level
+<br  />array implementation from Figure~\ref{fig:stagedArrays}
+<br  />in a separate lowering pass. Trait \code{LowerVectors} in Figure~\ref{fig:vectorImpl}
+<br  />implements this transformation by delegating back
+<br  />to user-space code, namely method \code{vec_plus_ll} in
+<br  />trait \code{VectorsLowLevel}.</p>
+<p>\begin{listing}
+<br  />// Vector interface
+<br  />trait Vectors extends Base {
+<br  />// elided implicit enrichment boilerplate:
+<br  />//   Vector.zeros(n) = vec_zeros(n), v1 + v2 = vec_plus(a,b)
+<br  />def vec_zeros[T:Numeric](n: Rep[Int]): Rep[Vector[T]]
+<br  />def vec_plus[T:Numeric](a: Rep[Vector[T]], b: Rep[Vector[T]]): Rep[Vector[T]]
+<br  />}
+<br  />// low level translation target
+<br  />trait VectorsLowLevel extends Vectors {
+<br  />def vec_zeros_ll[T:Numeric](n: Rep[Int]): Rep[Vector[T]] =</p>
+<pre><code>Vector.fromArray(Array.fill(n) { i =&gt; zero[T] })
+</code></pre>
+<p>def vec_plus_ll[T:Numeric](a: Rep[Vector[T]], b: Rep[Vector[T]]) =</p>
+<pre><code>Vector.fromArray(a.data.zipWith(b.data)(_ + _))
+</code></pre>
+<p>}
+<br  />// IR level implementation
+<br  />trait VectorsExp extends BaseExp with Vectors {
+<br  />// IR node definitions and constructors
+<br  />case class VectorZeros(n: Exp[Int]) extends Def[Vector[T]]
+<br  />case class VectorPlus(a: Exp[Vector[T]],b: Exp[Vector[T]]) extends Def[Vector[T]]
+<br  />def vec_zeros[T:Numeric](n: Rep[Int]): Rep[Vector[T]] = VectorZeros(n)
+<br  />def vec_plus[T:Numeric](a: Rep[Vector[T]], b: Rep[Vector[T]]) = VectorPlus(a,b)
+<br  />// mirror: transformation default case
+<br  />def mirror[T](d: Def[T])(t: Transformer) = d match {</p>
+<pre><code>case VectorZeros(n) =&gt; Vector.zeros(t.transformExp(n))
+case VectorPlus(a,b) =&gt; t.transformExp(a) + t.transformExp(b)
+case _ =&gt; super.mirror(d)
+</code></pre>
+<p>}
+<br  />}
+<br  />// optimizing rewrites (can be specified separately)
+<br  />trait VectorsExpOpt extends VectorsExp {
+<br  />override def vec_plus<a href="a:Rep[Vector[T]],b:Rep[Vector[T]]">T:Numeric</a>=(a,b)match{</p>
+<pre><code>case (a, Def(VectorZeros(n))) =&gt; a
+case (Def(VectorZeros(n)), b) =&gt; b
+case _ =&gt; super.vec_plus(a,b)
+</code></pre>
+<p>}
+<br  />}
+<br  />// transformer: IR -> low level impl
+<br  />trait LowerVectors extends ForwardTransformer {
+<br  />val IR: VectorsExp with VectorsLowLevel; import IR._
+<br  />def transformDef[T](d: Def[T]): Exp[T] = d match {</p>
+<pre><code>case VectorZeros(n) =&gt; vec_zeros_ll(transformExp(n))
+case VectorPlus(a,b) =&gt; vec_plus_ll(transformExp(a), transformExp(b))
+case _ =&gt; super.transformDef(d)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>The result of the transformation is a staged program
+<br  />fragment just like in Figure~\ref{fig:stagedArrays}.</p>
+<p>This setup greatly simplifies the definition of the
+<br  />lowering transform, which would otherwise need to assemble
+<br  />the \code{fill} or \code{zipWith} code using low level IR manipulations.
+<br  />Instead we benefit directly from the staged \code{zipWith} definition
+<br  />from Figure~\ref{fig:stagedArrays}. Also, further rewrites
+<br  />will take place automatically. Essentially all simplifications
+<br  />are performed eagerly, after each transform phase.
+<br  />Thus we guarantee that CSE, DCE, etc. have been applied on
+<br  />high-level operations before they are translated into
+<br  />lower-level equivalents, on which optimizations would
+<br  />be much harder to apply.
+<br  />To give a quick example, the initial program
+<br  />\begin{listing}
+<br  />val v1 = &hellip;
+<br  />val v2 = Vector.zeros(n)
+<br  />val v3 = v1 + v2
+<br  />v1 + v3
+<br  />\end{listing}
+<br  />will become
+<br  />\begin{listing}
+<br  />val v1 = &hellip;
+<br  />Vector.fromArray(v1.data.zipWith(v1.data)(<em> + </em>))
+<br  />\end{listing}
+<br  />after lowering (modulo unfolding of staged zipWith).</p>
+<h1>(Chapter 3) Case Studies</h1>
+<p>\label{chap:460fusionUse}</p>
+<p>This chapter presents case studies for Delite apps (using the OptiML and OptiQL DSLs) as
+<br  />well as classical staging use cases (FFT specialization and regular expression matching).
+<br  />The Delite apps are real-world examples for the loop fusion algorithm from
+<br  />Section~\ref{sec:360fusionComp} and the struct conversion from Section~\ref{sec:361struct}.</p>
+<h1>OptiML Stream Example</h1>
+<p>\credits{Design and presentation by Arvind Sujeeth, fusion implementation by the author}
+<br  />OptiML is an embedded DSL for machine learning (ML) developed on
+<br  />top of LMS and Delite.  It provides a MATLAB-like programming model with
+<br  />ML-specific abstractions. OptiML is a prototypical example of how the techniques
+<br  />described in this thesis can be used to construct productive, high performance
+<br  />DSLs targeted at heterogeneous parallel machines.</p>
+<p>\label{sec:optiml}
+<br  />%\subsection{Streaming Matrix}</p>
+<h2>Downsampling in Bioinformatics</h2>
+<p>In this example, we will demonstrate how the optimization and code generation
+<br  />techniques discussed in previous sections come together to produce efficient
+<br  />code in real applications. SPADE is a bioinformatics application
+<br  />that builds tree representations of large, high-dimensional flow cytometry datasets.
+<br  />Consider the following small but compute-intensive snippet from SPADE (C++):</p>
+<p>\begin{listing}
+<br  />std::fill(densities, densities+obs, 0);</p>
+<h1>pragma omp parallel for shared(densities)</h1>
+<p>for (size_t i=0; i<obs; i++) {
+<br  />if (densities[i] > 0)</p>
+<pre><code>continue;
+</code></pre>
+<p>std::vector<size_t> apprxs;  // Keep track on observations we can approximate
+<br  />Data_t <em>point = &amp;data[i</em>dim];
+<br  />Count_t c = 0;</p>
+<p>for (size_t j=0; j&lt;obs; j++) {</p>
+<pre><code>Dist_t d = distance(point, &amp;data[j*dim], dim);
+if (d &lt; apprx_width) {
+  apprxs.push_back(j);
+  c++;
+} else if (d &lt; kernel_width) c++;
+</code></pre>
+<p>}
+<br  />// Potential race condition on other density entries, use atomic
+<br  />// update to be safe
+<br  />for (size_t j=0; j&lt;apprxs.size(); j++)</p>
+<pre><code>__sync_bool_compare_and_swap(densities+apprxs[j],0,c);
+</code></pre>
+<p>densities[i] = c;
+<br  />}
+<br  />\end{listing}</p>
+<p>This snippet represents a downsampling step that computes a set of values,
+<br  />densities, that represents the number of samples within a bounded distance
+<br  />(kernel_width) from the current sample. Furthermore, any distances within
+<br  />apprx_width of the current sample are considered to be equivalent, and the
+<br  />density for the approximate group is updated as a whole. Finally, the loop is
+<br  />run in parallel using OpenMP. This snippet represents hand-optimized, high
+<br  />performance, low-level code. It took a systems and C++ expert to port the
+<br  />original MATLAB code (written by a bioinformatics researcher) to this
+<br  />particular implementation. In contrast, consider the equivalent snippet of
+<br  />code, but written in OptiML:</p>
+<p>\begin{listing}
+<br  />val distances = Stream[Double](data.numRows, data.numRows) {
+<br  />(i,j) => dist(data(i),data(j))
+<br  />}
+<br  />val densities = Vector[Int](data.numRows, true)</p>
+<p>for (row <- distances.rows) {
+<br  />if(densities(row.index) == 0) {</p>
+<pre><code>val neighbors = row find { _ &lt; apprxWidth }
+densities(neighbors) = row count { _ &lt; kernelWidth }
+</code></pre>
+<p>}
+<br  />}
+<br  />densities
+<br  />\end{listing}</p>
+<p>This snippet is expressive and easy to write. It is not obviously high
+<br  />performance. However, because we have abstracted away implementation detail,
+<br  />and built-in high-level semantic knowledge into the OptiML compiler, we can
+<br  />generate code that is essentially the same as the hand-tuned C++ snippet. Let's
+<br  />consider the OptiML code step by step.</p>
+<p>Line 1 instantiates a Stream, which is an OptiML data structure that is
+<br  />buffered; it holds only a chunk of the backing data in memory at a time, and
+<br  />evaluates operations one chunk at a time. Stream only supports iterator-style
+<br  />access and bulk operations. These semantics are necessary to be able to express
+<br  />the original problem in a more natural way without adding overwhelming
+<br  />performance overhead. The foreach implementation for stream.rows is:</p>
+<p>\begin{listing}
+<br  />def stream_foreachrow[A:Manifest](x: Exp[Stream[A]],</p>
+<pre><code>          block: Exp[StreamRow[A]] =&gt; Exp[Unit]) = {
+</code></pre>
+<p>var i = 0
+<br  />while (i &lt; numChunks) {</p>
+<pre><code>val rowsToProcess = stream_rowsin(x, i)
+val in = (0::rowsToProcess)
+val v = fresh[Int]
+
+// fuse parallel initialization and foreach function
+reflectEffect(StreamInitAndForeachRow(in, v, x, i, block))   // parallel
+i += 1
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>This method constructs the IR nodes for iterating over all of the chunks in the
+<br  />Stream, initalizing each row, and evaluating the user-supplied foreach
+<br  />anonymous function. We first obtain the number of rows in the current chunk by
+<br  />calling a method on the Stream instance (\code{stream_rowsin}). We then call
+<br  />the StreamInitAndForeachRow op, which is a DeliteOpForeach, over all of the
+<br  />rows in the chunk.  OptiML unfolds the foreach function and the stream
+<br  />initialization function while building the IR, inside StreamInitAndForeachRow.
+<br  />The stream initialization function (\code{(i,j) => dist(data(i),data(j)})
+<br  />constructs a StreamRow, which is the input to the foreach function. The
+<br  />representation of the foreach function consists of an IfThenElse operation,
+<br  />where the then branch contains the VectorFind, VectorCount, and
+<br  />VectorBulkUpdate operations from lines 6-7 of the OptiML SPADE snippet.
+<br  />VectorFind and VectorCount both extend DeliteOpLoop. Since they are both
+<br  />DeliteOpLoops over the same range with no cyclic dependencies, they are fused
+<br  />into a single DeliteOpLoop. This eliminates an entire pass (and the
+<br  />corresponding additional memory accesses) over the row, which is a non-trivial
+<br  />235,000 elements in one typical dataset.</p>
+<p>Fusion helps to transform the generated code into the iterative structure of
+<br  />the C++ code. One important difference remains: we only want to compute the
+<br  />distance if it hasn't already been computed for a neighbor. In the streaming
+<br  />version, this corresponds to only evaluating a row of the Stream if the
+<br  />user-supplied if-condition is true. In other words, we need to optimize the
+<br  />initialization function \emph{together with} the anonymous function supplied to
+<br  />the foreach. LMS does this naturally since the foreach implementation and the
+<br  />user code written in the DSL are all uniformly represented with the same IR.
+<br  />When the foreach block is scheduled, the stream initialization function is
+<br  />pushed inside the user conditional because the StreamRow result is not required
+<br  />anywhere else. Furthermore, once the initialization function is pushed inside
+<br  />the conditional, it is then fused with the existing DeliteOpLoop, eliminating
+<br  />another pass. We can go even further and remove all dependencies on the
+<br  />StreamRow instance by bypassing field accesses on the row, using the pattern
+<br  />matching mechanism described earlier:</p>
+<p>\begin{listing}
+<br  />trait StreamOpsExpOpt extends StreamOpsExp {
+<br  />this: OptiMLExp with StreamImplOps =></p>
+<p>override def stream_numrows[A:Manifest](x: Exp[Stream[A]]) = x match {</p>
+<pre><code>case Def(Reflect(StreamObjectNew(numRows, numCols, 
+                  chunkSize, func, isPure),_,_)) =&gt; numRows
+case _ =&gt; super.stream_numrows(x)
+</code></pre>
+<p>}
+<br  />// similar overrides for other stream fields
+<br  />}
+<br  />trait VectorOpsExpOpt extends VectorOpsExp {
+<br  />this: OptiMLExp with VectorImplOps =>
+<br  />// accessing an element of a StreamRow directly accesses the underlying Stream
+<br  />override def vector_apply[A:Manifest](x: Exp[Vector[A]], n: Exp[Int]) = x match {</p>
+<pre><code>case Def(StreamChunkRow(x, i, offset)) =&gt; stream_chunk_elem(x,i,n)
+case _ =&gt; super.vector_apply(x,n)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>Now as the row is computed, the results of VectorFind and VectorCount are also
+<br  />computed in a pipelined fashion. All accesses to the StreamRow are
+<br  />short-circuited to their underlying data structure (the Stream), and no
+<br  />StreamRow object is ever allocated in the generated code. The following listing
+<br  />shows the final code generated by OptiML for the ``then'' branch (comments and
+<br  />indentation added for clarity):</p>
+<p>\begin{multicols}{2}
+<br  />\begin{listing}
+<br  />// &hellip; initialization code omitted &hellip;
+<br  />// &ndash; FOR EACH ELEMENT IN ROW &ndash;
+<br  />while (x155 < x61) {
+<br  />val x168 = x155 * x64
+<br  />var x185: Double = 0
+<br  />var x180 = 0</p>
+<p>// &ndash; INIT STREAM VALUE (dist(i,j))
+<br  />while (x180 &lt; x64) {</p>
+<pre><code>val x248 = x164 + x180
+val x249 = x55(x248)
+val x251 = x168 + x180
+val x252 = x55(x251)
+val x254 = x249 - x252
+val x255 = java.lang.Math.abs(x254)
+val x184 = x185 + x255
+x185 = x184
+x180 += 1
+</code></pre>
+<p>}
+<br  />val x186 = x185
+<br  />val x245 = x186 < 6.689027961000001
+<br  />val x246 = x186 &lt; 22.296759870000002</p>
+<p>// &ndash; VECTOR FIND &ndash;
+<br  />if (x245) x201.insert(x201.length, x155)</p>
+<p>// &ndash; VECTOR COUNT &ndash;
+<br  />if (x246) {</p>
+<pre><code>val x207 = x208 + 1
+x208 = x207
+</code></pre>
+<p>}
+<br  />x155 += 1
+<br  />}</p>
+<p>// &ndash; VECTOR BULK UPDATE &ndash;
+<br  />var forIdx = 0
+<br  />while (forIdx < x201.size) {
+<br  />val x210 = x201(forIdx)
+<br  />val x211 = x133(x210) = x208
+<br  />x211
+<br  />forIdx += 1
+<br  />}
+<br  />\end{listing}
+<br  />\end{multicols}</p>
+<p>This code, though somewhat obscured by the compiler generated names, closely
+<br  />resembles the hand-written C++ snippet shown earlier. It was generated from a
+<br  />simple, 9 line description of the algorithm written in OptiML, making heavy use
+<br  />of the building blocks we described in previous sections to produce the final
+<br  />result.</p>
+<p>A more thorough performance evaluation is given in Section~\ref{sec:600perfOptiML}.</p>
+<h1>OptiQL Struct Of Arrays Example</h1>
+<p>\label{sec:460optiqlSoa}</p>
+<p>OptiQL is a DSL for data querying of in-memory collections, inspired by LINQ~\cite{meijer06linq}.
+<br  />We consider querying a data set with roughly 10 columns, similar to the table lineItems from
+<br  />the TPCH benchmark. The example is slightly trimmed down from TPCH Query 1:
+<br  />\begin{listing}
+<br  />val res = lineItems Where(<em>.l_shipdate <= Date("1998-12-01"))
+<br  />GroupBy(l => l.l_returnflag) Select(g => new Result {
+<br  />val returnFlag = g.key
+<br  />val sumQty = g.Sum(</em>.l_quantity)
+<br  />})
+<br  />\end{listing}</p>
+<p>A straightforward implementation is rather slow. There are multiple traversals
+<br  />that compute intermediate data structures. There is also a nested \code{Sum} operation
+<br  />inside the \code{Select} that follows the \code{groupBy}.</p>
+<p>We can translate this code to a single while loop that does not construct any intermediate
+<br  />data structures and furthermore ignores all columns that are not part of the result.
+<br  />First, the complete computation is split into separate loops, one for each column. Unnecessary ones
+<br  />are removed. Then the remaining component loops are reassembled via loop fusion.
+<br  />For the full TPCH Query 1, these transformations provide a speed up of 5.5x single
+<br  />threaded and 8.7x with 8 threads over the baseline array-of-struct version (see Section~\ref{sec:600perf}).</p>
+<p>We use two hash tables in slightly different ways: one to accumulate the keys (so it is really a
+<br  />hash set) and the other one to accumulate partial sums.
+<br  />Internally there is only one hash table that maps keys to positions. The partial sums
+<br  />are just kept in an array that shares the same indices with the key array.</p>
+<p>Below is the annotated generated code:</p>
+<p>\begin{listing}
+<br  />val x11 = x10.column(&ldquo;l_returnflag&rdquo;)
+<br  />val x20 = x10.column(&ldquo;l_shipdate&rdquo;)
+<br  />val x52 = generated.scala.util.Date(&ldquo;1998-12-01&rdquo;)
+<br  />val x16 = x10.columns(&ldquo;l_quantity&rdquo;)
+<br  />val x283 = x264 + x265</p>
+<p>// hash table constituents, grouped for both x304,x306
+<br  />var x304x306_hash_to_pos: Array[Int] = alloc_htable // actual hash table
+<br  />var x304x306_hash_keys: Array[Char] = alloc_buffer  // holds keys
+<br  />var x304_hash_data: Array[Char] = alloc_buffer      // first column data
+<br  />var x306_hash_data: Array[Double] = alloc_buffer    // second column data
+<br  />val x306_zero = 0.0
+<br  />var x33 = 0
+<br  />while (x33 &lt; x28) {  // begin fat loop x304,x306</p>
+<pre><code>val x35 = x11(x33)
+val x44 = x20(x33)
+val x53 = x44 &lt;= x52
+val x40 = x16(x33)
+
+// group conditionals
+if (x53) {
+  val x35_hash_val = x35.hashCode
+  val x304x306_hash_index_x35 = {
+    // code to lookup x35_hash_val 
+    // in hash table x304x306_hash_to_pos 
+    // with key table x304x306_hash_keys
+    // (growing hash table if necessary)
+  }
+
+  if (x304x306_hash_index_x35 &gt;= x304x306_hash_keys.length) { // not found
+    // grow x304x306_hash_keys and add key
+    // grow x304_hash_data
+    // grow x306_hash_data and set to x306_zero
+  }
+  x304_hash_data (x304x306_hash_index_x35) = x35
+
+  val x264 = x306_hash_data (x304x306_hash_index_x35)
+  val x265 = x40
+  val x283 = x264 + x265
+  x304_hash_data (x304x306_hash_index_x35) = x283
+}
+</code></pre>
+<p>} // end fat loop x304,x306
+<br  />val x304 = x304_hash_data
+<br  />val x305 = x304x306_hash_to_pos.size
+<br  />val x306 = x306_hash_data</p>
+<p>val x307 = Map(&ldquo;returnFlag&rdquo;->x304,&ldquo;sumQty&rdquo;->x306) //Array Result
+<br  />val x308 = Map(&ldquo;data&rdquo;->x307,&ldquo;size&rdquo;->x305) //DataTable
+<br  />\end{listing}</p>
+<h1>Fast Fourier Transform Example</h1>
+<p>\label{sec:Afft}</p>
+<p>We consider staging a fast fourier
+<br  />transform (FFT) algorithm. % \citep{cooley1965algorithm}.
+<br  />A staged FFT, implemented in MetaOCaml, has been presented
+<br  />by Kiselyov et~al.\ \cite{DBLP:conf/emsoft/KiselyovST04}
+<br  />Their work is a very good example for how staging allows to transform
+<br  />a simple, unoptimized algorithm into an efficient program generator.
+<br  />Achieving this in the context of MetaOCaml, however, required restructuring
+<br  />the program into monadic style and adding a front-end layer for
+<br  />performing symbolic rewritings.
+<br  />Using our approach of just adding \code{Rep} types, we can go from the
+<br  />naive textbook-algorithm to the staged version (shown in Figure~\ref{fig:fftcode})
+<br  />by changing literally two lines of code:
+<br  />\begin{slisting}
+<br  />trait FFT { this: Arith with Trig =></p>
+<pre><code>case class Complex(re: Rep[Double], im: Rep[Double])
+...
+</code></pre>
+<p>}
+<br  />\end{slisting}
+<br  />All that is needed is adding the self-type annotation to import
+<br  />arithmetic and trigonometric operations and changing the type of the real
+<br  />and imaginary components of complex numbers from \code{Double}
+<br  />to \code{Rep[Double]}.</p>
+<p>\begin{figure}
+<br  />\begin{slisting}
+<br  />trait FFT { this: Arith with Trig =>
+<br  />case class Complex(re: Rep[Double], im: Rep[Double]) {</p>
+<pre><code>def +(that: Complex) = Complex(this.re + that.re, this.im + that.im)
+def *(that: Complex) = ...
+</code></pre>
+<p>}
+<br  />def omega(k: Int, N: Int): Complex = {</p>
+<pre><code>val kth = -2.0 * k * Math.Pi / N
+Complex(cos(kth), sin(kth))
+</code></pre>
+<p>}
+<br  />def fft(xs: Array[Complex]): Array[Complex] = xs match {</p>
+<pre><code>case (x :: Nil) =&gt; xs
+case _ =&gt;
+  val N = xs.length // assume it's a power of two
+  val (even0, odd0) = splitEvenOdd(xs)
+  val (even1, odd1) = (fft(even0), fft(odd0))
+  val (even2, odd2) = (even1 zip odd1 zipWithIndex) map {
+    case ((x, y), k) =&gt;
+      val z = omega(k, N) * y
+      (x + z, x - z)
+  }.unzip;
+  even2 ::: odd2
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{slisting}
+<br  />\caption{\label{fig:fftcode} FFT code. Only the real and imaginary components
+<br  />of complex numbers need to be staged.}
+<br  />\end{figure}</p>
+<p>\begin{figure}\centering
+<br  />\includegraphics[scale=0.5]{papers/cacm2012/figures/test2-fft2-x-dot.pdf}
+<br  />\caption{\label{fig:fftgraph} Computation graph for size-4 FFT. Auto-generated from
+<br  />staged code in Figure~\ref{fig:fftcode}.}
+<br  />\end{figure}</p>
+<p>Merely changing the types %will remove the interpretive overhead of the program but
+<br  />will not provide us with %all of
+<br  />the desired optimizations yet.
+<br  />We will see below how we can add the transformations described by Kiselyov et~al.\ to generate the same fixed-size
+<br  />FFT code, corresponding to the famous FFT butterfly networks
+<br  />(see Figure~\ref{fig:fftgraph}).
+<br  />Despite the seemingly naive algorithm, this staged code is free
+<br  />of branches, intermediate data structures and redundant computations.
+<br  />The important point here is that we can add these transformations
+<br  />without any further changes to the code in Figure~\ref{fig:fftcode},
+<br  />just by mixing in the trait \code{FFT} with a few others.</p>
+<p>\begin{figure}[t]
+<br  />\begin{slisting}
+<br  />trait ArithExpOptFFT extends ArithExp {
+<br  />override def infix_*(x:Exp[Double],y:Exp[Double]) = (x,y) match {</p>
+<pre><code>case (Const(k), Def(Times(Const(l), y))) =&gt; Const(k * l) * y
+case (x, Def(Times(Const(k), y))) =&gt; Const(k) * (x * y))
+case (Def(Times(Const(k), x)), y) =&gt; Const(k) * (x * y))
+...
+case (x, Const(y)) =&gt; Times(Const(y), x)
+case _ =&gt; super.infix_*(x, y)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{slisting}
+<br  />\caption{\label{fig:expOpt}Extending the generic implementation from Section~\ref{sec:308addOpts}
+<br  />with FFT-specific optimizations.}
+<br  />\end{figure}</p>
+<h2>Implementing Optimizations</h2>
+<p>As already discussed in Section~\ref{sec:308addOpts}, some profitable optimizations
+<br  />are very generic (CSE, DCE, etc), whereas others are specific to the actual program.
+<br  />In the FFT case, Kiselyov et al.\ \cite{DBLP:conf/emsoft/KiselyovST04} describe
+<br  />a number of rewritings that are particularly
+<br  />effective for the patterns of code generated by the FFT algorithm
+<br  />but not as much for other programs.</p>
+<p>What we want to achieve again is modularity, such that
+<br  />optimizations can be combined in a way that is most useful for a given task.
+<br  />This can be achieved by overriding smart constructors,
+<br  />as shown by trait \code{ArithExpOptFFT} (see Figure~\ref{fig:expOpt}).
+<br  />Note that the use of \code{x<em>y} within
+<br  />the body of \code{infix_</em>} will apply the optimization
+<br  />recursively.</p>
+<h2>Running the Generated Code</h2>
+<p>\begin{figure}
+<br  />\begin{slisting}
+<br  />trait FFTC extends FFT { this: Arrays with Compile =>
+<br  />def fftc(size: Int) = compile { input: Rep[Array[Double]] =></p>
+<pre><code>assert(&lt;size is power of 2&gt;) // happens at staging time
+val arg = Array.tabulate(size) { i =&gt; 
+  Complex(input(2*i), input(2*i+1))
+}
+val res = fft(arg)
+updateArray(input, res.flatMap {
+  case Complex(re,im) =&gt; Array(re,im)
+})
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{slisting}
+<br  />\caption{\label{fig:fftc}Extending the FFT component from Figure~\ref{fig:fftcode}
+<br  />with explicit compilation.}
+<br  />\end{figure}</p>
+<p>Using the staged FFT implementation as part of some larger Scala program
+<br  />is straightforward but requires us to interface the generic algorithm
+<br  />with a concrete data representation.
+<br  />The algorithm in Figure~\ref{fig:fftcode} expects
+<br  />an array of \code{Complex} objects as input, each of which contains
+<br  />fields of type \code{Rep[Double]}. The algorithm itself has no
+<br  />notion of staged arrays but uses arrays only in the generator stage,
+<br  />which means that it is agnostic to how data is stored.
+<br  />The enclosing program, however, will store arrays of complex numbers
+<br  />in some native format which we will need to feed into the algorithm.
+<br  />A simple choice of representation is to use \code{Array[Double]} with
+<br  />the complex numbers flattened into adjacent slots.
+<br  />When applying \code{compile}, we will thus receive
+<br  />input of type \code{Rep[Array[Double]]}.
+<br  />Figure~\ref{fig:fftc} shows how we can
+<br  />extend trait \code{FFT} to \code{FFTC} to obtain compiled FFT
+<br  />implementations that realize the necessary data interface for a
+<br  />fixed input size.</p>
+<p>We can then define code that creates and uses compiled
+<br  />FFT ``codelets'' by extending \code{FFTC}:
+<br  />\begin{slisting}
+<br  />trait TestFFTC extends FFTC {</p>
+<pre><code>val fft4: Array[Double] =&gt; Array[Double] = fftc(4) 
+val fft8: Array[Double] =&gt; Array[Double] = fftc(8) 
+
+// embedded code using fft4, fft8, ...
+</code></pre>
+<p>}
+<br  />\end{slisting}
+<br  />Constructing an instance of this subtrait (mixed in with the
+<br  />appropriate LMS traits) will execute the embedded code:
+<br  />\begin{slisting}
+<br  />val OP: TestFFC = new TestFFTC with CompileScala</p>
+<pre><code>with ArithExpOpt  with ArithExpOptFFT with ScalaGenArith
+with TrigExpOpt   with ScalaGenTrig 
+with ArraysExpOpt with ScalaGenArrays
+</code></pre>
+<p>\end{slisting}
+<br  />We can also use the compiled methods from outside the
+<br  />object:
+<br  />\begin{slisting}
+<br  />OP.fft4(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0))
+<br  />$\hookrightarrow$ Array(6.0,0.0,-1.0,1.0,0.0,0.0,-1.0,-1.0)
+<br  />\end{slisting}
+<br  />Providing an explicit type in the definition \code{val OP: TestFFC = &hellip;}
+<br  />ensures that the internal representation is not accessible
+<br  />from the outside, only the members defined by \code{TestFFC}.</p>
+<h1>Regular Expression Matcher Example</h1>
+<p>\label{sec:Aregex}</p>
+<p>Specializing string matchers and parsers is a popular benchmark in the partial evaluation and supercompilation literature
+<br  />\cite{DBLP:journals/ipl/ConselD89,DBLP:journals/toplas/AgerDR06,DBLP:journals/toplas/SperberT00,DBLP:journals/toplas/Turchin86,
+<br  />DBLP:journals/jfp/SorensenGJ96}.
+<br  />%
+<br  />We consider ``multi-threaded'' regular expression matchers, that spawn a new conceptual thread
+<br  />to process alternatives in parallel. Of course these matchers do not actually spawn OS-level threads,
+<br  />but rather need to be advanced manually by client code. Thus, they are similar to coroutines.</p>
+<p>Here is a simple example for the fixed regular expression \code{.*AAB}:
+<br  />\begin{listing}
+<br  />def findAAB(): NIO = {
+<br  />guard(Set('A')) {</p>
+<pre><code>guard(Set('A')) {
+  guard(Set('B'), Found)) {
+    stop()
+</code></pre>
+<p>}}} ++
+<br  />guard(None) { findAAB() } // in parallel&hellip;
+<br  />}
+<br  />\end{listing}
+<br  />We can easily add combinators on top of the core abstractions that take
+<br  />care of producing matchers from textual regular expressions. However
+<br  />the point here is to demonstrate how the implementation works.</p>
+<p>The given matcher uses an API that models
+<br  />nondeterministic finite automata (NFA):
+<br  />\begin{listing}
+<br  />type NIO = List[Trans]   // state: many possible transitions
+<br  />case class Trans(c: Set[Char], x: Flag, s: () => NIO)</p>
+<p>def guard(cond: Set[Char], flag: Flag)(e: => NIO): NIO =
+<br  />List(Trans(cond, flag, () => e))
+<br  />def stop(): NIO = Nil
+<br  />\end{listing}
+<br  />An NFA state consists of a list of possible transitions.
+<br  />Each transition may be guarded by a set of characters and it may
+<br  />have a flag to be signaled if the transition is taken.
+<br  />It also knows how to compute the following state.
+<br  />We use \code{Char}s for simplicity, but of course we could
+<br  />use generic types as well. Note that the API
+<br  />does not mention where input is obtained from (files,
+<br  />streams, etc).</p>
+<p>We will translate NFAs to DFAs using staging. This is the unstaged DFA API:
+<br  />\begin{listing}
+<br  />abstract class DfaState {
+<br  />def hasFlag(x: Flag): Boolean
+<br  />def next(c: Char): DfaState
+<br  />}
+<br  />def dfaFlagged(flag: Flag, link: DfaState) = new DfaState {
+<br  />def hasFlag(x: Flag) = x == flag || link.hasFlag(x)
+<br  />def next(c: Char) = link.next(c)
+<br  />}
+<br  />def dfaState(f: Char => DfaState) = new DfaState {
+<br  />def hasFlag(x: Flag) = false
+<br  />def next(c: Char) = f(c)
+<br  />}
+<br  />\end{listing}</p>
+<p>The staged API is just a thin wrapper:
+<br  />\begin{listing}
+<br  />type DIO = Rep[DfaState]
+<br  />def dfa_flag(x: Flag)(link: DIO): DIO
+<br  />def dfa_trans(f: Rep[Char] => DIO): DIO
+<br  />\end{listing}</p>
+<p>Translating an NFA to a DFA is accomplished
+<br  />by creating a DFA state for each encountered
+<br  />NFA configuration (removing duplicate states
+<br  />via \code{canonicalize}):
+<br  />\begin{listing}
+<br  />def convertNFAtoDFA(states: NIO): DIO = {
+<br  />val cstates = canonicalize(state)
+<br  />dfa_trans { c: Rep[Char] =></p>
+<pre><code>exploreNFA(cstates, c)(dfa_flag) { next =&gt;
+  convertNFAtoDFA(next)
+}
+</code></pre>
+<p>}
+<br  />}
+<br  />iterate(findAAB())
+<br  />\end{listing}
+<br  />The LMS framework memoizes
+<br  />functions (see Section~\ref{sec:220functions}) which ensures
+<br  />termination if the NFA is indeed finite.</p>
+<p>We use a separate function to explore the NFA space (see Figure~\ref{fig:NFAexplore}), advancing the automaton
+<br  />by a symbolic character \code{cin} to invoke its continuations \code{k} with a new automaton,
+<br  />i.e.\ the possible set of states after consuming \code{cin}.
+<br  />The given implementation assumes character sets contain either zero
+<br  />or one characters, the empty set \code{Set()} denoting a wildcard match.
+<br  />More elaborate cases such as character ranges are easy to add.
+<br  />The algorithm tries to remove as many redundant checks and impossible branches as possible.
+<br  />This only works because the character guards are staging time values.</p>
+<p>\begin{figure}[t]
+<br  />\begin{listing}
+<br  />def exploreNFA[A](xs: NIO, cin: Rep[Char])(flag: Flag => Rep[A] => Rep[A])</p>
+<pre><code>                                      (k: NIO =&gt; Rep[A]):Rep[A] = xs match {
+</code></pre>
+<p>case Nil => k(Nil)
+<br  />case Trans(Set(c), e, s)::rest =></p>
+<pre><code>if (cin == c) {
+  // found match: drop transitions that look for other chars and
+  // remove redundant checks
+  val xs1 = rest collect { case Trans(Set(`c`)|None,e,s) =&gt; Trans(Set(),e,s) }
+  val maybeFlag = e map flag getOrElse (x=&gt;x)
+  maybeFlag(exploreNFA(xs1, cin)(acc =&gt; k(acc ++ s())))
+} else {
+  // no match, drop transitions that look for same char
+  val xs1 = rest filter { case Trans(Set(`c`),_,_) =&gt; false case _ =&gt; true }
+  exploreNFA(xs1, cin)(k)
+}
+</code></pre>
+<p>case Trans(Set(), e, s)::rest =></p>
+<pre><code>val maybeFlag = e map flag getOrElse (x=&gt;x)
+maybeFlag(exploreNFA(rest, cin)(acc =&gt; k(acc ++ s())))
+</code></pre>
+<p>}
+<br  />\end{listing}
+<br  />\caption{\label{fig:NFAexplore}NFA Exploration}
+<br  />\end{figure}</p>
+<p>The generated code is shown in Figure~\ref{fig:regexGen}. Each function corresponds to one DFA state. Note how
+<br  />negative information has been used to prune the transition space: Given input such as \code{&hellip;AAB} the
+<br  />automaton jumps back to the initial state, i.e.\ it recognizes that the last character B cannot
+<br  />also be A and starts looking for two As after the B.</p>
+<p>\clearpage
+<br  />The generated code can be used as follows:
+<br  />\begin{listing}
+<br  />var state = stagedFindAAB()
+<br  />var input = &hellip;
+<br  />while (input.nonEmpty) {
+<br  />state = state.next(input.head)
+<br  />if (state.hasFlag(Found))</p>
+<pre><code>println("found AAB. rest: " + input.tail)
+</code></pre>
+<p>input = input.tail
+<br  />}
+<br  />\end{listing}</p>
+<p>If the matcher and input iteration logic is generated together, further
+<br  />translations can be applied to transform the mutually recursive lambdas
+<br  />into tight imperative state machines.\credits{Optimizations implemented by Nada Amin}</p>
+<p>\begin{figure}[t]
+<br  />\begin{multicols}{2}
+<br  />\begin{listing}
+<br  />def stagedFindAAB(): DfaState = {
+<br  />val x7 = { x8: (Char) =></p>
+<pre><code>// matched AA
+val x9 = x8 == B
+val x15 = if (x9) {
+  x11
+} else {
+  val x12 = x8 == A
+  val x14 = if (x12) {
+    x13
+  } else {
+    x10
+  }
+  x14
+}
+x15
+</code></pre>
+<p>}
+<br  />val x13 = dfaState(x7)
+<br  />val x4 = { x5: (Char) =></p>
+<pre><code>// matched A
+val x6 = x5 == A
+val x16 = if (x6) {
+  x13
+} else {
+  x10
+}
+x16
+</code></pre>
+<p>}
+<br  />val x17 = dfaState(x4)
+<br  />val x1 = { x2: (Char) =></p>
+<pre><code>// matched nothing
+val x3 = x2 == A
+val x18 = if (x3) {
+  x17
+} else {
+  x10
+}
+x18
+</code></pre>
+<p>}
+<br  />val x10 = dfaState(x1)
+<br  />val x11 = dfaFlagged(Found, x10)
+<br  />x10
+<br  />}
+<br  />\end{listing}
+<br  />\end{multicols}
+<br  />\caption{\label{fig:regexGen}Generated matcher code for regular expression \code{.*AAB}}
+<br  />\end{figure}</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'></code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

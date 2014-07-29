@@ -1,0 +1,1688 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>03_compiler.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 22px;
+            color: #252519;
+            margin: 0; padding: 0;
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            /*padding-top: 40px;*/
+            padding-bottom: 15px;
+            color: #000;
+        }
+        #container {
+            position: relative;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            min-width: 600px;
+            /*max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;*/
+            padding: 10px 25px 1px 50px;
+            /*overflow-x: hidden;*
+            vertical-align: top;
+            text-align: left;*/
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            width: 100%;
+            vertical-align: top;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        03_compiler.scala // Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
+                    01_overview.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/02_basics.html">
+                    02_basics.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/03_compiler.html">
+                    03_compiler.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/04_atwork.html">
+                    04_atwork.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
+                    regex.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <!--<tr>
+            <th class="docs">
+                <h1>03_compiler.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>-->
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                <h1>Overview</h1>
+<ol>
+<li>Intro: Not your Grandfather's Compiler</li>
+<li>Intermediate Representation: Trees<ol>
+<li>Trees Instead of Strings<ol>
+<li>Modularity: Adding IR Node Types</li>
+</ol>
+</li>
+<li>Enabling Analysis and Transformation<ol>
+<li>Modularity: Adding Traversal Passes</li>
+<li>Solving the ''Expression Problem''</li>
+<li>Generating Code</li>
+<li>Modularity: Adding Transformations</li>
+<li>Transformation by Iterated Staging</li>
+</ol>
+</li>
+<li>Problem: Phase Ordering</li>
+</ol>
+</li>
+<li>Intermediate Representation: Graphs<ol>
+<li>Purely Functional Subset</li>
+<li>Modularity: Adding IR Node Types</li>
+<li>Simpler Analysis and More Flexible Transformations<ol>
+<li>Common Subexpression Elimination/Global Value Numbering</li>
+<li>Pattern Rewrites</li>
+<li>Modularity: Adding new Optimizations</li>
+<li>Context- and Flow-Sensitive Transformations</li>
+<li>Graph Transformations</li>
+<li>Dead Code Elimination</li>
+</ol>
+</li>
+<li>From Graphs Back to Trees<ol>
+<li>Code Motion<ol>
+<li>Pathological Cases</li>
+<li>Scheduling</li>
+</ol>
+</li>
+<li>Tree-Like Traversals and Transformers</li>
+</ol>
+</li>
+<li>Effects<ol>
+<li>Simple Effect Domain</li>
+<li>Fine Grained Effects: Tracking Mutations per Allocation Site<ol>
+<li>Restricting Possible Effects</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Advanced Optimizations<ol>
+<li>Rewriting<ol>
+<li>Context-Sensitive Rewriting</li>
+<li>Speculative Rewriting: Combining Analyses and Transformations</li>
+<li>Delayed Rewriting and Multi-Level IR</li>
+</ol>
+</li>
+<li>Splitting and Combining Statements<ol>
+<li>Effectful Statements</li>
+<li>Data Structures</li>
+<li>Representation Conversion</li>
+</ol>
+</li>
+<li>Loop Fusion and Deforestation</li>
+</ol>
+</li>
+</ol>
+<h1>(Chapter 0) Intro: Not your Grandfather's Compiler</h1>
+<p><a name="chap:300"></a></p>
+<p>This part discusses compiler internals.
+<br  />How do embedded compilers compile their programs?</p>
+<p>The purely string based representation of staged programs from Part~\ref{part:P1} does
+<br  />not allow analysis or transformation of embedded programs. Since LMS is not
+<br  />inherently tied to a particular program representation it is very easy to
+<br  />pick one that is better suited for optimization. As a first cut, we switch to
+<br  />an intermediate representation (IR) based on expression trees, adding a level of indirection
+<br  />between construction of object programs and code generation (Chapter~\ref{chap:310trees}).
+<br  />On this tree IR we can define traversal and transformation passes and
+<br  />build a straightforward embedded compiler. We can add new IR node types
+<br  />and new transformation passes that implement domain specific
+<br  />optimizations. In particular we can use multiple passes of staging:
+<br  />While traversing (effectively, interpreting) one IR we can execute staging
+<br  />commands to build another staged program, possibly in a different,
+<br  />lower-level object language.</p>
+<p>However the extremely high degree of extensibility poses serious challenges.
+<br  />In particular, the interplay of optimizations implemented as many separate
+<br  />phases does not yield good results due to the phase ordering problem: It
+<br  />is unclear in which order
+<br  />and how often to execute these phases, and since each optimization pass
+<br  />has to make pessimistic assumptions about the outcome of all other passes
+<br  />the global result is often suboptimal compared to a dedicated, combined
+<br  />optimization phase \cite{veldhuizen:combiningoptimizations,click95combineanalysis}.
+<br  />There are also implementation challenges as each optimization needs to be
+<br  />designed to treat unknown IR nodes in a sensible way.</p>
+<p>Other challenges are due to the fact that embedded compilers are supposed
+<br  />to be used like libraries. Extending an embedded compiler should be easy,
+<br  />and as much of the work as possible should be delegated to a library
+<br  />of compiler components. Newly defined high-level IR nodes should
+<br  />profit from generic optimizations automatically.</p>
+<p>To remedy this situation, we switch to a graph-based ''sea of nodes''
+<br  />representation (Chapter~\ref{chap:320graphs}). This representation links definitions and uses, and it also
+<br  />reflects the program block structure via nesting edges.
+<br  />We consider purely functional programs first. A number of nontrivial optimizations
+<br  />become considerably simpler. Common subexpression elimination (CSE) and dead
+<br  />code elimination (DCE) are particularly easy. Both are completely generic and support
+<br  />an open domain of IR node types.
+<br  />Optimizations that can be expressed as context-free rewrites are also easy to add
+<br  />in a modular fashion.
+<br  />A scheduling and code motion algorithm transforms graphs back into trees, moving
+<br  />computations to places where they are less often executed, e.g.\ out of loops or functions.
+<br  />Both graph-based and tree-based transformations are useful: graph-based
+<br  />transformations are usually simpler and more efficient whereas tree-based
+<br  />transformations, implemented as multiple staging passes, can be more
+<br  />powerful and employ arbitrary context-sensitive information.</p>
+<p>To support effectful programs, we make effects explicit in the dependency graph
+<br  />(similar to SSA form). We can support simple effect domains (pure vs effectful)
+<br  />and more fine grained ones, such as tracking modifications per allocation site.
+<br  />The latter one relies on alias and points-to analysis.</p>
+<p>We turn to advanced optimizations in Chapter~\ref{chap:330opt}.
+<br  />For combining analyses and optimizations, it is crucial to maintain optimistic assumptions for
+<br  />all analyses. The key challenge is that one analysis has to anticipate the effects of the other
+<br  />transformations. The solution is
+<br  />speculative rewriting \cite{lerner02composingdataflow}: transform a program fragment
+<br  />in the presence of partial and possibly
+<br  />unsound analysis results and re-run the analyses on the transformed code until a fixpoint
+<br  />is reached. This way, different analyses can communicate through the transformed code and
+<br  />need not anticipate their results in other ways. Using speculative rewriting, we compose
+<br  />many optimizations into more powerful combined passes. Often, a single forward
+<br  />simplification pass that can be used to clean up after non-optimizing
+<br  />transformations is sufficient.</p>
+<p>However not all rewrites can fruitfully be combined into a single phase. For example,
+<br  />high-level representations of linear algebra operations may give rise to rewrite
+<br  />rules like $I M \rightarrow M$ where $I$ is the identity matrix. At the same time,
+<br  />there may be rules that define how a matrix multiplication can be implemented in terms
+<br  />of arrays and while loops, or a call to an external library (BLAS).
+<br  />To be effective, all the high-level simplifications need to be applied
+<br  />exhaustively before any of the lowering transformations are applied. But
+<br  />lowering transformations may create new opportunities for high-level rules, too.
+<br  />Our solution here is delayed rewriting: programmers can specify that a
+<br  />certain rewrite should not be applied right now, but have it registered to
+<br  />be executed at the next iteration of a particular phase. Delayed rewriting
+<br  />thus provides a way of grouping and prioritizing modularly defined
+<br  />transformations.</p>
+<p>On top of this infrastructure, we build a number of advanced optimizations.
+<br  />A general pattern is split and merge: We split operations and
+<br  />data structures in order to expose their components to rewrites and dead-code
+<br  />elimination and then merge the remaining parts back together. This struct transformation
+<br  />also allows for more general data structure conversions, including array-of-struct to
+<br  />struct-of-array representation conversion. Furthermore we present a novel loop fusion
+<br  />algorithm, a powerful transformation that removes intermediate data structures.</p>
+<p>Evaluation and examples follow in Part~\ref{part:P3}.</p>
+<h1>(Chapter 1) Intermediate Representation: Trees</h1>
+<p>\label{chap:310trees}</p>
+<p>With the aim of generating code, we could represent
+<br  />staged expressions directly as strings, as done in Part~\ref{part:P1}. But for optimization
+<br  />purposes we would rather have a structured intermediate
+<br  />representation that we can analyze in various ways. Fortunately, LMS
+<br  />makes it very easy to use a different internal program
+<br  />representation.</p>
+<h1>Trees Instead of Strings</h1>
+<p>\label{sec:301}</p>
+<p>Our starting point is an object language \emph{interface} derived from Part~\ref{part:P1}:
+<br  />\begin{listing}
+<br  />trait Base {
+<br  />type Rep[T]
+<br  />}
+<br  />trait Arith extends Base {
+<br  />def infix<em>+(x: Rep[Double], y: Rep[Double]): Rep[Double]
+<br  />def infix</em>*(x: Rep[Double], y: Rep[Double]): Rep[Double]
+<br  />&hellip;
+<br  />}
+<br  />trait IfThenElse extends Base  {
+<br  />def __ifThenElse[T](c: Rep[Boolean], a: =>Rep[T], b: =>Rep[T]): Rep[T]
+<br  />}
+<br  />\end{listing}
+<br  />The goal will be to build a corresponding \emph{implementation} hierarchy that supports
+<br  />optimizing compilation.</p>
+<p>Splitting interface and implementation has many advantages, most importantly a clear
+<br  />separation between the user program world and the compiler implementation world.
+<br  />For the sake of completeness, let us briefly recast the string representation
+<br  />from Part~\ref{part:P1} in this model:
+<br  />\begin{listing}
+<br  />trait BaseStr extends Base {
+<br  />type Rep[T] = String
+<br  />}
+<br  />trait ArithStr extends BaseStr with Arith {
+<br  />def infix<em>+(x: Rep[Double], y: Rep[Double]) = perform(x + " + " + y)
+<br  />def infix</em>*(x: Rep[Double], y: Rep[Double]) = perform(x + " * " + y)
+<br  />&hellip;
+<br  />}
+<br  />trait IfThenElseStr extends BaseStr with IfThenElse  {
+<br  />def __ifThenElse[T](c: Rep[Boolean], a: =>Rep[T], b: =>Rep[T]) =</p>
+<pre><code>perform("if (" + c + ") " + accumulate(a) + " else " + accumulate(b))
+</code></pre>
+<p>}
+<br  />\end{listing}</p>
+<p>In this chapter, we will use an IR that is based on expression trees, closely resembling
+<br  />the abstract syntax tree (AST) of a staged program. This representation enables separate analysis,
+<br  />optimization and code generation passes. We will use the following types:
+<br  />\begin{listing}
+<br  />type Exp[T]     // atomic:     Sym, Const
+<br  />type Def[T]     // composite:  Exp + Exp, Exp * Exp, &hellip;
+<br  />type Stm[T]     // statement:  val x = Def
+<br  />type Block[T]   // blocks:     { Stm; &hellip;; Stm; Exp }
+<br  />\end{listing}
+<br  />They are defined as follows in a separate trait:
+<br  />\begin{listing}
+<br  />trait Expressions {
+<br  />// expressions (atomic)
+<br  />abstract class Exp[T]
+<br  />case class Const[T](x: T) extends Exp[T]
+<br  />case class Sym[T](n: Int) extends Exp[T]
+<br  />def fresh[T]: Sym[T]</p>
+<p>// definitions (composite, subclasses provided by other traits)
+<br  />abstract class Def[T]</p>
+<p>// statements
+<br  />case class Stm[T](sym: Sym[T], rhs: Def[T])</p>
+<p>// blocks
+<br  />case class Block[T](stms: Stm[_], res: Exp[T])</p>
+<p>// perform and accumulate
+<br  />def reflectStm[T](d: Stm[T]): Exp[T]
+<br  />def reifyBlock[T](b: =>Exp[T]): Block[T]</p>
+<p>// bind definitions to symbols automatically
+<br  />// by creating a statement
+<br  />implicit def toAtom[T](d: Def[T]): Exp[T] =</p>
+<pre><code>reflectStm(Stm(fresh[T], d))
+</code></pre>
+<p>}
+<br  />\end{listing}
+<br  />This trait \code{Expressions} will be mixed in at the root of the object language
+<br  />implementation hierarchy. The guiding principle
+<br  />is that each definition has an
+<br  />associated symbol and refers to other definitions
+<br  />only via their symbols. This means that every
+<br  />composite value will be named, similar to administrative
+<br  />normal form (ANF).
+<br  />Methods \code{reflectStm} and \code{reifyBlock}
+<br  />take over the responsibility of \code{perform}
+<br  />and \code{accumulate}.</p>
+<h2>Modularity: Adding IR Node Types</h2>
+<p>We observe that there are no concrete definition classes provided by trait \code{Expressions}.
+<br  />Providing meaningful data types is the responsibility of other traits that implement the
+<br  />interfaces defined previously (\code{Base} and its descendents).</p>
+<p>Trait \code{BaseExp} forms the root of the implementation hierarchy and installs
+<br  />atomic expressions as the representation of staged
+<br  />values by defining \code{Rep[T] = Exp[T]}:
+<br  />\begin{listing}
+<br  />trait BaseExp extends Base with Expressions {
+<br  />type Rep[T] = Exp[T]
+<br  />}
+<br  />\end{listing}
+<br  />For each interface trait, there is one corresponding core implementation trait.
+<br  />Shown below, we have traits \code{ArithExp}
+<br  />and \code{IfThenElseExp} as the running example.
+<br  />Both traits define one definition class for each
+<br  />operation defined by \code{Arith} and \code{IfThenElse}, respectively, and
+<br  />implement the corresponding interface methods to create instances of
+<br  />those classes.
+<br  />\begin{listing}
+<br  />trait ArithExp extends BaseExp with Arith {
+<br  />case class Plus(x: Exp[Double], y: Exp[Double]) extends Def[Double]
+<br  />case class Times(x: Exp[Double], y: Exp[Double]) extends Def[Double]
+<br  />def infix<em>+(x: Rep[Double], y: Rep[Double]) = Plus(x, y)
+<br  />def infix</em>*(x: Rep[Double], y: Rep[Double]) = Times(x, y)
+<br  />&hellip;
+<br  />}
+<br  />trait IfThenElseExp extends BaseExp with IfThenElse {
+<br  />case class IfThenElse(c: Exp[Boolean], a: Block[T], b: Block[T]) extends Def[T]
+<br  />def __ifThenElse[T](c: Rep[Boolean], a: =>Rep[T], b: =>Rep[T]): Rep[T] =</p>
+<pre><code>IfThenElse(c, reifyBlock(a), reifyBlock(b))
+</code></pre>
+<p>}
+<br  />\end{listing}</p>
+<p>The framework ensures that code that contains staging operations will
+<br  />always be executed within the dynamic scope of at least one invocation
+<br  />of \code{reifyBlock}, which returns a block object
+<br  />and takes as call-by-name argument the present-stage expression
+<br  />that will compute the staged block result.
+<br  />Block objects can be part of definitions, e.g.\ for
+<br  />loops or conditionals.</p>
+<p>Since all operations in interface traits such as
+<br  />\code{Arith} return \code{Rep} types,
+<br  />equating \code{Rep[T]} and \code{Exp[T]} in trait
+<br  />\code{BaseExp} means
+<br  />that conversion to symbols will take place already
+<br  />within those methods. This fact is important
+<br  />because it establishes our correspondence between
+<br  />the evaluation order of the program generator
+<br  />and the evaluation order of the generated program:
+<br  />at the point where the generator calls \code{toAtom},
+<br  />the composite definition is turned into an atomic
+<br  />value via \code{reflectStm}, i.e.\ its evaluation will be recorded
+<br  />now and played back later in the same
+<br  />relative order with respect to others
+<br  />within the closest \code{reifyBlock}
+<br  />invocation.</p>
+<h1>Enabling Analysis and Transformation</h1>
+<p>Given our IR representation it is easy to add traversals
+<br  />and transformations.</p>
+<h2>Modularity: Adding Traversal Passes</h2>
+<p>All that is needed to define a generic in-order traversal
+<br  />is a way to access all blocks immediately contained in a
+<br  />definition:
+<br  />\begin{listing}
+<br  />def blocks(x: Any): List[Block[Any]]
+<br  />\end{listing}
+<br  />For example, applying \code{blocks} to an \code{IfThenElse}
+<br  />node will return the then and else blocks.
+<br  />Since definitions are case classes, this method is easy
+<br  />to implement by using the \code{Product} interface that
+<br  />all case classes implement.</p>
+<p>The basic structural in-order traversal is then defined like this:
+<br  />\begin{listing}
+<br  />trait ForwardTraversal {
+<br  />val IR: Expressions
+<br  />import IR._
+<br  />def traverseBlock[T](b: Block[T]): Unit = b.stms.foreach(traverseStm)
+<br  />def traverseStm[T](s: Stm[T]): Unit = blocks(s).foreach(traverseBlock)
+<br  />}
+<br  />\end{listing}</p>
+<p>Custom traversals can be implemented in a modular way by extending
+<br  />the \code{ForwardTraversal} trait:
+<br  />\begin{listing}
+<br  />trait MyTraversalBase extends ForwardTraversal {
+<br  />val IR: BaseExp
+<br  />import IR._
+<br  />override def traverseStm[T](s: Stm[T]) = s match {</p>
+<pre><code>// custom base case or delegate to super
+case _ =&gt; super.traverseStm(s)
+</code></pre>
+<p>}
+<br  />}
+<br  />trait MyTraversalArith extends MyTraversalBase {
+<br  />val IR: ArithExp
+<br  />import IR._
+<br  />override def traverseStm[T](s: Stm[T]) = s match {</p>
+<pre><code>case Plus(x,y) =&gt; ... // handle specific nodes
+case _ =&gt; super.traverseStm(s)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}
+<br  />For each unit of functionality such as \code{Arith} or \code{IfThenElse}
+<br  />the traversal actions can be defined separately as \code{MyTraversalArith}
+<br  />and \code{MyTraversalIfThenElse}.</p>
+<p>Finally, we can use our traversal as follows:
+<br  />\begin{listing}
+<br  />trait Prog extends Arith {
+<br  />def main = &hellip; // program code here
+<br  />}
+<br  />val impl = new Prog with ArithExp
+<br  />val res = impl.reifyBlock(impl.main)
+<br  />val inspect = MyTraversalArith { val IR: impl.type = impl }
+<br  />inspect.traverseBlock(res)
+<br  />\end{listing}</p>
+<h2>Solving the ''Expression Problem''</h2>
+<p>In essence, traversals confront us with the classic ''expression problem''
+<br  />of independently extending a data model with new data variants and
+<br  />new operations \citep{wadlerExprProblem}.
+<br  />There are many solutions to this problem but most of them
+<br  />are rather heavyweight.
+<br  />More lightweight implementations are possible in languages that support
+<br  />multi-methods, i.e.\
+<br  />dispatch method calls dynamically based on the actual types of
+<br  />all the arguments.
+<br  />We can achieve essentially the same using pattern
+<br  />matching and mixin composition, making use of the fact
+<br  />that composing traits is subject to linearization \citep{DBLP:conf/oopsla/OderskyZ05}.
+<br  />We package each set of specific traversal rules into its own
+<br  />trait, e.g.\ \code{MyTraversalArith} that inherits from \code{MyTraversalBase}
+<br  />and overrides \code{traverseStm}.
+<br  />When the arguments do not match the rewriting pattern,
+<br  />the overridden method will invoke the ''parent'' implementation using \code{super}.
+<br  />When several such traits are combined, the super calls
+<br  />will traverse the overridden method implementations according to
+<br  />the linearization order of their containing traits.
+<br  />The use of pattern matching and super calls is similar to earlier
+<br  />work on extensible algebraic data types with defaults~\cite{DBLP:conf/icfp/ZengerO01},
+<br  />which supported linear extensions but not composition of independent extensions.</p>
+<p>Implementing multi-methods in a statically typed setting usually poses three problems:
+<br  />separate type checking/compilation, ensuring non-ambiguity and ensuring exhaustiveness.
+<br  />The described encoding supports separate type-checking and compilation in as far as
+<br  />traits do. Ambiguity is ruled out by always following the linearization order and
+<br  />the first-match semantics of pattern matching. Exhaustiveness is ensured at the type
+<br  />level by requiring a default implementation, although no guarantees can be
+<br  />made that the default will not choose to throw an exception at runtime.
+<br  />In the particular case of traversals, the default is always
+<br  />safe and will just continue the structural traversal.</p>
+<h2>Generating Code</h2>
+<p>Code generation is just a traversal pass that prints code. Compiling
+<br  />and executing code can use the same mechanism as described in Section~\ref{sec:230codegen}.</p>
+<h2>Modularity: Adding Transformations</h2>
+<p>Transformations work very similar to traversals. One option
+<br  />is to traverse and transform an existing program more or less in place, not actually modifying data
+<br  />but attaching new Defs to existing Syms:
+<br  />\begin{listing}
+<br  />trait SimpleTransformer {
+<br  />val IR: Expressions
+<br  />import IR._
+<br  />def transformBlock[T](b: Block[T]): Block[T] =</p>
+<pre><code>Block(b.stms.flatMap(transformStm), transformExp(b.res))
+</code></pre>
+<p>def transformStm[T](s: Stm[T]): List[Stm] =</p>
+<pre><code>List(Stm(s.lhs, transformDef(s.rhs)))   // preserve existing symbol s
+</code></pre>
+<p>def transformDef[T](d: Def[T]): Def[T]    // default: use reflection</p>
+<pre><code>                                        // to map over case classes
+</code></pre>
+<p>}
+<br  />\end{listing}</p>
+<p>An implementation is straightforward:
+<br  />\begin{listing}
+<br  />trait MySimpleTransformer extends SimpleTransformer {
+<br  />val IR: IfThenElseExp
+<br  />import IR._
+<br  />// override transformDef for each Def subclass
+<br  />def transformDef[T](d: Def[T]): Def[T] = d match {</p>
+<pre><code>case IfThenElse(c,a,b) =&gt; 
+  IfThenElse(transformExp(c), transformBlock(a), transformBlock(b))
+case _ =&gt; super.transformDef(d)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<h2>Transformation by Iterated Staging</h2>
+<p>\label{sec:310treeTrans}</p>
+<p>Another option that is more principled and in line with the idea of making
+<br  />compiler transforms programmable through the use of staging
+<br  />is to traverse the old program and create a new program. Effectively we
+<br  />are implementing an IR interpreter that executes staging commands,
+<br  />which greatly simplifies the implementation of the transform and
+<br  />removes the need for low-level IR manipulation.</p>
+<p>In the implementation, we will create new symbols instead of reusing existing
+<br  />ones so we need to maintain a substitution that maps old to new Syms.
+<br  />The core implementation is given below:
+<br  />\begin{listing}
+<br  />trait ForwardTransformer extends ForwardTraversal {
+<br  />val IR: Expressions
+<br  />import IR.<em>
+<br  />var subst: Map[Exp[</em>],Exp[_]]
+<br  />def transformExp[T](s: Exp[T]): Exp[T] = &hellip; // lookup s in subst
+<br  />def transformDef[T](d: Def[T]): Exp[T]       // default
+<br  />def transformStm[T](s: Stm[T]): Exp[T] = {</p>
+<pre><code>val e = transformDef(s.rhs); subst += (s.sym -&gt; e); e
+</code></pre>
+<p>}
+<br  />override def traverseStm[T](s: Stm[T]): Unit = {</p>
+<pre><code>transformStm(s)
+</code></pre>
+<p>}
+<br  />def reflectBlock[T](b: Block[T]): Exp[T] = withSubstScope {</p>
+<pre><code>traverseBlock(b); transformExp(b.res)
+</code></pre>
+<p>}
+<br  />def transformBlock[T](b: Block[T]): Block[T] = {</p>
+<pre><code>reifyBlock(reflectBlock(b))  
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>Here is a simple identity transformer implementation for conditionals
+<br  />and array construction:
+<br  />\begin{listing}
+<br  />trait MyTransformer extends ForwardTransformer {
+<br  />val IR: IfThenElseExp with ArraysExp
+<br  />import IR._
+<br  />def transformDef[T](d: Def[T]): Exp[T] = d match {</p>
+<pre><code>case IfThenElse(c,a,b) =&gt; 
+  __ifThenElse(transformExp(c), reflectBlock(a), reflectBlock(b))
+case ArrayFill(n,i,y) =&gt; 
+  arrayFill(transformExp(n), { j =&gt; withSubstScope(i -&gt; j) { reflectBlock(y) }})
+case _ =&gt; ...
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>The staged transformer facility can be extended slightly to translate not only within a single
+<br  />language but also between two languages:
+<br  />\begin{listing}
+<br  />trait FlexTransformer {
+<br  />val SRC: Expressions
+<br  />val DST: Base
+<br  />trait TypeTransform[A,B]
+<br  />var subst: Map[SRC.Exp[<em>],DST.Rep[</em>]]
+<br  />def transformExp[A,B](s: SRC.Exp[A])(implicit t: TypeTransform[A,B]): DST.Rep[B]
+<br  />}
+<br  />\end{listing}</p>
+<p>It is also possible to add more abstraction on top of the base transforms to build
+<br  />combinators for rewriting strategies in the style of Stratego \cite{spoofax} or
+<br  />Kiama \cite{DBLP:conf/gttse/Sloane09}.</p>
+<h1>Problem: Phase Ordering</h1>
+<p>This all works but is not completely satisfactory.
+<br  />With fine grained separate transformations
+<br  />we immediately run into phase ordering problems \cite{veldhuizen:combiningoptimizations,click95combineanalysis}.
+<br  />We could execute optimization passes in a loop until we reach a fixpoint but even then
+<br  />we may miss opportunities if the program contains loops. For best
+<br  />results, optimizations need to be tightly integrated. Optimizations need a different
+<br  />mechanisms than lowering transformations that have a clearly defined
+<br  />before and after model.
+<br  />In the next chapter, we will thus consider a slightly different IR
+<br  />representation.</p>
+<h1>(Chapter 2) Intermediate Representation: Graphs</h1>
+<p>\label{chap:320graphs}</p>
+<p>To remedy phase ordering problems and overall allow for more flexibility in rearranging program pieces,
+<br  />we switch to a program representation based on structured graphs. This representation is not to be
+<br  />confused with control-flow graphs (CFGs): Since one of our main goals is parallelization, a sequential CFG
+<br  />would not be a good fit.</p>
+<h1>Purely Functional Subset</h1>
+<p>\label{sec:303purefun}</p>
+<p>Let us first consider a purely functional language subset. There are much more possibilities for aggressive optimizations.
+<br  />We can rely on referential transparency: The value of an expression is always the same, no matter when and where it is computed.
+<br  />Thus, optimizations do not need to check availability or lifetimes of expressions.
+<br  />Global common subexpression elimination (CSE), pattern rewrites, dead code elimination (DCE) and code motion
+<br  />are considerably simpler than the usual implementations for imperative programs.</p>
+<p>We switch to a ''sea of nodes''-like \cite{DBLP:conf/irep/ClickP95} representation that is a directed
+<br  />(and for the moment, acyclic) graph:
+<br  />\begin{listing}
+<br  />trait Expressions {
+<br  />// expressions (atomic)
+<br  />abstract class Exp[T]
+<br  />case class Const[T](x: T) extends Exp[T]
+<br  />case class Sym[T](n: Int) extends Exp[T]
+<br  />def fresh[T]: Sym[T]</p>
+<p>// definitions (composite, subclasses provided by other traits)
+<br  />abstract class Def[T]</p>
+<p>// blocks &ndash; no direct links to statements
+<br  />case class Block[T](res: Exp[T])</p>
+<p>// bind definitions to symbols automatically
+<br  />// by creating a statement
+<br  />implicit def toAtom[T](d: Def[T]): Exp[T] =</p>
+<pre><code>reflectPure(d)
+</code></pre>
+<p>def reifyBlock[T](b: =>Exp[T]): Block[T]
+<br  />def reflectPure[T](d: Def[T]): Sym[T] =</p>
+<pre><code>findOrCreateDefinition(d)
+</code></pre>
+<p>def findDefinition[T](s: Sym[T]): Option[Def[T]]
+<br  />def findDefinition[T](d: Def[T]): Option[Sym[T]]
+<br  />def findOrCreateDefinition[T](d: Def[T]): Sym[T]
+<br  />}
+<br  />\end{listing}</p>
+<p>It is instructive to compare the definition of trait \code{Expressions}
+<br  />with the one from the previous Chapter~\ref{chap:310trees}.
+<br  />Again there are three categories of objects involved: expressions,
+<br  />which are atomic (subclasses of \code{Exp}: constants and symbols; with
+<br  />a ''gensym'' operator \code{fresh} to create fresh symbols),
+<br  />definitions, which represent composite operations (subclasses of
+<br  />\code{Def}, to be provided by other components), and blocks, which
+<br  />model nested scopes.</p>
+<p>Trait \code{Expressions} now provides methods to
+<br  />find a definition given a symbol or vice versa.
+<br  />Direct links between blocks and statements are removed.
+<br  />The actual graph nodes are \code{(Sym[T], Def[T])} pairs.
+<br  />They need not be accessible to clients at this level.
+<br  />Thus method \code{reflectStm} from the previous chapter is
+<br  />replaced by \code{reflectPure}.</p>
+<p>Graphs also carry nesting information (boundSyms, see below).
+<br  />This enables code motion for different kinds of nested expressions such as lambdas,
+<br  />not only for loops or conditionals.
+<br  />The structured graph representation is also more appropriate for parallel
+<br  />execution than the traditional sequential control-flow graph. Pure
+<br  />computation can float freely in
+<br  />the graph and can be scheduled for
+<br  />execution anywhere.</p>
+<h1>Modularity: Adding IR Node Types</h1>
+<p>The object language implementation code is the same compared to the tree representation:
+<br  />\begin{listing}
+<br  />trait BaseExp extends Base with Expressions {
+<br  />type Rep[T] = Exp[T]
+<br  />}
+<br  />\end{listing}
+<br  />Again, we have separate traits, one for each unit of functionality:
+<br  />\begin{listing}
+<br  />trait ArithExp extends BaseExp with Arith {
+<br  />case class Plus(x: Exp[Double], y: Exp[Double]) extends Def[Double]
+<br  />case class Times(x: Exp[Double], y: Exp[Double]) extends Def[Double]
+<br  />def infix<em>+(x: Rep[Double], y: Rep[Double]) = Plus(x, y)
+<br  />def infix</em>*(x: Rep[Double], y: Rep[Double]) = Times(x, y)
+<br  />&hellip;
+<br  />}
+<br  />trait IfThenElseExp extends BaseExp with IfThenElse {
+<br  />case class IfThenElse(c: Exp[Boolean], a: Block[T], b: Block[T]) extends Def[T]
+<br  />def __ifThenElse[T](c: Rep[Boolean], a: =>Rep[T], b: =>Rep[T]): Rep[T] =</p>
+<pre><code>IfThenElse(c, reifyBlock(a), reifyBlock(b))
+</code></pre>
+<p>}
+<br  />\end{listing}</p>
+<h1>Simpler Analysis and More Flexible Transformations</h1>
+<p>Several optimizations are very simple to implement on
+<br  />this purely functional graph IR. The implementation draws inspiration
+<br  />from previous work on compiling embedded DSLs \cite{DBLP:conf/saig/ElliottFM00,DBLP:conf/dsl/LeijenM99}
+<br  />as well as staged FFT kernels \cite{DBLP:conf/emsoft/KiselyovST04}.</p>
+<h2>Common Subexpression Elimination/Global Value Numbering</h2>
+<p>\label{sec:320cse}</p>
+<p>Common subexpressions are eliminated during IR construction using
+<br  />hash consing:
+<br  />\begin{listing}
+<br  />def findOrCreateDefinition[T](d: Def[T]): Sym[T]
+<br  />\end{listing}</p>
+<p>Invoked by \code{reflectPure} through the implicit conversion
+<br  />method \code{toAtom}, this method converts
+<br  />a definition to an atomic expression and links it to
+<br  />the scope being built up by the innermost enclosing
+<br  />\code{reifyBlock} call. When the definition is known to be
+<br  />side-effect free, it will search the already
+<br  />encountered definitions for a structurally equivalent one.
+<br  />If a matching previous definition is found, its symbol
+<br  />will be returned, possibly moving the definition to
+<br  />a parent scope to make it accessible.
+<br  />If the definition may have side effects or it is seen
+<br  />for the first time,
+<br  />it will be associated with a fresh symbol and saved
+<br  />for future reference.
+<br  />This simple scheme provides a powerful
+<br  />global value numbering optimization \cite{DBLP:conf/pldi/Click95}
+<br  />that effectively prevents generating duplicate code.</p>
+<h2>Pattern Rewrites</h2>
+<p>Using \code{findDefinition}, we can implement an extractor object \citep{DBLP:conf/ecoop/EmirOW07}
+<br  />that enables pattern matching on a symbol to lookup
+<br  />the underlying definition associated to the symbol:
+<br  />\begin{listing}
+<br  />object Def {
+<br  />def unapply[T](s: Exp[T]): Option[Def[T]] = s match {</p>
+<pre><code>case s: Sym[T] =&gt; findDefinition(s)
+case _ =&gt; None
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}</p>
+<p>This extractor object can be used to implement smart
+<br  />constructors for IR nodes that deeply inspect their arguments:
+<br  />\begin{listing}
+<br  />def infix<em>*(x: Exp[Double], y: Exp[Double]) = (x,y) match {
+<br  />case (Const(x), Const(y)) => Const(x * y)
+<br  />case (Const(k), Def(Times(Const(l), y))) => Const(k * l) * y
+<br  />case </em> => Times(x,y)
+<br  />}
+<br  />\end{listing}</p>
+<p>Smart constructors are a simple yet powerful rewriting facility.
+<br  />If the smart constructor is the only way to construct \code{Times}
+<br  />nodes we obtain a strong guarantee: No \code{Times} node is ever
+<br  />created without applying all possible rewrites first.</p>
+<h2>Modularity: Adding new Optimizations</h2>
+<p>\label{sec:308addOpts}</p>
+<p>Some profitable optimizations, such as the global value numbering
+<br  />described above, are very generic.
+<br  />Other optimizations apply only to specific aspects of functionality,
+<br  />for example particular implementations of constant folding (or more generally
+<br  />symbolic rewritings) such as replacing computations like
+<br  />\code{x * 1.0} with \code{x}.
+<br  />Yet other optimizations are specific to the actual program being staged.
+<br  />Kiselyov et al.\ \cite{DBLP:conf/emsoft/KiselyovST04} describe
+<br  />a number of rewritings that are particularly
+<br  />effective for the patterns of code generated by a staged FFT algorithm
+<br  />but not as much for other programs. The FFT example is discussed
+<br  />in more detail in Section~\ref{sec:Afft}.</p>
+<p>What we want to achieve again is modularity, so that
+<br  />optimizations can be combined in a way that is most useful for a given task.
+<br  />To implement a particular rewriting rule (whether specific or generic),
+<br  />say, \code{x * 1.0} $\rightarrow$ \code{x}, we can provide
+<br  />a specialized implementation of \code{infix<em><em>} (overriding the one in trait \code{ArithExp})
+<br  />that will test its arguments for a particular pattern.
+<br  />How this can be done in a modular way is shown by the
+<br  />traits \code{ArithExpOpt} and \code{ArithExpOptFFT},
+<br  />which implement some generic and program specific optimizations.
+<br  />Note that the use of \code{x</em>y} within
+<br  />the body of \code{infix</em>*} will apply the optimization recursively.</p>
+<p>The appropriate pattern is to override the smart constructor in a separate
+<br  />trait and call the super implementation if no rewrite matches. This decouples
+<br  />optimizations from node type definitions.
+<br  />\begin{listing}
+<br  />trait ArithExpOpt extends ArithExp {
+<br  />override def infix_*(x:Exp[Double],y:Exp[Double]) = (x,y) match {</p>
+<pre><code>case (Const(x), Const(y)) =&gt; Const(x * y)
+case (x, Const(1)) =&gt; x
+case (Const(1), y) =&gt; x
+case _ =&gt; super.infix_*(x, y)
+</code></pre>
+<p>}
+<br  />}
+<br  />trait ArithExpOptFFT extends ArithExp {
+<br  />override def infix_*(x:Exp[Double],y:Exp[Double]) = (x,y) match {</p>
+<pre><code>case (Const(k), Def(Times(Const(l), y))) =&gt; Const(k * l) * y
+case (x, Def(Times(Const(k), y))) =&gt; Const(k) * (x * y))
+case (Def(Times(Const(k), x)), y) =&gt; Const(k) * (x * y))
+...
+case (x, Const(y)) =&gt; Const(y) * x
+case _ =&gt; super.infix_*(x, y)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}
+<br  />Note that the trait linearization order defines the rewriting strategy.
+<br  />We still maintain our guarantee that no \code{Times} node could be rewritten further.</p>
+<p>\begin{figure<em>}\centering
+<br  />\includegraphics[width=\textwidth]{papers/cacm2012/figoverview.pdf}
+<br  />\caption{\label{fig:overview}Component architecture. Arrows denote extends relationships,
+<br  />dashed boxes represent units of functionality.}
+<br  />\vspace{1cm}
+<br  />\end{figure</em>}</p>
+<p>Figure~\ref{fig:overview} shows the component architecture formed by base traits and
+<br  />corresponding optimizations.</p>
+<h2>Context- and Flow-Sensitive Transformations</h2>
+<p>Context and flow sensitive transformation become very important
+<br  />once we introduce effects. But even pure functional programs can profit
+<br  />from context information:
+<br  />\begin{listing}
+<br  />if (c) { if (c) a else b } else &hellip;
+<br  />\end{listing}
+<br  />The inner test on the same condition is redundant and will
+<br  />always succeed. How do we detect this situation?
+<br  />In other cases we can use the Def extractor to lookup the definition
+<br  />of a symbol. This will not work here, because Def works on Exp input and
+<br  />produces a Def object as output.
+<br  />We however need to work on the level of Exps, turning a Sym into \code{Const(true)}
+<br  />based on context information.</p>
+<p>We need to adapt the way we construct IR nodes.
+<br  />When we enter the then branch, we add \code{c$\rightarrow$Const(true)} to
+<br  />a substitution. This substitution needs to be applied
+<br  />to arguments of IR nodes constructed within the then branch.</p>
+<p>One possible solution would be add yet another type constructor, \code{Ref},
+<br  />with an implicit conversion from Exp to Ref that applies the substitution.
+<br  />A signature like \code{IfThenElse(c: Exp, &hellip;)} would become \code{IfThenElse(c: Ref, &hellip;)}.
+<br  />A simpler solution is to implement \code{toAtom} in such a way that it
+<br  />checks the resulting Def if any of its
+<br  />inputs need substitution and if so invoke \code{mirror} (see below) on the result
+<br  />Def, which will apply the substitution, call the appropriate smart constructor
+<br  />and finally call \code{toAtom} again with the transformed result.</p>
+<h2>Graph Transformations</h2>
+<p>In addition to optimizations performed during graph constructions, we
+<br  />can also implement transformation that work directly on the graph
+<br  />structure. This is useful if
+<br  />we need to do analysis on a larger portion of the program first and only
+<br  />then apply the transformation. An example would be to find all \code{FooBar}
+<br  />statements in a graph, and replace them uniformly with \code{BarBaz}.
+<br  />All dependent statements should re-execute
+<br  />their pattern rewrites, which might trigger on the new \code{BarBaz}
+<br  />input.</p>
+<p>We introduce the concept of \emph{mirroring}: Given an IR node, we want to
+<br  />apply a substitution (or generally, a \code{Transformer}) to the arguments and
+<br  />call the appropriate smart constructor again.
+<br  />For every IR node type we require a default \code{mirror} implementation
+<br  />that calls back its smart constructor:
+<br  />\begin{listing}
+<br  />override def mirror[A](e: Def[A], f: Transformer): Exp[A] = e match {
+<br  />case Plus(a,b) => f(a) + f(b) // calls infix<em>+
+<br  />case Times(a,b) => f(a) * f(b)
+<br  />case </em> => super.mirror(e,f)
+<br  />}
+<br  />\end{listing}</p>
+<p>There are some restrictions if we are working directly on the graph level: In
+<br  />general we have no (or only limited) context information because a single
+<br  />IR node may occur multiple times in the final program. Thus, attempting to simplify
+<br  />effectful or otherwise context-dependent expressions will produce wrong results
+<br  />without an appropriate context.
+<br  />For pure expressions, a smart constructor called from \code{mirror} should not
+<br  />create new symbols apart from the result and it should not call reifyBlock.
+<br  />Otherwise, if we were creating new symbols when
+<br  />nothing changes, the returned symbol could not be used to check
+<br  />convergence of an iterative transformation easily.</p>
+<p>The \code{Transfomer} argument to \code{mirror} can be
+<br  />queried to find out whether \code{mirror} is allowed to call context
+<br  />dependent methods:
+<br  />\begin{listing}
+<br  />override def mirror[A](e: Def[A], f: Transformer): Exp[A] = e match {
+<br  />case IfThenElse(c,a,b) =></p>
+<pre><code>if (f.hasContext)
+  __ifThenElse(f(c),f.reflectBlock(a),f.reflectBlock(b))
+else
+  ifThenElse(f(c),f(a),f(b)) // context-free version
+</code></pre>
+<p>case _ => super.mirror(e,f)
+<br  />}
+<br  />\end{listing}
+<br  />If the context is guaranteed to be set up correctly, we
+<br  />call the regular smart constructor and use \code{f.reflectBlock} to
+<br  />call mirror recursively on the contents of blocks \code{a} and \code{b}.
+<br  />Otherwise, we call a more restricted context free method.</p>
+<h2>Dead Code Elimination</h2>
+<p>Dead code elimination can be performed purely on the graph level, simply by finding all statements
+<br  />reachable from the final result and discarding everything else.</p>
+<p>We define a method to find all symbols a given object references directly:
+<br  />\begin{listing}
+<br  />def syms(x: Any): List[Sym[Any]]
+<br  />\end{listing}
+<br  />If \code{x} is a Sym itself, \code{syms(x)} will return \code{List(x)}. For a case class instance
+<br  />that implements the \code{Product} interface such as \code{Times(a,b)}, it will return \code{List(a,b)} if both
+<br  />\code{a} and \code{b} are Syms. Since the argument type is \code{Any}, we can apply \code{syms} not
+<br  />only to Def objects directly but also to lists of Defs, for example.</p>
+<p>Then, assuming \code{R} is the final program result, the set of remaining symbols in the
+<br  />graph \code{G} is the least fixpoint of:
+<br  />\begin{listing}
+<br  />G = R $\cup$ syms(G map findDefinition)
+<br  />\end{listing}
+<br  />Dead code elimination will discard all other nodes.</p>
+<h1>From Graphs Back to Trees</h1>
+<p>To turn program graphs back into trees for code generation we have to decide
+<br  />which graph nodes should go where in the resulting program. This is the task
+<br  />of code motion.</p>
+<h2>Code Motion</h2>
+<p>\label{sec:320codemotion}</p>
+<p>Other optimizations can apply transformations optimistically and need not worry
+<br  />about maintaining a correct schedule: Code motion will fix it up.
+<br  />The algorithm will try to push statements inside conditional branches and hoist statements
+<br  />out of loops. Code motion depends on dependency and frequency information but not directly on
+<br  />data-flow information. Thus it can treat functions or other user defined compound statements
+<br  />in the same way as loops. This makes
+<br  />our algorithm different from code motion algorithms based on data flow
+<br  />analysis such as Lazy Code Motion (LCM, \cite{DBLP:conf/pldi/KnoopRS92}) or Partial Redundancy Elimination (PRE, \cite{DBLP:journals/toplas/KennedyCLLTC99}).</p>
+<p>The graph IR reflects ''must before'' (ordering) and ''must inside'' (containment) relations,
+<br  />as well as anti-dependence and frequency. These relations are implemented by the
+<br  />following methods, which can be overridden for new definition classes:
+<br  />\begin{listing}
+<br  />def syms(e: Any): List[Sym[Any]]        // value dependence (must before)
+<br  />def softSyms(e: Any): List[Sym[Any]]    // anti dependence (must not after)
+<br  />def boundSyms(e: Any): List[Sym[Any]]   // nesting dependence (must not outside)
+<br  />def symsFreq(e: Any): List[(Sym[Any],   // frequency information (classify
+<br  />Double)]                              // sym as 'hot', 'normal', 'cold')
+<br  />\end{listing}
+<br  />To give an example, \code{boundSyms} applied to a loop node \code{RangeForeach(range,idx,body)}
+<br  />with index variable \code{idx} would return \code{List(idx)} to denote that
+<br  />\code{idx} is fixed ''inside'' the loop expression.</p>
+<p>Given a subgraph and a list of result nodes, the goal is to identify the graph
+<br  />nodes that should form the ''current'' level, as opposed to those that should
+<br  />remain in some ''inner'' scope, to be scheduled later. We will reason about the
+<br  />paths on which statements can be reached from the result.
+<br  />The first idea is to retain all nodes on the current level that are reachable
+<br  />on a path that does not cross any conditionals, i.e.\ that has no ''cold'' refs.
+<br  />Nodes only used from conditionals will be pushed down. However, this
+<br  />approach does not yet reflect the precedence of loops. If a loop is top-level,
+<br  />then conditionals inside the loop (even if deeply nested) should not prevent
+<br  />hoisting of statements. So we refine the characterization to retain all
+<br  />nodes that are reachable on a path that does not cross top-level conditionals.</p>
+<p>This leads to a simple iterative algorithm (see Figure~\ref{fig:codemotion2}):
+<br  />Starting with the known top level statements, nodes reachable via normal
+<br  />links are added and for each hot ref, we follow nodes that are forced inside
+<br  />until we reach one that can become top-level again.</p>
+<p>\begin{figure}
+<br  />\begin{center}
+<br  />\includegraphics[width=0.7\textwidth]{fig_graph_nesting.pdf}
+<br  />\end{center}
+<br  />\caption{\label{fig:codemotion}Graph IR with regular and nesting edges (boundSyms, dotted line) as
+<br  />used for code motion.}
+<br  />\end{figure}</p>
+<p>%% ALGO begins here:
+<br  />\begin{figure}
+<br  />\begin{center}\begin{minipage}{10cm}
+<br  />Code Motion Algorithm: Compute the set $L$ of top level statements for the current block, from a set of available statements $E$, a set of forced-inside statements $G \subseteq E$ and a block result $R$.
+<br  />\begin{enumerate}
+<br  />\item Start with $L$ containing the known top level statements, initially the (available) block result $R \cap E$.</p>
+<p>\item Add to $L$ all nodes reachable from $L$ via normal links (neither hot nor cold) through $E-G$ (not forced inside).</p>
+<p>\item For each hot ref from $L$ to a statement in $E-L$, follow any links through $G$, i.e.\ the nodes that are forced inside, if there are any. The first non-forced-inside nodes (the ''hot fringe'') become top level as well (add to $L$).</p>
+<p>\item Continue with 2 until a fixpoint is reached.
+<br  />\end{enumerate}
+<br  />\end{minipage}
+<br  />\end{center}
+<br  />\caption{\label{fig:codemotion2}Code Motion algorithm.}
+<br  />\end{figure}</p>
+<p>To implement this algorithm, we need to determine the set \code{G} of nodes that are
+<br  />forced inside and may not be part of the top level.
+<br  />We start with the block result \code{R} and a graph \code{E} that has all unnecessary
+<br  />nodes removed (DCE already performed):
+<br  />\begin{listing}
+<br  />E = R $\cup$ syms(E map findDefinition)
+<br  />\end{listing}</p>
+<p>We then need a way to find all uses of a given symbol \code{s},
+<br  />up to but not including the node where the symbol is bound:
+<br  />\begin{listing}
+<br  />U(s) = {s} $\cup$ { g $\in$ E | syms(findDefinition(g)) $\cap$ U(s) $\ne\emptyset$</p>
+<pre><code>                  &amp;&amp; s $\notin$ boundSyms(findDefinition(g))) }
+</code></pre>
+<p>\end{listing}</p>
+<p>We collect all bound symbols and their dependencies. These cannot live on the current level, they
+<br  />are forced inside:
+<br  />\begin{listing}
+<br  />B = boundSyms (E map findDefinition)
+<br  />G = union (B map U)    // must inside
+<br  />\end{listing}
+<br  />Computing \code{U(s)} for many symbols \code{s} individually is costly but
+<br  />implementations can exploit considerable sharing to optimize the computation of
+<br  />\code{G}.</p>
+<p>The iteration in Figure~\ref{fig:codemotion2} uses \code{G} to follow forced-inside
+<br  />nodes after a hot ref until a node is found that can be moved to the top level.</p>
+<p>Let us consider a few examples to build some intuition about the code motion behavior.
+<br  />In the code below, the starred conditional is on the fringe (first statement that
+<br  />can be outside) and on a hot path (through the loop). Thus it will be hoisted.
+<br  />Statement \code{foo} will be moved inside:
+<br  />\begin{listing}
+<br  />loop { i =>                z = *if (x) foo
+<br  />if (i > 0)               loop { i =>
+<br  />if (x)                  if (i > 0)</p>
+<pre><code>  foo                      z
+</code></pre>
+<p>}                          }
+<br  />\end{listing}</p>
+<p>The situation changes if the inner conditional is forced inside by a value dependency.
+<br  />Now statement \code{foo} is on the hot fringe and becomes top level.
+<br  />\begin{listing}
+<br  />loop { i =>                z = *foo
+<br  />if (x)                   loop { i =></p>
+<pre><code>if (i &gt; 0)               if (x)
+</code></pre>
+<p>foo                     if (i > 0)
+<br  />}                                z</p>
+<pre><code>                       }
+</code></pre>
+<p>\end{listing}</p>
+<p>For loops inside conditionals, the containing statements will be moved inside (relative
+<br  />to the current level).
+<br  />\begin{listing}
+<br  />if (x)                     if (x)
+<br  />loop { i =>                z = foo</p>
+<pre><code>foo                      loop { i =&gt;
+</code></pre>
+<p>}                            z</p>
+<pre><code>                         }
+</code></pre>
+<p>\end{listing}</p>
+<h3>Pathological Cases</h3>
+<p>The described algorithm works well and is reasonably efficient in practice.
+<br  />Being a heuristic, it cannot be optimal in all cases. Future versions
+<br  />could employ more elaborate cost models instead of
+<br  />the simple hot/cold distinction. One case worth mentioning is when a
+<br  />statement is used only in conditionals but in different conditionals:
+<br  />\begin{listing}
+<br  />z = foo                    if (x)
+<br  />if (x)                       foo
+<br  />z                        if (y)
+<br  />if (y)                       foo
+<br  />z
+<br  />\end{listing}
+<br  />In this situation \code{foo} will be duplicated. Often this duplication is
+<br  />beneficial because \code{foo} can be optimized together with other
+<br  />statements inside
+<br  />the branches.
+<br  />In general of course there is a danger of slowing down the program
+<br  />if both conditions are likely to be true at the same time. In that case
+<br  />it would be a good idea anyways to restructure the program to factor out
+<br  />the common criteria into a separate test.</p>
+<h3>Scheduling</h3>
+<p>Once we have determined which statements should occur on which level,
+<br  />we have to come up with an ordering for the statements. Before starting
+<br  />the code motion algorithm, we sort the input graph in topological order
+<br  />and we will use the same order for the final result.
+<br  />For the purpose of sorting, we include anti-dependencies in the topological
+<br  />sort although they are disregarded during dead code elimination.
+<br  />A bit of care must be taken though: If we introduce loops or recursive
+<br  />functions the graph can be cyclic, in which case
+<br  />no topological order exists. However, cycles are caused only by inner nodes
+<br  />pointing back to outer nodes and for sorting purposes we can remove these
+<br  />back-edges to obtain an acyclic graph.</p>
+<h2>Tree-Like Traversals and Transformers</h2>
+<p>To generate code or to perform transformation by iterated staging (see Section~\ref{sec:310treeTrans})
+<br  />we need to turn our graph back into a tree.
+<br  />The interface to code motion allows us to build a generic tree-like traversal
+<br  />over our graph structure:
+<br  />\begin{listing}
+<br  />trait Traversal {
+<br  />val IR: Expressions; import IR._
+<br  />// perform code motion, maintaining current scope
+<br  />def focusExactScope(r: Exp[Any])(body: List[Stm[Any]] => A): A
+<br  />// client interface
+<br  />def traverseBlock[T](b: Block[T]): Unit =</p>
+<pre><code>focusExactScope(b.res) { levelScope =&gt;
+  levelScope.foreach(traverseStm)
+}
+</code></pre>
+<p>def traverseStm[T](s: Stm[T]): Unit = blocks(s).foreach(traverseBlock)
+<br  />}
+<br  />\end{listing}
+<br  />This is useful for other analyses as well, but in particular for
+<br  />building transformers that traverse one graph
+<br  />in a tree like fashion and create another graph analogous to
+<br  />Section~\ref{sec:310treeTrans}. The implementation of
+<br  />trait \code{ForwardTransformer} carries over almost
+<br  />unmodified.</p>
+<h1>Effects</h1>
+<p>\label{sec:321}</p>
+<p>To ensure that operations can be safely moved around (and for other optimizations as well),
+<br  />a compiler needs to reason about their possible side effects. The graph representation presented so far is pure
+<br  />and does not mention effects at all.
+<br  />However all the necessary ingredients are already there: We can keep track of side effects simply by making
+<br  />effect dependencies explicit in the graph.
+<br  />In essence, we turn all programs into functional programs by adding an invisible state parameter (similar
+<br  />in spirit but not identical to SSA conversion).</p>
+<h2>Simple Effect Domain</h2>
+<p>We first consider global effects like console output via \code{println}. Distinguishing only between
+<br  />''has no effect'' and ''may have effect'' means that all operations on mutable data structures,
+<br  />including reads, have to be serialized along with all other side effects.</p>
+<p>By default, we assume operations to be pure (i.e.\ side-effect free).
+<br  />Programmers can designate effectful operations by using \code{reflectEffect} instead of
+<br  />the implicit conversion \code{toAtom} which internally delegates to \code{reflectPure}.
+<br  />Console output, for example, is implemented like this:
+<br  />\begin{listing}
+<br  />def print(x: Exp[String]): Exp[Unit] = reflectEffect(Print(x))
+<br  />\end{listing}</p>
+<p>The call to \code{reflectEffect} adds the passed IR node to a list of effects for the
+<br  />current block. Effectful expressions will attract dependency edges between them to
+<br  />ensure serialization.
+<br  />A compound expression such as a loop or a conditional will internally use \code{reifyBlock},
+<br  />which attaches nesting edges to the effectful nodes contained in the block.</p>
+<p>Internally, \code{reflectEffect} creates \code{Reflect} nodes that keep track
+<br  />of the context dependencies:
+<br  />\begin{listing}
+<br  />var context: List[Exp[Any]]
+<br  />case class Reflect[T](d: Def[T], es: List[Sym[Any]]) extends Def[T]
+<br  />def reflectEffect[T](d: Def[T]): Exp[T] = createDefinition(Reflect(d, context)).sym
+<br  />\end{listing}
+<br  />The context denotes the ''current state''. Since state can be seen as an abstraction of effect
+<br  />history, we just define context as a list of the previous effects.</p>
+<p>In this simple model, all effect dependencies are uniformly encoded in the IR graph.
+<br  />Rewriting, CSE, DCE, and Code Motion are disabled for effectful
+<br  />statements (very pessimistic). Naturally we would like something more
+<br  />fine grained for mutable data.</p>
+<h2>Fine Grained Effects: Tracking Mutations per Allocation Site</h2>
+<p>We can add other, more fine grained, variants of \code{reflectEffect} which
+<br  />allow tracking mutations per allocation site or other, more general abstractions
+<br  />of the heap that provide a partitioning into regions. Aliasing and sharing of
+<br  />heap objects such as arrays can be tracked via optional annotations on IR
+<br  />nodes. Reads and writes of mutable objects are automatically serialized and
+<br  />appropriate dependencies inserted to guarantee a legal execution schedule.</p>
+<p>Effectful statements are tagged with an effect summary that further describes the effect.
+<br  />The summary can be extracted via \code{summarizeEffects}, and
+<br  />there are some operations on summaries (like \code{orElse}, \code{andThen}) to
+<br  />combine effects.
+<br  />As an example consider the definition of conditionals, which computes the
+<br  />compound effect from the effects of the two branches:
+<br  />\begin{listing}
+<br  />def __ifThenElse[T](cond: Exp[Boolean], thenp: => Rep[T], elsep: => Rep[T]) {
+<br  />val a = reifyBlock(thenp)
+<br  />val b = reifyBlock(elsep)
+<br  />val ae = summarizeEffects(a) // get summaries of the branches
+<br  />val be = summarizeEffects(b)
+<br  />val summary = ae orElse be   // compute summary for whole expression
+<br  />reflectEffect(IfThenElse(cond, a, b), summary)  // reflect compound expression</p>
+<pre><code>                                              // (effect might be none, i.e. pure)
+</code></pre>
+<p>}
+<br  />\end{listing}</p>
+<p>To specify effects more precisely for different kinds of IR nodes, we add
+<br  />further \code{reflect} methods:
+<br  />\begin{listing}
+<br  />reflectSimple     // a 'simple' effect: serialized with other simple effects
+<br  />reflectMutable    // an allocation of a mutable object; result guaranteed unique
+<br  />reflectWrite(v)   // a write to v: must refer to a mutable allocation</p>
+<pre><code>              // (reflectMutable IR node)
+</code></pre>
+<p>reflectRead(v)    // a read of allocation v (not used by programmer,</p>
+<pre><code>              // inserted implicitly)
+</code></pre>
+<p>reflectEffect(s)  // provide explicit summary s, specify may/must info for</p>
+<pre><code>              // multiple reads/writes
+</code></pre>
+<p>\end{listing}</p>
+<p>The framework will serialize reads and writes so to respect data and anti-dependency with respect
+<br  />to the referenced allocations. To make this work we also need to keep track of sharing and
+<br  />aliasing. Programmers can provide for their IR nodes
+<br  />a list of input expressions which the result of the IR node may
+<br  />alias, contain, extract from or copy from.
+<br  />\begin{listing}
+<br  />def aliasSyms(e: Any): List[Sym[Any]]
+<br  />def containSyms(e: Any): List[Sym[Any]]
+<br  />def extractSyms(e: Any): List[Sym[Any]]
+<br  />def copySyms(e: Any): List[Sym[Any]]
+<br  />\end{listing}</p>
+<p>These four pieces of information correspond to the possible pointer
+<br  />operations \code{x = y}, \code{<em>x = y}, \code{x = </em>y} and \code{<em>x = </em>y}.
+<br  />Assuming an operation \code{y = Foo(x)}, \code{x} should be returned in the following cases:
+<br  />\begin{listing}
+<br  />x $\in$ aliasSyms(y)      if y = x      // if then else
+<br  />x $\in$ containSyms(y)    if <em>y = x     // array update
+<br  />x $\in$ extractSyms(y)    if y = </em>x     // array apply
+<br  />x $\in$ copySyms(y)       if <em>y = </em>x    // array clone
+<br  />\end{listing}
+<br  />Here, \code{y = x} is understood as ''y may be equal to x'',
+<br  />\code{*y = x} as ''dereferencing y (at some index) may return x'' etc.</p>
+<h3>Restricting Possible Effects</h3>
+<p>It is often useful to restrict the allowed effects somewhat to
+<br  />make analysis more tractable and provide better optimizations.
+<br  />One model, which works reasonably well for many applications,
+<br  />is to prohibit sharing and aliasing between
+<br  />mutable objects. Furthermore, read and write operations must
+<br  />unambiguously identify the allocation site of the object being
+<br  />accessed.
+<br  />The framework uses the aliasing and points-to information to
+<br  />enforce these rules and to keep track of immutable objects that
+<br  />point to mutable data. This is to make sure the right serialization
+<br  />dependencies and \code{reflectRead} calls are inserted for
+<br  />operations that may reference mutable state in an
+<br  />indirect way.</p>
+<h1>(Chapter 3) Advanced Optimizations</h1>
+<p>\label{chap:330opt}</p>
+<p>We have seen above in Chaper~\ref{chap:320graphs} how many classic compiler
+<br  />optimizations can be applied to the IR generated from embedded programs
+<br  />in a straightforward way.
+<br  />Due to the structure of the IR, these optimizations all
+<br  />operate in an essentially global way, at the level of domain operations.
+<br  />In this chapter we discuss some other advanced optimizations that can be implemented on
+<br  />the graph IR. We present more elaborate examples for how these optimizations benefit
+<br  />larger use cases later in Part~\ref{part:P3}.</p>
+<h1>Rewriting</h1>
+<p>Many optimizations that are traditionally implemented using an iterative
+<br  />dataflow analysis followed by a transformation pass can also be expressed
+<br  />using various flavors of rewriting. Whenever possible we tend to prefer
+<br  />the rewriting version because rewrite rules are easy to specify
+<br  />separately and do not require programmers to define
+<br  />abstract interpretation lattices.</p>
+<h2>Context-Sensitive Rewriting</h2>
+<p>Smart constructors in our graph IR can be context sensitive. For example,
+<br  />reads of local variables examine the current effect context
+<br  />to find the last assignment, implementing
+<br  />a form of copy propagation (middle):
+<br  />\begin{listing}
+<br  />var x = 7     var x = 7    println(5)
+<br  />x = 5         x = 5
+<br  />println(x)    println(5)
+<br  />\end{listing}
+<br  />This renders the stores dead, and they will be removed
+<br  />by dead code elimination later (right).</p>
+<h2>Speculative Rewriting: Combining Analyses and Transformations</h2>
+<p>Many optimizations are mutually beneficial.  In the presence of loops,
+<br  />optimizations need to make optimistic assumptions for the supporting analysis
+<br  />to obtain best results.  If multiple analyses are run separately, each of them
+<br  />effectively makes pessimistic assumptions about the outcome of all others.
+<br  />Combined analyses avoid the phase ordering problem by solving everything at the
+<br  />same time. Lerner, Grove, and Chambers showed a method of composing
+<br  />optimizations by interleaving analyses and transformations
+<br  />\cite{lerner02composingdataflow}.  We use a modified version of their algorithm that
+<br  />works on structured loops instead of CFGs and using dependency information and
+<br  />rewriting instead of explicit data flow lattices. Usually, rewriting is
+<br  />semantics preserving, i.e.\ pessimistic. The idea is to drop that assumption.
+<br  />As a corollary, we need
+<br  />to rewrite speculatively and be able to rollback to a previous state to get
+<br  />optimistic optimization. The algorithm proceeds as follows: for each
+<br  />encountered loop, apply all possible transforms to the loop body, given empty
+<br  />initial assumptions.  Analyze the result of the transformation: if any new
+<br  />information is discovered throw away the transformed loop body and retransform
+<br  />the original with updated assumptions.  Repeat until the analysis result has
+<br  />reached a fixpoint and keep the last transformation as result.</p>
+<p>Here is an example of speculative rewriting, showing the initial optimistic
+<br  />iteration (middle), with the fixpoint (right) reached after the second iteration:
+<br  />\begin{listing}
+<br  />var x = 7                 var x = 7          var x = 7 //dead
+<br  />var c = 0                 var c = 0          var c = 0
+<br  />while (c < 10) {          while (true) {     while (c < 10) {
+<br  />if (x < 10) print("!")    print("!")         print("!")
+<br  />else x = c                print(7)           print(7)
+<br  />print(x)                  print(0)           print(c)
+<br  />print(c)                  c = 1              c += 1
+<br  />c += 1                  }                  }
+<br  />}
+<br  />\end{listing}
+<br  />This algorithm allows us to do all forward data flow analyses and transforms in
+<br  />one uniform, combined pass driven by rewriting. In the example above, during the initial
+<br  />iteration (middle), separately
+<br  />specified rewrites for variables and conditionals work together to
+<br  />determine that \code{x=c} is never executed. At the end of the loop body we
+<br  />discover the write to \code{c}, which invalidates our initial optimistic
+<br  />assumption \code{c=0}.  We rewrite the original body again with the augmented
+<br  />information (right).  This time there is no additional knowledge discovered so
+<br  />the last speculative rewrite becomes the final one.</p>
+<h2>Delayed Rewriting and Multi-Level IR</h2>
+<p>\label{sec:330delayed}</p>
+<p>For some transformations, e.g.\ data structure representation lowering, we
+<br  />do not execute rewrites now, but later, to give further immediate
+<br  />rewrites a change to match on the current expression before
+<br  />it is rewritten. This is a simple form of prioritizing different
+<br  />rewrites, in this case optimizations over lowerings. It also
+<br  />happens to be a central idea behind telescoping
+<br  />languages \cite{kennedy05telescoping}.</p>
+<p>We perform simplifications eagerly, after each transform phase.
+<br  />Thus we guarantee that CSE, DCE etc. have been applied on
+<br  />high-level operations before they are translated into
+<br  />lower-level equivalents, on which optimizations would
+<br  />be much harder to apply.</p>
+<p>We call the mechanism to express this form of rewrites
+<br  />\emph{delayed} rewriting. Here is an example that delayedly
+<br  />transforms a plus operation on Vectors into an operation on arrays:
+<br  />\begin{listing}
+<br  />def infix_plus(a: Rep[Vector[Double]], b: Rep[Vector[Double]]) = {
+<br  />VectorPlus(a,b) atPhase(lowering) {</p>
+<pre><code>val data = Array.fill(a.length) { i =&gt; a(i) + b(i) }
+vector_with_backing_array(data)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}
+<br  />The transformation is only carried out at phase \code{lowering}.
+<br  />Before that, the IR node remains a \code{VectorPlus} node, which
+<br  />allows other smart constructor rewrites to kick in that
+<br  />match their arguments against \code{VectorPlus}.</p>
+<p>Technically, delayed rewriting is implemented using a worklist
+<br  />transformer that keeps track of the rewrites to be
+<br  />performed during the next iteration. The added convenience
+<br  />over using a transformer directly is that programmers can
+<br  />define simple lowerings inline without needing to subclass
+<br  />and install a transformer trait.</p>
+<h1>Splitting and Combining Statements</h1>
+<p>Since our graph IR contains structured expressions, optimizations need to
+<br  />work with compound statements. Reasoning about compound statements is not
+<br  />easy: For example, our simple dead code elimination algorithm will not
+<br  />be able to remove only pieces of a compound expression. Our solution
+<br  />is simple yet effective: We eagerly split many kinds of compound
+<br  />statements, assuming optimistically that only parts will be needed.
+<br  />We find out which parts through the regular DCE algorithm.
+<br  />Afterwards we reassemble the remaining pieces.</p>
+<h2>Effectful Statements</h2>
+<p>A good example of statement splitting are effectful conditionals:
+<br  />\begin{listing}
+<br  />var a, b, c = &hellip;      var a, b, c = &hellip;      var a, c = &hellip;
+<br  />if (cond) {            if (cond)              if (cond)
+<br  />a = 9                  a = 9                  a = 9
+<br  />b = 1                if (cond)              else
+<br  />} else                   b = 1                  c = 3
+<br  />c = 3                if (!cond)             println(a+c)
+<br  />println(a+c)             c = 3</p>
+<pre><code>                   println(a+c)     
+</code></pre>
+<p>\end{listing}
+<br  />From the conditional in the initial program (left), splitting creates
+<br  />three separate expressions, one for each referenced variable (middle).
+<br  />Pattern rewrites are executed when building the split nodes but
+<br  />do not have any effect here.
+<br  />Dead code elimination removes the middle one because variable b is
+<br  />not used, and the remaining conditionals are merged back together (right).
+<br  />Of course successful merging requires to keep track
+<br  />of how expressions have been split.</p>
+<h2>Data Structures</h2>
+<p>\label{sec:361struct}</p>
+<p>Splitting is also very effective for data structures, as often only parts of
+<br  />a data structure are used or modified.
+<br  />We can define a generic framework for data structures:
+<br  />\begin{listing}
+<br  />trait StructExp extends BaseExp {
+<br  />abstract class StructTag
+<br  />case class Struct[T](tag: StructTag, elems: Map[String,Rep[Any]]) extends Def[T]
+<br  />case class Field[T](struct: Rep[Any], key: String) extends Def[T]</p>
+<p>def struct[T](tag: StructTag, elems: Map[String,Rep[Any]]) = Struct(tag, elems)
+<br  />def field[T](struct: Rep[Any], key: String): Rep[T] = struct match {</p>
+<pre><code>case Def(Struct(tag, elems)) =&gt; elems(index).asInstanceOf[Rep[T]]
+case _ =&gt; Field[T](struct, index)
+</code></pre>
+<p>}
+<br  />}
+<br  />\end{listing}
+<br  />There are two IR node types, one for structure creation and one for field access.
+<br  />The structure creation node contains a hash map that holds (static) field identifiers
+<br  />and (dynamic) field values. It also contains a \code{tag} that can be used to
+<br  />hold further information about the nature of the data structure.
+<br  />The interface for field accesses is method \code{field}, which pattern matches
+<br  />on its argument and, if that is a \code{Struct} creation, looks up the desired value
+<br  />from the embedded hash map.</p>
+<p>We continue by adding a rule that makes the result
+<br  />of a conditional a \code{Struct} if the branches return \code{Struct}:
+<br  />\begin{listing}
+<br  />override def ifThenElse[T](cond: Rep[Boolean], a: Rep[T], b: Rep[T]) =
+<br  />(a,b) match {
+<br  />case (Def(Struct(tagA,elemsA)), Def(Struct(tagB, elemsB))) =></p>
+<pre><code>assert(tagA == tagB)
+assert(elemsA.keySet == elemsB.keySet)
+Struct(tagA, elemsA.keySet map (k =&gt; ifThenElse(cond, elemsA(k), elemsB(k))))
+</code></pre>
+<p>case _ => super.ifThenElse(cond,a,b)
+<br  />}
+<br  />\end{listing}
+<br  />Similar rules are added for many of the other core IR node types.
+<br  />DCE can remove individual elements of the data structure that are never used.
+<br  />During code generation and tree traversals, the remaining parts of the
+<br  />split conditional are merged back together.</p>
+<p>We will study examples of this struct abstraction in Section~\ref{sec:455struct} and
+<br  />an extension to unions and inheritance in Section~\ref{sec:455inherit}.</p>
+<h2>Representation Conversion</h2>
+<p>\label{sec:360soa}</p>
+<p>A natural extension of this mechanism is a generic array-of-struct to struct-of-array transform.
+<br  />The definition is analogous to that of conditionals. We override the array constructor \code{arrayFill}
+<br  />that represents expressions of the form \c|Array.fill(n) { i => body }|
+<br  />to create a struct with an array for each component of the body if the body itself
+<br  />is a Struct:
+<br  />\begin{listing}
+<br  />override def arrayFill[T](size: Exp[Int], v: Sym[Int], body: Def[T]) = body match {
+<br  />case Block(Def(Struct(tag, elems))) =></p>
+<pre><code>struct[T](ArraySoaTag(tag,size), 
+  elems.map(p =&gt; (p._1, arrayFill(size, v, Block(p._2)))))
+</code></pre>
+<p>case _ => super.arrayFill(size, v, body)
+<br  />}
+<br  />\end{listing}
+<br  />Note that we tag the result struct with an \code{ArraySoaTag} to keep track
+<br  />of the transformation. This class is defined as follows:
+<br  />\begin{listing}
+<br  />case class ArraySoaTag(base: StructTag, len: Exp[Int]) extends StructTag
+<br  />\end{listing}</p>
+<p>We also override the methods that are used to access array elements
+<br  />and return the length of an array to do the right thing for transformed
+<br  />arrays:
+<br  />\begin{listing}
+<br  />override def infix_apply[T](a: Rep[Array[T]], i: Rep[Int]) = a match {
+<br  />case Def(Struct(ArraySoaTag(tag,len),elems)) =></p>
+<pre><code>struct[T](tag, elems.map(p =&gt; (p._1, infix_apply(p._2, i))))
+</code></pre>
+<p>case <em> => super.infix_at(a,i)
+<br  />}
+<br  />override def infix_length[T](a: Rep[Array[T]]): Rep[Int] = a match {
+<br  />case Def(Struct(ArraySoaTag(tag, len), elems)) => len
+<br  />case </em> => super.infix_length(a)
+<br  />}
+<br  />\end{listing}</p>
+<p>Examples for this struct of array transformation are shown in
+<br  />Section~\ref{sec:455structUse} and Chapter~\ref{chap:460fusionUse}.</p>
+<h1>Loop Fusion and Deforestation</h1>
+<p>\label{sec:360fusionComp}</p>
+<p>\newcommand{\yield}[0]{\leftarrow}
+<br  />\newcommand{\G}[0]{\mathcal{G}}</p>
+<p>The use of independent and freely composable traversal operations such as
+<br  />\code{v.map(..).sum} is preferable to explicitly coded loops. However, naive
+<br  />implementations of these operations would be expensive and entail lots of
+<br  />intermediate data structures.  We provide a novel loop fusion algorithm for
+<br  />data parallel loops and traversals (see Chapter~\ref{chap:460fusionUse}
+<br  />for examples of use). The core loop abstraction is
+<br  />\begin{listing}
+<br  />loop(s) $\overline{\mathtt{{x=}}\G}$ { i => $\overline{E[ \mathtt{x} \yield \mathtt{f(i)} ]}$ }
+<br  />\end{listing}
+<br  />where \code{s} is the size of the loop and \code{i} the loop
+<br  />variable ranging over $[0,\mathtt{s})$. A loop can compute
+<br  />multiple results $\overline{\mathtt{x}}$, each of which is associated
+<br  />with a generator $\G$, one of \code{Collect}, which creates a flat array-like
+<br  />data structure, \code{Reduce($\oplus$)}, which reduces values with
+<br  />the associative operation $\oplus$, or \code{Bucket($\G$)}, which
+<br  />creates a nested data structure, grouping generated values by key
+<br  />and applying $\G$ to those with matching key. Loop bodies consist
+<br  />of yield statements \code{x $\yield$ f(i)} that define values
+<br  />passed to generators (of this loop or an outer loop), embedded
+<br  />in some outer context $E[.]$ that might consist of other loops
+<br  />or conditionals. For \code{Bucket} generators yield takes
+<br  />(key,value) pairs.</p>
+<p>\begin{figure}
+<br  />\begin{center}
+<br  />\begin{minipage}{10cm}
+<br  />Generator kinds: $\mathcal{G} ::= $ \code{Collect} $|$ \code{Reduce($\oplus$)} $|$ \code{Bucket($\mathcal{G}$)} \
+<br  />Yield statement: xs $\yield$ x \
+<br  />Contexts: $E[.] ::= $ loops and conditionals \[2em]</p>
+<p>\emph{Horizontal case (for all types of generators):}
+<br  />~\
+<br  />\begin{mlisting}</p>
+<pre><code>   loop(s) x1=$\G_1$ { i1 =&gt; $E_1[$ x1 $\yield$ f1(i1) $]$ }
+   loop(s) y1=$\G_2$ { i2 =&gt; $E_2[$ x2 $\yield$ f2(i2) $]$ }
+</code></pre>
+<p>\end{mlisting}
+<br  />\vspace{-5pt}{\hspace{6mm}\rule{9cm}{0.25pt}}
+<br  />\begin{mlisting}</p>
+<pre><code> loop(s) x1=$\G_1$, x2=$\G_2$ { i =&gt; 
+          $E_1[$ x1 $\yield$ f1(i) $]$; $E_2[$ x2 $\yield$ f2(i) $]$ }
+</code></pre>
+<p>\end{mlisting}
+<br  />~\
+<br  />\emph{Vertical case (consume collect):}
+<br  />~\
+<br  />\begin{mlisting}</p>
+<pre><code>  loop(s) x1=Collect { i1 =&gt; $E_1[$ x1 $\yield$ f1(i1) $]$ }
+loop(x1.size) x2=$\G$ { i2 =&gt; $E_2[$ x2 $\yield$ f2(x1(i2)) $]$ }
+</code></pre>
+<p>\end{mlisting}
+<br  />\vspace{-5pt}{\hspace{3mm}\rule{10cm}{0.25pt}}
+<br  />\begin{mlisting}
+<br  />loop(s) x1=Collect, x2=$\G$ { i =></p>
+<pre><code>            $E_1[$ x1 $\yield$ f1(i); $E_2[$ x2 $\yield$ f2(f1(i)) $]]$ }
+</code></pre>
+<p>\end{mlisting}
+<br  />~\
+<br  />\emph{Vertical case (consume bucket collect):}
+<br  />~\
+<br  />\begin{mlisting}</p>
+<pre><code>        loop(s) x1=Bucket(Collect) { i1 =&gt; 
+            $E_1[$ x1 $\yield$ (k1(i1), f1(i1)) $]$ }
+  loop(x1.size) x2=Collect { i2 =&gt;  
+    loop(x1(i2).size) y=$\G$ { j =&gt; 
+      $E_2[$ y $\yield$ f2(x1(i2)(j)) $]$ }; x2 $\yield$ y }
+</code></pre>
+<p>\end{mlisting}
+<br  />\vspace{-5pt}{\hspace{3mm}\rule{10cm}{0.25pt}}
+<br  />\begin{mlisting}</p>
+<pre><code>loop(s) x1=Bucket(Collect), x2=Bucket($\G$) { i =&gt; 
+    $E_1[$ x1 $\yield$ (k1(i), f1(i));
+        $E_2[$ x2 $\yield$ (k1(i), f2(f1(i))) $]]$ }
+</code></pre>
+<p>\end{mlisting}
+<br  />\end{minipage}
+<br  />\end{center}</p>
+<p>\caption{\label{fig-fusion} Loop fusion}
+<br  />\end{figure}</p>
+<p>The fusion rules are summarized in Figure~\ref{fig-fusion}.
+<br  />This model is expressive enough to model many common collection
+<br  />operations:
+<br  />\begin{mlisting}
+<br  />x=v.map(f)     loop(v.size) x=Collect { i => x $\yield$ f(v(i)) }
+<br  />x=v.sum        loop(v.size) x=Reduce(+) { i =>  x $\yield$ v(i) }
+<br  />x=v.filter(p)  loop(v.size) x=Collect { i => if (p(v(i)))</p>
+<pre><code>                                            x $\yield$ v(i) }
+</code></pre>
+<p>x=v.flatMap(f) loop(v.size) x=Collect { i => val w = f(v(i))</p>
+<pre><code>                     loop(w.size) { j =&gt; x $\yield$ w(j) }}
+</code></pre>
+<p>x=v.distinct   loop(v.size) x=Bucket(Reduce(rhs)) { i =></p>
+<pre><code>                                    x $\yield$ (v(i), v(i)) }
+</code></pre>
+<p>\end{mlisting}
+<br  />Other operations are accommodated by generalizing slightly. Instead of
+<br  />implementing a \code{groupBy} operation that returns a sequence of
+<br  />(Key, Seq[Value]) pairs we can return the keys and
+<br  />values in separate data structures. The equivalent of \code{(ks,vs)=v.groupBy(k).unzip}
+<br  />is:
+<br  />\begin{mlisting}
+<br  />loop(v.size) ks=Bucket(Reduce(rhs)),vs=Bucket(Collect) { i =>
+<br  />ks $\yield$ (v(i), v(i)); vs $\yield$ (v(i), v(i)) }
+<br  />\end{mlisting}</p>
+<p>In Figure~\ref{fig-fusion},
+<br  />multiple instances of \code{f1(i)} are subject to CSE and not evaluated twice.
+<br  />Substituting \code{x1(i2)} with \code{f1(i)} will remove a reference to \code{x1}.
+<br  />If \code{x1} is not used anywhere else, it will also be subject to DCE.
+<br  />Within fused loop bodies, unifying index variable \code{i} and substituting
+<br  />references will trigger the uniform forward transformation pass.
+<br  />Thus, fusion not only removes intermediate data structures but also provides
+<br  />additional optimization opportunities inside fused loop bodies
+<br  />(including fusion of nested loops).</p>
+<p>Fixed size array construction \code{Array(a,b,c)} can be expressed as
+<br  />\begin{listing}
+<br  />loop(3) x=Collect { case 0 => x $\yield$ a</p>
+<pre><code>                case 1 =&gt; x $\yield$ b case 2 =&gt; x $\yield$ c }
+</code></pre>
+<p>\end{listing}
+<br  />and concatenation \code{xs ++ ys} as \code{Array(xs,ys).flatMap(i=>i)}:
+<br  />\begin{listing}
+<br  />loop(2) x=Collect { case 0 => loop(xs.size) { i => x $\yield$ xs(i) }</p>
+<pre><code>                case 1 =&gt; loop(ys.size) { i =&gt; x $\yield$ ys(i) }}
+</code></pre>
+<p>\end{listing}
+<br  />Fusing these patterns with a consumer will duplicate the consumer code into each match
+<br  />case. Implementations should have some kind of cutoff value to prevent code explosion.
+<br  />Code generation does not need to emit actual loops for fixed array constructions
+<br  />but can just produce the right sequencing of yield operations.</p>
+<p>Examples for the fusion algorithm are shown in Section~\ref{subsec:fusion}
+<br  />and Chapter~\ref{chap:460fusionUse}.</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'></code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

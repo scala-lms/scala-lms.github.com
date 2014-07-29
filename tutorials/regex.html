@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>sre.scala</title>
+    <title>regex.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -151,9 +151,25 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        sre.scala // Jump To &hellip;
+        regex.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
+                    01_overview.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/02_basics.html">
+                    02_basics.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/03_compiler.html">
+                    03_compiler.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/04_atwork.html">
+                    04_atwork.html
+                </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
                     ack.html
@@ -175,20 +191,12 @@
                     index.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/main.html">
-                    main.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
-                    re.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
+                    regex.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
                     shonan.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
-                    sre.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
@@ -211,7 +219,7 @@
         <thead>
         <!--<tr>
             <th class="docs">
-                <h1>sre.scala</h1>
+                <h1>regex.scala</h1>
             </th>
             <th class="code"></th>
         </tr>-->
@@ -245,10 +253,6 @@
 <br  />staging an interpreter. This process is widely applicable. For
 <br  />example, we used the same process to stage a bytecode interpreter into
 <br  />a bytecode compiler.</p>
-<h2>Regular Expression Matcher</h2>
-<p>We start with a small regular expression matcher, ported to Scala from
-<br  />a C version, written by Rob Pike and Brian Kernighan
-<br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html</a>.</p>
 
             </td>
         </tr><tr>
@@ -257,7 +261,122 @@
 
 import org.scalatest.FunSuite
 
-trait StagedRegexpMatcher extends Dsl {
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_1">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Regular Expression Matcher</h2>
+<p>We start with a small regular expression matcher, ported to Scala from
+<br  />a C version, written by Rob Pike and Brian Kernighan
+<br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html</a>.</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>// translated to Scala from
+// http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html
+trait RegexpMatcher {
+  //#matchsearch
+  /* search for regexp anywhere in text */
+  def matchsearch(regexp: String, text: String): Boolean = {
+    if (regexp(0) == '^')
+      matchhere(regexp, 1, text, 0)
+    else {
+      var start = -1
+      var found = false
+      while (!found &amp;&amp; start &lt; text.length) {
+        start += 1
+        found = matchhere(regexp, 0, text, start)
+      }
+      found
+    }
+  }
+  //#matchsearch
+
+  //#matchhere
+  /* search for restart of regexp at start of text */
+  def matchhere(regexp: String, restart: Int, text: String, start: Int): Boolean = {
+    if (restart==regexp.length)
+      true
+    else if (regexp(restart)=='$' &amp;&amp; restart+1==regexp.length)
+      start==text.length
+    else if (restart+1 &lt; regexp.length &amp;&amp; regexp(restart+1)=='*')
+      matchstar(regexp(restart), regexp, restart+2, text, start)
+    else if (start &lt; text.length &amp;&amp; matchchar(regexp(restart), text(start)))
+      matchhere(regexp, restart+1, text, start+1)
+    else false
+  }
+  //#matchhere
+
+  //#matchstar
+  /* search for c* followed by restart of regexp at start of text */
+  def matchstar(c: Char, regexp: String, restart: Int, text: String, start: Int): Boolean = {
+    var sstart = start
+    var found = matchhere(regexp, restart, text, sstart)
+    var failed = false
+    while (!failed &amp;&amp; !found &amp;&amp; sstart &lt; text.length) {
+      failed = !matchchar(c, text(sstart))
+      sstart += 1
+      found = matchhere(regexp, restart, text, sstart)
+    }
+    !failed &amp;&amp; found
+  }
+  //#matchstar
+
+  //#matchchar
+  def matchchar(c: Char, t: Char): Boolean = {
+    c == '.' || c == t
+  }
+  //#matchchar
+}
+
+class RegexpMatcherTest extends FunSuite with RegexpMatcher {
+  def testmatch(regexp: String, text: String, expected: Boolean) {
+    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
+      expectResult(expected){matchsearch(regexp, text)}
+    }
+  }
+
+  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
+  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
+  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
+  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
+  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
+  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
+  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
+  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
+  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
+  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
+  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
+  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
+}
+
+</code></pre>
+            </td>
+        </tr>
+        
+        <tr id="section_2">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>Staged Interpreter</h2>
+<p>The staged interpreter simply consist in wrapping the variable
+<br  />parameters in <code>Rep[_]</code> types. Otherwise, the code is the same.</p>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'>trait StagedRegexpMatcher extends Dsl {
   //#matchsearch
   /* search for regexp anywhere in text */
   def matchsearch(regexp: String, text: Rep[String]): Rep[Boolean] = {
@@ -355,10 +474,10 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
             </td>
         </tr>
         
-        <tr id="section_1">
+        <tr id="section_3">
             <td class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_1">&#182;</a>
+                    <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
                 <h2>Generated Code</h2>
 <p>As an example, here is the code generated for <code>^ab</code>.</p>

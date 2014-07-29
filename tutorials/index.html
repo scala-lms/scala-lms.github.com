@@ -155,6 +155,22 @@
         <div id="jump_wrapper">
             <div id="jump_page">
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
+                    01_overview.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/02_basics.html">
+                    02_basics.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/03_compiler.html">
+                    03_compiler.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/04_atwork.html">
+                    04_atwork.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
                     ack.html
                 </a>
@@ -175,20 +191,12 @@
                     index.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/main.html">
-                    main.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/re.html">
-                    re.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
+                    regex.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
                     shonan.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/sre.html">
-                    sre.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
@@ -223,10 +231,11 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Tutorials Overview</h1>
+                <h1>Tutorials and Documentation</h1>
 <p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS),
 <br  />a technique for embedding domain-specific languages (DSL) in Scala,
 <br  />using a runtime code generation approach.</p>
+<h2>Self-Contained Tutorials</h2>
 <p>The following tutorials are available:</p>
 <ul>
 <li><p><a href="start.html">Getting Started</a>
@@ -238,7 +247,7 @@
 <br  />Sparse matrix vector multiplication
 <br  />Selective unrolling and precomputation</p>
 </li>
-<li><p><a href="sre.html">Regular Expressions</a>
+<li><p><a href="regex.html">Regular Expressions</a>
 <br  />From interpreters to compilers using staging</p>
 </li>
 <li><p><a href="ack.html">Ackermann's Function</a>
@@ -250,6 +259,156 @@
 <li><p><a href="stencil.html">Sliding Stencil</a></p>
 </li>
 </ul>
+<h2>In-Depth Documentation</h2>
+<ol>
+<li><p><a href="01_overview.html">Getting Started</a></p>
+<ol>
+<li>About Generative Programming<ol>
+<li>Productivity vs Performance</li>
+<li>About Generative Programming</li>
+<li>Generative Programming Patterns</li>
+<li>Staging and Extensible Compilers</li>
+<li>Domain-Specific Languages</li>
+</ol>
+</li>
+<li>LMS Basics<ol>
+<li>Rep Types</li>
+<li>Staging as a Scala library</li>
+<li>Comparing LMS to other systems</li>
+</ol>
+</li>
+<li>Installing LMS</li>
+<li>Getting Help</li>
+<li>Summary</li>
+</ol>
+</li>
+<li><p><a href="02_basics.html">Generative programming and LMS basics</a></p>
+<ol>
+<li>Generative Programming Basics<ol>
+<li>Program Generation with Strings</li>
+<li>Program Generation with Quasi-Quotes</li>
+<li>Syntactic Correctness through Deep Reuse of Syntax</li>
+<li>Scope Correctness through Deep Reuse of Scope</li>
+<li>Type Correctness through Deep Reuse of Types</li>
+<li>Value Correctness is an Open Problem</li>
+<li>Let Insertion as a Remedy</li>
+</ol>
+</li>
+<li>The LMS Way<ol>
+<li>Value Correctness through Deep Reuse of Evaluation Order</li>
+<li>Removing Syntactic Overhead</li>
+<li>Staging as a Library and Modular Definition of Object Languages<ol>
+<li>Syntax correctness through Embedding as Methods</li>
+<li>Scope Correctness through Deep Reuse Of Val Bindings</li>
+<li>Type Correctness through Typed Embedding (Deep Reuse of Types)</li>
+<li>Value Correctness through Deep Reuse of Evaluation Order</li>
+</ol>
+</li>
+<li>Functions and Recursion</li>
+<li>Generating and Loading Executable Code</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><a href="03_compiler.html">Intermediate representation and optimzations</a></p>
+<ol>
+<li>Intro: Not your Grandfather's Compiler</li>
+<li>Intermediate Representation: Trees<ol>
+<li>Trees Instead of Strings<ol>
+<li>Modularity: Adding IR Node Types</li>
+</ol>
+</li>
+<li>Enabling Analysis and Transformation<ol>
+<li>Modularity: Adding Traversal Passes</li>
+<li>Solving the ''Expression Problem''</li>
+<li>Generating Code</li>
+<li>Modularity: Adding Transformations</li>
+<li>Transformation by Iterated Staging</li>
+</ol>
+</li>
+<li>Problem: Phase Ordering</li>
+</ol>
+</li>
+<li>Intermediate Representation: Graphs<ol>
+<li>Purely Functional Subset</li>
+<li>Modularity: Adding IR Node Types</li>
+<li>Simpler Analysis and More Flexible Transformations<ol>
+<li>Common Subexpression Elimination/Global Value Numbering</li>
+<li>Pattern Rewrites</li>
+<li>Modularity: Adding new Optimizations</li>
+<li>Context- and Flow-Sensitive Transformations</li>
+<li>Graph Transformations</li>
+<li>Dead Code Elimination</li>
+</ol>
+</li>
+<li>From Graphs Back to Trees<ol>
+<li>Code Motion</li>
+<li>Tree-Like Traversals and Transformers</li>
+</ol>
+</li>
+<li>Effects<ol>
+<li>Simple Effect Domain</li>
+<li>Fine Grained Effects: Tracking Mutations per Allocation Site</li>
+</ol>
+</li>
+</ol>
+</li>
+<li>Advanced Optimizations<ol>
+<li>Rewriting<ol>
+<li>Context-Sensitive Rewriting</li>
+<li>Speculative Rewriting: Combining Analyses and Transformations</li>
+<li>Delayed Rewriting and Multi-Level IR</li>
+</ol>
+</li>
+<li>Splitting and Combining Statements<ol>
+<li>Effectful Statements</li>
+<li>Data Structures</li>
+<li>Representation Conversion</li>
+</ol>
+</li>
+<li>Loop Fusion and Deforestation</li>
+</ol>
+</li>
+</ol>
+</li>
+<li><p><a href="04_atwork.html">Staging and LMS at work</a></p>
+<ol>
+<li>Intro: Abstraction Without Regret</li>
+<li>Common Compiler Optimizations</li>
+<li>Delite: An End-to-End System for Embedded Parallel DSLs<ol>
+<li>Building a Simple DSL</li>
+<li>Code Generation</li>
+<li>The Delite Compiler Framework and Runtime</li>
+</ol>
+</li>
+<li>Control Abstraction<ol>
+<li>Leveraging Higher-Order Functions in the Generator</li>
+<li>Using Continuations in the Generator to Implement Backtracking</li>
+<li>Using Continuations in the Generator to Generate Async Code Patterns</li>
+<li>Guarantees by Construction</li>
+</ol>
+</li>
+<li>Data Abstraction<ol>
+<li>Static Data Structures</li>
+<li>Dynamic Data Structures with Partial Evaluation</li>
+<li>Generic Programming with Type Classes</li>
+<li>Unions and Inheritance</li>
+<li>Struct of Array and Other Data Format Conversions</li>
+<li>Loop Fusion and Deforestation</li>
+<li>Extending the Framework</li>
+<li>Lowering Transforms}</li>
+</ol>
+</li>
+<li>Case Studies<ol>
+<li>OptiML Stream Example</li>
+<li>OptiQL Struct Of Arrays Example</li>
+<li>Fast Fourier Transform Example</li>
+<li>Regular Expression Matcher Example</li>
+</ol>
+</li>
+</ol>
+</li>
+</ol>
 
             </td>
         </tr><tr>
