@@ -8,10 +8,10 @@
         body {
             font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
             font-size: 15px;
-            line-height: 22px;
+            line-height: 1.5;
             color: #252519;
             margin: 0; padding: 0;
-            background: #fbfbfb;
+            /*background: #fbfbfb;*/
         }
         a {
             color: #261a3b;
@@ -219,7 +219,7 @@
         </div>
     </div>
 
-    <div><a href="../">LMS</a>|<a href="index.html">Tutorials</a>|02_basics.scala</div>
+    <div><a href="../">LMS</a>|<a href="index.html">Tutorials</a>|02_basics.scala</div><!-- TODO proper nav -->
     <hr>
 
     <table cellpadding="0" cellspacing="0">
@@ -328,13 +328,13 @@
 <br  />However the multi-stage language compiler must know about the syntax
 <br  />of the object language. This is trivial if meta-language and
 <br  />object language are the same. Otherwise it is slightly more difficult
-<br  />\citep{mainland07quasiquoting}.</p>
+<br  /><a href="mainland07quasiquoting">(*)</a>.</p>
 <p>The \code{Tree} type can be left abstract. Some implementations
 <br  />hide the exact data structures to guarantee safety of optimizations
 <br  />on object code. Silently modifying trees with rewrites that
 <br  />maintain semantic but not structural equality (e.g.\ beta reduction)
 <br  />can change the behavior of programs that inspect the
-<br  />tree structure~\citep{DBLP:conf/pepm/Taha00}. In general, optimizations should
+<br  />tree structure <a href="DBLP:conf/pepm/Taha00">(*)</a>. In general, optimizations should
 <br  />not change the result of a program.</p>
 <h2>Scope Correctness through Deep Reuse of Scope</h2>
 <p>The multi-stage compiler can bind identifiers at the definition
@@ -346,7 +346,7 @@
 $[[$ val y = 7; $\$${ x = y }$]]$
 </code></pre>
 <p>Scope extrusion can be prevented by appropriate type systems
-<br  />\citep{DBLP:conf/pldi/WestbrookRIYAT10,DBLP:conf/pepm/KameyamaKS09},
+<br  /><a href="DBLP:conf/pldi/WestbrookRIYAT10,DBLP:conf/pepm/KameyamaKS09">(*)</a>,
 <br  />which are beyond the scope of this thesis.
 <br  />Scope extrusion is a real problem for code generators
 <br  />that imperatively manage staged program fragments.
@@ -365,7 +365,7 @@ $[[$ val y = 7; $\$${ x = y }$]]$
 <br  />in the next stage.</p>
 <p>Note that the use of parametric types alone does not prevent scope
 <br  />extrusion, which can also be seen as a type error in the sense of
-<br  />a well-typed multi-stage program ''going wrong'' \cite{DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03}.
+<br  />a well-typed multi-stage program ''going wrong'' <a href="DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03">(*)</a>.
 <br  />Thus we do not obtain a guarantee that \emph{all}
 <br  />generated programs type check, but the slightly weaker assurance
 <br  />that all generated programs that are well-formed are also type
@@ -379,8 +379,8 @@ $[[$ val y = 7; $\$${ x = y }$]]$
 <br  />We cannot expect a strong guarantee in all cases for reasons of
 <br  />nontermination but what is troubling is that there are many practical cases
 <br  />where staging annotations change a program's behavior quite drastically.
-<br  />This fact is well documented in the literature \citep{techreport/EckhardtKSTK04,DBLP:journals/scp/CohenDGHKP06,
-<br  />DBLP:conf/gpce/CaretteK05,DBLP:conf/pepm/SwadiTKP06,DBLP:conf/esop/InoueT12}.</p>
+<br  />This fact is well documented in the literature [(*)](techreport/EckhardtKSTK04,DBLP:journals/scp/CohenDGHKP06,
+<br  />DBLP:conf/gpce/CaretteK05,DBLP:conf/pepm/SwadiTKP06,DBLP:conf/esop/InoueT12).</p>
 <p>The problem manifests itself both with strings and with trees.
 <br  />The root cause is that both approaches are based on syntactic
 <br  />expansion, irrespective of semantics such as order of execution.</p>
@@ -429,7 +429,7 @@ power($[[$computeB() + $\$$x$]]$, 4)
 </code></pre>
 <p>Staging has turned the more efficient algorithm into a less
 <br  />efficient one. This effect of staging undoing binding and memoization
-<br  />is widely known \cite{DBLP:conf/pepm/SwadiTKP06,techreport/EckhardtKSTK04}.</p>
+<br  />is widely known <a href="DBLP:conf/pepm/SwadiTKP06,techreport/EckhardtKSTK04">(*)</a>.</p>
 <h2>Let Insertion as a Remedy</h2>
 <p>One way of fixing the order of staged expressions is to insert
 <br  />let-bindings in strategic places. This is frequently done by
@@ -439,33 +439,33 @@ power($[[$computeB() + $\$$x$]]$, 4)
 <br  />explicit side effects, or the code generators are written
 <br  />in monadic style or continuation passing style (CPS), in
 <br  />which case the monadic bind operation will insert let-bindings
-<br  />to maintain the desired evaluation order \cite{DBLP:conf/pepm/SwadiTKP06}.
+<br  />to maintain the desired evaluation order <a href="DBLP:conf/pepm/SwadiTKP06">(*)</a>.
 <br  />Effectful code generators are much more likely to cause
 <br  />scope extrusion. Explicit monadic style or CPS complicate
 <br  />code generators a lot. This dilemma is described as an ''agonizing trade-off'', due to which one
-<br  />''cannot achieve clarity, safety, and efficiency at the same time'' \citep{DBLP:conf/pepm/KameyamaKS09}.
+<br  />''cannot achieve clarity, safety, and efficiency at the same time'' <a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.
 <br  />Only very recently have type-systems been devised to handle both staging and
-<br  />effects \citep{DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10}.
+<br  />effects <a href="DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>.
 <br  />They are not excessively restrictive but not without restrictions either.
-<br  />Mint~\citep{DBLP:conf/pldi/WestbrookRIYAT10},
+<br  />Mint <a href="DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>,
 <br  />a multi-stage extension of Java, restricts non-local operations within escapes
 <br  />to final classes which excludes much of the standard Java library.
 <br  />Languages that support both staging
 <br  />and first class delimited continuations can mitigate this
 <br  />overhead but front ends that encapsulate the staging
-<br  />primitives are still needed \cite{DBLP:conf/pepm/KameyamaKS09}.</p>
+<br  />primitives are still needed <a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.</p>
 <p>In the partial evaluation community, specialization of effectful programs
 <br  />has been achieved by inserting let-bindings eagerly for each effectful
-<br  />statement \cite{thiemann1999partial,DBLP:conf/tacs/LawallT97},
+<br  />statement <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>,
 <br  />achieving on-the-fly conversion to administrative normal form
-<br  />(ANF, \cite{DBLP:conf/pldi/FlanaganSDF93}).
+<br  />(ANF, <a href="DBLP:conf/pldi/FlanaganSDF93">(*)</a>.
 <br  />As we will show below, a simplified variant of this approach naturally
 <br  />extends to staging with and without quasiquotes.</p>
 <h1>The LMS Way</h1>
 <p><a name="sec:222"></a></p>
 <p>We first show how to maintain value correctness through deep reuse
 <br  />of evaluation order. The key idea is similar to that employed in
-<br  />partial evaluation \cite{thiemann1999partial,DBLP:conf/tacs/LawallT97}
+<br  />partial evaluation <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>
 <br  />and applies to both quasiquoting and
 <br  />LMS. Our presentation differs from the partial evaluation literature in
 <br  />that it is independent of any partial evaluation mechanics such as CPS
@@ -533,7 +533,7 @@ accumulate { code("str") }
 <br  />called reflectEffects, accumulate reifyEffects. This hints at the view
 <br  />that we are embedding perform and accumulate in the (invisible) computation
 <br  />monad of the meta language using Filinski's notion
-<br  />of monadic reflection \cite{DBLP:conf/popl/Filinski94,DBLP:conf/popl/Filinski10}.
+<br  />of monadic reflection <a href="DBLP:conf/popl/Filinski94,DBLP:conf/popl/Filinski10">(*)</a>.
 <br  />Accumulate is a left inverse of perform with respect to extensional equality ($\equiv$)
 <br  />of the generated code:</p>
 <pre><code>accumulate { perform("a") } $\longrightarrow^{*}$ "{ val fresh = a; fresh }"       $\equiv$     "a"
@@ -677,7 +677,7 @@ def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
 <br  />contain sets of lifted operations from which different
 <br  />flavors of object languages can be assembled.
 <br  />It is also possible to lift whole traits or classes
-<br  />using reflection \cite{DBLP:conf/ecoop/KossakowskiARO12}.</p>
+<br  />using reflection <a href="DBLP:conf/ecoop/KossakowskiARO12">(*)</a>.</p>
 <p>We can define a simple object language \code{MyStagedLanguage} as follows,
 <br  />using \code{private} access qualifiers to ensure that the staging primitives
 <br  />perform and accumulate are inaccessible to client code outside of package
@@ -738,7 +738,7 @@ def power(b: Rep[Double], n: Int): Rep[Double] = ...
 <br  />is translated away.</p>
 <p>As for scope correctness, we have not encountered any binders in object code so far.
 <br  />Below in Section~\ref{sec:220functions} we will introduce staged functions
-<br  />using higher order abstract syntax (HOAS) \citep{DBLP:conf/pldi/PfenningE88}:</p>
+<br  />using higher order abstract syntax (HOAS) <a href="DBLP:conf/pldi/PfenningE88">(*)</a>:</p>
 <pre><code>def lambda[A,B](f: Rep[A] =&gt; Rep[B]): Rep[A=&gt;B]
 lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
 </code></pre>
@@ -760,9 +760,9 @@ lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
 <br  />we will take a closer look at
 <br  />staged functions.
 <br  />Basic support for staged function definitions and function applications
-<br  />can be defined in terms of a simple higher-order abstract syntax (HOAS) \citep{DBLP:conf/pldi/PfenningE88}
-<br  />representation, similar to those of Carette et al.\ \cite{DBLP:journals/jfp/CaretteKS09}
-<br  />and Hofer et al.\ \cite{DBLP:conf/gpce/HoferORM08}.</p>
+<br  />can be defined in terms of a simple higher-order abstract syntax (HOAS) <a href="DBLP:conf/pldi/PfenningE88">(*)</a>
+<br  />representation, similar to those of Carette et al.\ <a href="DBLP:journals/jfp/CaretteKS09">(*)</a>
+<br  />and Hofer et al. <a href="DBLP:conf/gpce/HoferORM08">(*)</a>.</p>
 <p>The idea is to provide a \code{lambda} operation that transforms present-stage
 <br  />functions over staged values (type \code{Rep[A] => Rep[B]}) to staged
 <br  />function values (type \code{Rep[A=>B]}).</p>
