@@ -18,7 +18,7 @@ DSLs more seamless.
 
 News:
 
-- [The Summer of LMS 2014](summer-of-lms-2014.html): polishing, stability, documentation.
+- [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation.
 
 We're been holding tutorials on LMS and Delite at major conferences:
 
