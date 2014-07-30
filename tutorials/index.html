@@ -149,7 +149,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 }
 
 
-        #jump_to, #jump_page {
+        #jump_to, #jump_page, #jump_toc {
             background: white;
             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
@@ -184,6 +184,23 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             background: #f5f5ff;
         }
         #jump_page .source:first-child {
+        }
+
+
+        #jump_toc {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_toc li {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_toc li:hover {
+            background: #f5f5ff;
+        }
+        #jump_toc li:first-child {
         }
 
 
@@ -294,6 +311,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div id="jump_to">
         index.scala // Jump To &hellip;
         <div id="jump_wrapper">
+            <div id="jump_toc"></div>
             <div id="jump_page">
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
@@ -371,6 +389,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     </ol>
 
 
+    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+    <!-- tbd whether it should be here ?? -->
 
         
             <div class="docs">
@@ -381,6 +401,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a
 <br  />technique for embedding domain-specific languages (DSL) in Scala, using a
 <br  />runtime code generation approach.</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
 <h2>Self-Contained Tutorials</h2>
 <p>The following tutorials are available:</p>
 <ul>
@@ -409,6 +431,63 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 </li>
 <li><p><a href="stencil.html">Sliding Stencil</a></p>
 </li>
+</ul>
+<h2>In-Depth Documentation</h2>
+<p>Tentative restructuring</p>
+<h3>Getting Started</h3>
+<ul>
+<li>Why generative programming?
+<br  /><em>Because abstraction without regret!</em></li>
+<li>Why LMS?
+<br  /><em>Because batteries included and hackable!</em></li>
+<li>Hellow World</li>
+</ul>
+<h3>Design Patterns</h3>
+<p>Purely generative:</p>
+<ul>
+<li>Specialization on static data</li>
+<li>Abstractions in the meta-language</li>
+<li>From interpreter to compiler</li>
+<li>Mixed-stage data structures</li>
+<li>Type classes and generic programming</li>
+</ul>
+<p>Including IR:</p>
+<ul>
+<li>DSLs with multiple abstraction levels</li>
+</ul>
+<h3>From Zero to LMS</h3>
+<ul>
+<li>Program generation with Strings</li>
+<li>Program generation with Trees</li>
+<li>Program generation with Graphs</li>
+</ul>
+<h3>LMS Internals</h3>
+<ul>
+<li>Graph IR</li>
+<li>Effects</li>
+<li>Code Motion</li>
+<li>Transformers</li>
+<li>Code Generators</li>
+</ul>
+<p>Advanced:</p>
+<ul>
+<li>Functions</li>
+<li>Structs</li>
+</ul>
+<h3>Integration</h3>
+<ul>
+<li>LMS for Scala</li>
+<li>LMS for JavaScript</li>
+<li>LMS for C</li>
+</ul>
+<p>Advanced:</p>
+<ul>
+<li>LMS for Scala Macros</li>
+<li>LMS for Vector Intrinsics</li>
+<li>LMS for GPUs</li>
+<li>LMS for FPGAs</li>
+<li>LMS for SMT Solvers</li>
+<li>LMS for Truffle / Graal</li>
 </ul>
 <h2>In-Depth Documentation</h2>
 <ol>
@@ -553,82 +632,11 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <li>Case Studies<ol>
 <li>OptiML Stream Example</li>
 <li>OptiQL Struct Of Arrays Example</li>
-<li>Fast Fourier Transform Example</li>
-<li>Regular Expression Matcher Example</li>
 </ol>
 </li>
 </ol>
 </li>
 </ol>
-<h2>In-Depth Documentation</h2>
-<p>Tentative restructuring</p>
-<h3>Getting Started</h3>
-<ul>
-<li>Why generative programming?
-<br  />Because abstraction without regret!</li>
-<li>Why LMS?
-<br  />Because batteries included and hackable!</li>
-<li>Hellow World</li>
-</ul>
-<h3>Design Patterns</h3>
-<ul>
-<li><p>Specialization on static data</p>
-</li>
-<li><p>Building meta-language abstractions</p>
-</li>
-<li><p>From interpreter to compiler</p>
-</li>
-<li><p>Mixed-stage data structures</p>
-</li>
-<li><p>Type classes and generic programming</p>
-</li>
-<li><p>Implementing DSLs with multiple abstraction levels</p>
-</li>
-</ul>
-<h3>From Zero to LMS</h3>
-<ul>
-<li>Program generation with Strings</li>
-<li>Program generation with Trees</li>
-<li>Program generation with Graphs</li>
-</ul>
-<h3>LMS Internals</h3>
-<ul>
-<li><p>Graph IR</p>
-</li>
-<li><p>Effects</p>
-</li>
-<li><p>Code Motion</p>
-</li>
-<li><p>Transformers</p>
-</li>
-<li><p>Code Generators</p>
-</li>
-<li><p>Functions</p>
-</li>
-<li><p>Structs</p>
-</li>
-</ul>
-<h3>Integration</h3>
-<ul>
-<li><p>LMS for Scala</p>
-</li>
-<li><p>LMS for JavaScript</p>
-</li>
-<li><p>LMS for C</p>
-</li>
-<li><p>LMS for Scala Macros</p>
-</li>
-<li><p>LMS for Vector Intrinsics</p>
-</li>
-<li><p>LMS for GPUs</p>
-</li>
-<li><p>LMS for FPGAs</p>
-</li>
-<li><p>LMS for SMT Solvers</p>
-</li>
-<li><p>LMS for Truffle / Graal</p>
-</li>
-</ul>
 
             </div>
             <div class="code">
@@ -653,5 +661,27 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
     <script src="../bootstrap/assets/js/docs.min.js"></script>
-</body>
+    <script src="../javascripts/toc.min.js"></script>
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $(".container").tableofcontents({
+            id: "#tableofcontents"
+        });      
+        $(".container").tableofcontents({
+            id: "#jump_toc"
+        });      
+    });
+
+
+        $('#my-affix').affix({
+            offset: {
+              top: 100
+            , bottom: function () {
+                return (this.bottom = $('.footer').outerHeight(true))
+              }
+            }
+        })
+    </script>
+  </body>
 </html>

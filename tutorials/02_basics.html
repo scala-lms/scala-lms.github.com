@@ -149,7 +149,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 }
 
 
-        #jump_to, #jump_page {
+        #jump_to, #jump_page, #jump_toc {
             background: white;
             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
@@ -184,6 +184,23 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             background: #f5f5ff;
         }
         #jump_page .source:first-child {
+        }
+
+
+        #jump_toc {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_toc li {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_toc li:hover {
+            background: #f5f5ff;
+        }
+        #jump_toc li:first-child {
         }
 
 
@@ -294,6 +311,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div id="jump_to">
         02_basics.scala // Jump To &hellip;
         <div id="jump_wrapper">
+            <div id="jump_toc"></div>
             <div id="jump_page">
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
@@ -371,45 +389,22 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     </ol>
 
 
+    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+    <!-- tbd whether it should be here ?? -->
 
         
             <div class="docs">
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Overview</h1>
-<ol>
-<li>Generative Programming Basics<ol>
-<li>Program Generation with Strings</li>
-<li>Program Generation with Quasi-Quotes</li>
-<li>Syntactic Correctness through Deep Reuse of Syntax</li>
-<li>Scope Correctness through Deep Reuse of Scope</li>
-<li>Type Correctness through Deep Reuse of Types</li>
-<li>Value Correctness is an Open Problem</li>
-<li>Let Insertion as a Remedy</li>
-</ol>
-</li>
-<li>The LMS Way<ol>
-<li>Value Correctness through Deep Reuse of Evaluation Order</li>
-<li>Removing Syntactic Overhead</li>
-<li>Staging as a Library and Modular Definition of Object Languages<ol>
-<li>Syntax correctness through Embedding as Methods</li>
-<li>Scope Correctness through Deep Reuse Of Val Bindings</li>
-<li>Type Correctness through Typed Embedding (Deep Reuse of Types)</li>
-<li>Value Correctness through Deep Reuse of Evaluation Order</li>
-</ol>
-</li>
-<li>Functions and Recursion</li>
-<li>Generating and Loading Executable Code</li>
-</ol>
-</li>
-</ol>
-<p><a name="sec:221"></a></p>
+                <p><a name="sec:221"></a></p>
 <h1>Generative Programming Basics</h1>
 <p>Previous staging approaches either work directly with strings that represent
 <br  />concrete program syntax or make use of quasiquoting to compose abstract syntax
 <br  />trees. We examine both approaches in turn, with an eye on how linguistic reuse
 <br  />improves productivity and safety for the multi-stage programmer.</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
 <h2>Program Generation with Strings</h2>
 <p>As a simple example, let us turn the power function:</p>
 <pre><code>def power(b: Double, n: Int): Double = 
@@ -1017,5 +1012,27 @@ if (c)    // c: Rep[Boolean]
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
     <script src="../bootstrap/assets/js/docs.min.js"></script>
-</body>
+    <script src="../javascripts/toc.min.js"></script>
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $(".container").tableofcontents({
+            id: "#tableofcontents"
+        });      
+        $(".container").tableofcontents({
+            id: "#jump_toc"
+        });      
+    });
+
+
+        $('#my-affix').affix({
+            offset: {
+              top: 100
+            , bottom: function () {
+                return (this.bottom = $('.footer').outerHeight(true))
+              }
+            }
+        })
+    </script>
+  </body>
 </html>

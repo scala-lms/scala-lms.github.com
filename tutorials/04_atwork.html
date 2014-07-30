@@ -149,7 +149,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 }
 
 
-        #jump_to, #jump_page {
+        #jump_to, #jump_page, #jump_toc {
             background: white;
             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
@@ -184,6 +184,23 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             background: #f5f5ff;
         }
         #jump_page .source:first-child {
+        }
+
+
+        #jump_toc {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_toc li {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_toc li:hover {
+            background: #f5f5ff;
+        }
+        #jump_toc li:first-child {
         }
 
 
@@ -294,6 +311,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div id="jump_to">
         04_atwork.scala // Jump To &hellip;
         <div id="jump_wrapper">
+            <div id="jump_toc"></div>
             <div id="jump_page">
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
@@ -371,63 +389,18 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     </ol>
 
 
+    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+    <!-- tbd whether it should be here ?? -->
 
         
             <div class="docs">
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Overview</h1>
-<ol>
-<li>Intro: Abstraction Without Regret</li>
-<li>Common Compiler Optimizations</li>
-<li>Delite: An End-to-End System for Embedded Parallel DSLs<ol>
-<li>Building a Simple DSL</li>
-<li>Code Generation</li>
-<li>The Delite Compiler Framework and Runtime</li>
-</ol>
-</li>
-<li>Control Abstraction<ol>
-<li>Leveraging Higher-Order Functions in the Generator</li>
-<li>Using Continuations in the Generator to Implement Backtracking</li>
-<li>Using Continuations in the Generator to Generate Async Code Patterns<ol>
-<li>CPS and Staging</li>
-<li>CPS for Interruptible Traversals</li>
-<li>Defining the Ajax API</li>
-<li>CPS for Parallelism</li>
-</ol>
-</li>
-<li>Guarantees by Construction</li>
-</ol>
-</li>
-<li>Data Abstraction<ol>
-<li>Static Data Structures</li>
-<li>Dynamic Data Structures with Partial Evaluation</li>
-<li>Generic Programming with Type Classes</li>
-<li>Unions and Inheritance</li>
-<li>Struct of Array and Other Data Format Conversions</li>
-<li>Loop Fusion and Deforestation</li>
-<li>Extending the Framework</li>
-<li>Lowering Transforms}</li>
-</ol>
-</li>
-<li>Case Studies<ol>
-<li>OptiML Stream Example<ol>
-<li>Downsampling in Bioinformatics</li>
-</ol>
-</li>
-<li>OptiQL Struct Of Arrays Example</li>
-<li>Fast Fourier Transform Example<ol>
-<li>Implementing Optimizations</li>
-<li>Running the Generated Code</li>
-</ol>
-</li>
-<li>Regular Expression Matcher Example</li>
-</ol>
-</li>
-</ol>
-<h1>(Chapter 0) Intro: Abstraction Without Regret</h1>
+                <h1>(Chapter 0) Intro: Abstraction Without Regret</h1>
 <p>\label{chap:400}</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
 <p>LMS is a dynamic multi-stage programming approach: We have the full Scala
 <br  />language at our disposal to compose fragments of object code. In fact, DSL
 <br  />programs are program <em>generators</em> that produce an object program IR when run.
@@ -2124,5 +2097,27 @@ val x308 = Map("data"-&gt;x307,"size"-&gt;x305) //DataTable
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
     <script src="../bootstrap/assets/js/docs.min.js"></script>
-</body>
+    <script src="../javascripts/toc.min.js"></script>
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $(".container").tableofcontents({
+            id: "#tableofcontents"
+        });      
+        $(".container").tableofcontents({
+            id: "#jump_toc"
+        });      
+    });
+
+
+        $('#my-affix').affix({
+            offset: {
+              top: 100
+            , bottom: function () {
+                return (this.bottom = $('.footer').outerHeight(true))
+              }
+            }
+        })
+    </script>
+  </body>
 </html>

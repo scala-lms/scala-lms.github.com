@@ -149,7 +149,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 }
 
 
-        #jump_to, #jump_page {
+        #jump_to, #jump_page, #jump_toc {
             background: white;
             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
@@ -184,6 +184,23 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             background: #f5f5ff;
         }
         #jump_page .source:first-child {
+        }
+
+
+        #jump_toc {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_toc li {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_toc li:hover {
+            background: #f5f5ff;
+        }
+        #jump_toc li:first-child {
         }
 
 
@@ -294,6 +311,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div id="jump_to">
         start.scala // Jump To &hellip;
         <div id="jump_wrapper">
+            <div id="jump_toc"></div>
             <div id="jump_page">
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
@@ -371,6 +389,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     </ol>
 
 
+    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+    <!-- tbd whether it should be here ?? -->
 
         
             <div class="docs">
@@ -378,6 +398,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
                 <h1>Getting Started</h1>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
 <h2>Staging</h2>
 <p>What is staging? The idea behind staging is to delay computation of
 <br  />certain expressions, generating code to compute them later. The
@@ -703,5 +725,27 @@ class DslApiTest extends TutorialFunSuite {
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
     <script src="../bootstrap/js/bootstrap.min.js"></script>
     <script src="../bootstrap/assets/js/docs.min.js"></script>
-</body>
+    <script src="../javascripts/toc.min.js"></script>
+    <script type="text/javascript">
+
+    $(document).ready(function() {
+        $(".container").tableofcontents({
+            id: "#tableofcontents"
+        });      
+        $(".container").tableofcontents({
+            id: "#jump_toc"
+        });      
+    });
+
+
+        $('#my-affix').affix({
+            offset: {
+              top: 100
+            , bottom: function () {
+                return (this.bottom = $('.footer').outerHeight(true))
+              }
+            }
+        })
+    </script>
+  </body>
 </html>
