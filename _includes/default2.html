@@ -27,15 +27,134 @@
     <![endif]-->
 
     <!-- Custom styles for this template -->
-    <link href="bootstrap/carousel.css" rel="stylesheet">
+    <!-- <link href="bootstrap/carousel.css" rel="stylesheet"> -->
+
+    <style type="text/css">
+@import url(stylesheets/pygment_trac.css);
+/* head fancy: Lobster, Pacifico */    
+/* head serif: Arvo, Bitter, Podkova, Roboto Slab */    
+/* dense bold: Squada One, Oswald; */
+@import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+@import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+@import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+body {
+  /*line-height: 1.7;*/
+  /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+  font-family: 'Helvetica Neue';
+  /*font-size: 15pt;*/
+  color: rgb(41,41,41);
+}
+
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+  font-family: 'Roboto Slab';
+  font-weight: 700;
+}
+
+
+.container h1,h2 {
+  border-bottom: 1px solid #e5e5e5;
+/*  margin-bottom: 1em;
+  margin-top: 2em;*/
+}
+
+
+
+
+.jumbotron {
+  background: transparent;
+}
+
+/* Space out content a bit */
+/*body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}*/
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  padding-bottom: 19px;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .jumbotron .container {
+    max-width: 730px;
+  }
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  padding: 14px 24px;
+  font-size: 21px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 40px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+    </style>
+
   </head>
 <!-- NAVBAR
 ================================================== -->
   <body>
-<!--    <div class="navbar-wrapper"> -->
-      <div class="container">
 
-        <div class="navbar navbar-inverse navbar-static-top" role="navigation">
+        <div class="navbar navbar-default navbar-static-top" role="navigation">
           <div class="container">
             <div class="navbar-header">
               <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
@@ -49,9 +168,12 @@
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
                 <li class="active"><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#contact">Contact</a></li>
-                <li class="dropdown">
+                <li><a href="tutorials/index.html">Documentation</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="publications.html">Publications</a></li>
+                <li><a href="community.html">Community</a></li>
+                <!--<li><a href="community.html">Community</a></li>-->
+                <!--<li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">
                     <li><a href="#">Action</a></li>
@@ -62,19 +184,27 @@
                     <li><a href="#">Separated link</a></li>
                     <li><a href="#">One more separated link</a></li>
                   </ul>
-                </li>
+                </li>-->
               </ul>
             </div>
           </div>
         </div>
 
 
-    {{content}}
+{{ content }}
 
 
-      </div>
-<!--    </div> -->
+<!-- FOOTER -->
+<div class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2014 EPFL</p>
+</div>  
+</div>
 
+
+
+      
    
 
     <!-- Bootstrap core JavaScript

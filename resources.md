@@ -1,10 +1,10 @@
 ---
-layout: default
+layout: page
 title: Resources
 category: documentation
 ---
 
-## Background / Documentation {#docs}
+## Background / Resources {#docs}
 
 Overview presentations:
 
