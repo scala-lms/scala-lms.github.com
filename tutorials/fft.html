@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>fft.scala</title>
+    <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+    <style type="text/css">
+        /*--------------------- Layout and Typography ----------------------------*/
+        body {
+            font-family: 'Palatino Linotype', 'Book Antiqua', Palatino, FreeSerif, serif;
+            font-size: 15px;
+            line-height: 1.5;
+            color: #252519;
+            margin: 0; padding: 0;
+            /*background: #fbfbfb;*/
+        }
+        a {
+            color: #261a3b;
+        }
+        a:visited {
+            color: #261a3b;
+        }
+        /*p {
+            margin: 0 0 15px 0;
+        }
+        h4, h5, h6 {
+            color: #333;
+            padding: 6px 0 6px 0;
+            font-size: 13px;
+        }
+        h2, h3 {
+            padding-bottom: 15px;
+            color: #000;
+            overflow: hidden;
+        }
+        h1 {
+            padding-bottom: 15px;
+            color: #000;
+        }*/
+        #container {
+            /*position: relative;
+            float: right;*/
+            width: 650px;
+            margin: 0 auto;
+            background: white;
+        }
+        /*#background {
+            position: fixed;
+            top: 0; left: 525px; right: 0; bottom: 0;
+            background: #f5f5ff;
+            border-left: 1px solid #e5e5ee;
+            z-index: -1;
+        }*/
+        #jump_to, #jump_page {
+            background: white;
+            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+            font: 10px Arial;
+            text-transform: uppercase;
+            cursor: pointer;
+            text-align: right;
+        }
+        #jump_to, #jump_wrapper {
+            position: fixed;
+            right: 0; top: 0;
+            padding: 5px 10px;
+        }
+        #jump_wrapper {
+            padding: 0;
+            display: none;
+        }
+        #jump_to:hover #jump_wrapper {
+            display: block;
+        }
+        #jump_page {
+            padding: 5px 0 3px;
+            margin: 0 0 25px 25px;
+        }
+        #jump_page .source {
+            display: block;
+            padding: 5px 10px;
+            text-decoration: none;
+            border-top: 1px solid #eee;
+        }
+        #jump_page .source:hover {
+            background: #f5f5ff;
+        }
+        #jump_page .source:first-child {
+        }
+        table td {
+            border: 0;
+            outline: 0;
+        }
+        td.docs, th.docs {
+            min-width: 575px;
+            /*max-width: 450px;
+            min-width: 450px;
+            min-height: 5px;*/
+            padding: 10px 25px 1px 50px;
+            /*overflow-x: hidden;*
+            vertical-align: top;
+            text-align: left;*/
+        }
+        .docs pre {
+            margin: 15px 0 15px;
+            padding-left: 15px;
+        }
+        .docs p tt, .docs p code, .doc code {
+            background: #f8f8ff;
+            border: 1px solid #dedede;
+            font-size: 12px;
+            padding: 0 0.2em;
+        }
+        .pilwrap {
+            position: relative;
+        }
+        .pilcrow {
+            font: 12px Arial;
+            text-decoration: none;
+            color: #454545;
+            position: absolute;
+            top: 3px; left: -20px;
+            padding: 1px 2px;
+            opacity: 0;
+            -webkit-transition: opacity 0.2s linear;
+        }
+        td.docs:hover .pilcrow {
+            opacity: 1;
+        }
+        td.code, th.code {
+            padding: 10px 10px 10px 50px;
+            /*width: 100%;*/
+            vertical-align: top;
+            background: #f5f5ff;
+            /*border-left: 1px solid #e5e5ee;*/
+        }
+        pre, tt, code {
+            font-size: 12px; line-height: 18px;
+            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+            margin: 0; padding: 0;
+        }
+
+        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+        table.doc { margin-bottom: 20px; }
+        td.doc { border-bottom: 1px dashed #708090; }
+        td.param { font-weight: bold; }
+        td.return { font-weight: bold; text-decoration: underline; }
+    </style>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
+    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</head>
+
+<body onload="prettyPrint()">
+<div id="container">
+    <div id="background"></div>
+    <div id="jump_to">
+        fft.scala // Jump To &hellip;
+        <div id="jump_wrapper">
+            <div id="jump_page">
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/01_overview.html">
+                    01_overview.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/02_basics.html">
+                    02_basics.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/03_compiler.html">
+                    03_compiler.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/04_atwork.html">
+                    04_atwork.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/ack.html">
+                    ack.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/automata.html">
+                    automata.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
+                    csv.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
+                    dslapi.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dynvar.html">
+                    dynvar.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/fft.html">
+                    fft.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/index.html">
+                    index.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
+                    regex.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
+                    shonan.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/start.html">
+                    start.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/stencil.html">
+                    stencil.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/utils.html">
+                    utils.html
+                </a>
+                
+            </div>
+        </div>
+    </div>
+
+    <div><a href="../">LMS</a>|<a href="index.html">Tutorials</a>|fft.scala</div><!-- TODO proper nav -->
+    <hr>
+
+    <table cellpadding="0" cellspacing="0">
+        <thead>
+        <!--<tr>
+            <th class="docs">
+                <h1>fft.scala</h1>
+            </th>
+            <th class="code"></th>
+        </tr>-->
+        </thead>
+        <tbody>
+        
+        <tr id="section_0">
+            <td class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_0">&#182;</a>
+                </div>
+                <h1>Fast Fourier Transform (FFT)</h1>
+<p><a name="sec:Afft"></a></p>
+<p>We consider staging a fast fourier transform (FFT) algorithm.  A staged FFT,
+<br  />implemented in MetaOCaml, has been presented by Kiselyov et~al.\
+<br  /><a href="DBLP:conf/emsoft/KiselyovST04">(*)</a> Their work is a very good example for how
+<br  />staging allows to transform a simple, unoptimized algorithm into an efficient
+<br  />program generator. Achieving this in the context of MetaOCaml, however,
+<br  />required restructuring the program into monadic style and adding a front-end
+<br  />layer for performing symbolic rewritings. Using our approach of just adding
+<br  /><code>Rep</code> types, we can go from the naive textbook-algorithm to the staged version
+<br  />(shown below) by changing literally two lines of code:</p>
+<pre><code>trait FFT { this: Arith with Trig =&gt;
+  case class Complex(re: Rep[Double], im: Rep[Double])
+  ...
+}
+</code></pre>
+<p>All that is needed is adding the self-type annotation to import arithmetic and
+<br  />trigonometric operations and changing the type of the real and imaginary
+<br  />components of complex numbers from <code>Double</code> to <code>Rep[Double]</code>.</p>
+<pre><code>trait FFT { this: Arith with Trig =&gt;
+  case class Complex(re: Rep[Double], im: Rep[Double]) {
+    def +(that: Complex) = Complex(this.re + that.re, this.im + that.im)
+    def *(that: Complex) = ...
+  }
+  def omega(k: Int, N: Int): Complex = {
+    val kth = -2.0 * k * Math.Pi / N
+    Complex(cos(kth), sin(kth))
+  }
+  def fft(xs: Array[Complex]): Array[Complex] = xs match {
+    case (x :: Nil) =&gt; xs
+    case _ =&gt;
+      val N = xs.length // assume it's a power of two
+      val (even0, odd0) = splitEvenOdd(xs)
+      val (even1, odd1) = (fft(even0), fft(odd0))
+      val (even2, odd2) = (even1 zip odd1 zipWithIndex) map {
+        case ((x, y), k) =&gt;
+          val z = omega(k, N) * y
+          (x + z, x - z)
+      }.unzip;
+      even2 ::: odd2
+  }
+}
+</code></pre>
+<p>FFT code. Only the real and imaginary components of complex numbers need to be
+<br  />staged.</p>
+<p>\begin{figure}\centering
+<br  />\includegraphics[scale=0.5]{papers/cacm2012/figures/test2-fft2-x-dot.pdf}
+<br  />\caption{\label{fig:fftgraph} Computation graph for size-4 FFT. Auto-generated from
+<br  />staged code in Figure~\ref{fig:fftcode}.}
+<br  />\end{figure}</p>
+<p>Merely changing the types  will not provide us with  the desired optimizations
+<br  />yet.  We will see below how we can add the transformations described by
+<br  />Kiselyov et~al.\ to generate the same fixed-size FFT code, corresponding to
+<br  />the famous FFT butterfly networks (see Figure~\ref{fig:fftgraph}). Despite the
+<br  />seemingly naive algorithm, this staged code is free of branches, intermediate
+<br  />data structures and redundant computations. The important point here is that
+<br  />we can add these transformations without any further changes to the code in
+<br  />Figure~\ref{fig:fftcode}, just by mixing in the trait <code>FFT</code> with a few others.</p>
+<pre><code>trait ArithExpOptFFT extends ArithExp {
+  override def infix_*(x:Exp[Double],y:Exp[Double]) = (x,y) match {
+    case (Const(k), Def(Times(Const(l), y))) =&gt; Const(k * l) * y
+    case (x, Def(Times(Const(k), y))) =&gt; Const(k) * (x * y))
+    case (Def(Times(Const(k), x)), y) =&gt; Const(k) * (x * y))
+    ...
+    case (x, Const(y)) =&gt; Times(Const(y), x)
+    case _ =&gt; super.infix_*(x, y)
+  }
+}
+</code></pre>
+<p>Extending the generic implementation from <a href="#sec:308addOpts">here</a> with FFT-
+<br  />specific optimizations.</p>
+<h2>Implementing Optimizations</h2>
+<p>As already discussed <a href="#sec:308addOpts">here</a>, some profitable optimizations
+<br  />are very generic (CSE, DCE, etc), whereas others are specific to the actual
+<br  />program. In the FFT case, Kiselyov et al.\
+<br  /><a href="DBLP:conf/emsoft/KiselyovST04">(*)</a> describe  a number of rewritings that are
+<br  />particularly effective for the patterns of code generated by the FFT algorithm
+<br  />but not as much for other programs.</p>
+<p>What we want to achieve again is modularity, such that optimizations can be
+<br  />combined in a way that is most useful for a given task.  This can be achieved
+<br  />by overriding smart constructors,  as shown by trait <code>ArithExpOptFFT</code> (see
+<br  />Figure~\ref{fig:expOpt}).  Note that the use of <code>x*y</code> within the body of
+<br  /><code>infix_*</code> will apply the optimization  recursively.</p>
+<h2>Running the Generated Code</h2>
+<p>Extending the FFT component from Figure~\ref{fig:fftcode} with explicit
+<br  />compilation.</p>
+<pre><code>trait FFTC extends FFT { this: Arrays with Compile =&gt;
+  def fftc(size: Int) = compile { input: Rep[Array[Double]] =&gt;
+    assert(&lt;size is power of 2&gt;) // happens at staging time
+    val arg = Array.tabulate(size) { i =&gt; 
+      Complex(input(2*i), input(2*i+1))
+    }
+    val res = fft(arg)
+    updateArray(input, res.flatMap {
+      case Complex(re,im) =&gt; Array(re,im)
+    })
+  }
+}
+</code></pre>
+<p>Using the staged FFT implementation as part of some larger Scala program is
+<br  />straightforward but requires us to interface the generic algorithm with a
+<br  />concrete data representation. The algorithm in Figure~\ref{fig:fftcode}
+<br  />expects an array of <code>Complex</code> objects as input, each of which contains fields
+<br  />of type <code>Rep[Double]</code>. The algorithm itself has no notion of staged arrays but
+<br  />uses arrays only in the generator stage, which means that it is agnostic to
+<br  />how data is stored. The enclosing program, however, will store arrays of
+<br  />complex numbers in some native format which we will need to feed into the
+<br  />algorithm. A simple choice of representation is to use <code>Array[Double]</code> with
+<br  />the complex numbers flattened into adjacent slots. When applying <code>compile</code>, we
+<br  />will thus receive  input of type <code>Rep[Array[Double]]</code>.  Figure~\ref{fig:fftc}
+<br  />shows how we can  extend trait <code>FFT</code> to <code>FFTC</code> to obtain compiled FFT
+<br  />implementations that realize the necessary data interface for a  fixed input
+<br  />size.</p>
+<p>We can then define code that creates and uses compiled  FFT `<code>codelets'' by
+&lt;br /&gt;extending</code>FFTC`:</p>
+<pre><code>trait TestFFTC extends FFTC {
+  val fft4: Array[Double] =&gt; Array[Double] = fftc(4) 
+  val fft8: Array[Double] =&gt; Array[Double] = fftc(8) 
+
+  // embedded code using fft4, fft8, ...
+}
+</code></pre>
+<p>Constructing an instance of this subtrait (mixed in with the appropriate LMS
+<br  />traits) will execute the embedded code:</p>
+<pre><code>val OP: TestFFC = new TestFFTC with CompileScala
+  with ArithExpOpt  with ArithExpOptFFT with ScalaGenArith
+  with TrigExpOpt   with ScalaGenTrig 
+  with ArraysExpOpt with ScalaGenArrays
+</code></pre>
+<p>We can also use the compiled methods from outside the object:</p>
+<pre><code>OP.fft4(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0))
+$\hookrightarrow$ Array(6.0,0.0,-1.0,1.0,0.0,0.0,-1.0,-1.0)
+</code></pre>
+<p>Providing an explicit type in the definition <code>val OP: TestFFC = ...</code> ensures
+<br  />that the internal representation is not accessible from the outside, only the
+<br  />members defined by <code>TestFFC</code>.</p>
+<p>The full code is below:</p>
+<pre><code>package scala.virtualization.lms
+package epfl
+package test2
+
+import common._
+import test1._
+import reflect.SourceContext
+
+import java.io.PrintWriter
+
+import org.scalatest._
+
+
+trait FFT { this: Arith with Trig =&gt;
+
+  def omega(k: Int, N: Int): Complex = {
+    val kth = -2.0 * k * math.Pi / N
+    Complex(cos(kth), sin(kth))
+  }
+
+  case class Complex(re: Rep[Double], im: Rep[Double]) {
+    def +(that: Complex) = Complex(this.re + that.re, this.im + that.im)
+    def -(that: Complex) = Complex(this.re - that.re, this.im - that.im)
+    def *(that: Complex) = Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re)
+  }
+
+  def splitEvenOdd[T](xs: List[T]): (List[T], List[T]) = (xs: @unchecked) match {
+    case e :: o :: xt =&gt;
+      val (es, os) = splitEvenOdd(xt)
+      ((e :: es), (o :: os))
+    case Nil =&gt; (Nil, Nil)
+    // cases?
+  }
+
+  def mergeEvenOdd[T](even: List[T], odd: List[T]): List[T] = ((even, odd): @unchecked) match {
+    case (Nil, Nil) =&gt;
+      Nil
+    case ((e :: es), (o :: os)) =&gt;
+      e :: (o :: mergeEvenOdd(es, os))
+    // cases?
+  }
+
+  def fft(xs: List[Complex]): List[Complex] = xs match {
+    case (x :: Nil) =&gt; xs
+    case _ =&gt;
+      val N = xs.length // assume it's a power of two
+      val (even0, odd0) = splitEvenOdd(xs)
+      val (even1, odd1) = (fft(even0), fft(odd0))
+      val (even2, odd2) = (even1 zip odd1 zipWithIndex) map {
+        case ((x, y), k) =&gt;
+          val z = omega(k, N) * y
+          (x + z, x - z)
+      } unzip;
+      even2 ::: odd2
+  }
+
+}
+
+
+
+
+
+trait ArithExpOptFFT extends ArithExpOpt {
+
+  override def infix_+(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Def(Minus(Const(0.0) | Const(-0.0), y))) =&gt; infix_-(x, y)
+    case _ =&gt; super.infix_+(x, y)
+  }
+
+  override def infix_-(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Def(Minus(Const(0.0) | Const(-0.0), y))) =&gt; infix_+(x, y)
+    case _ =&gt; super.infix_-(x, y)
+  }
+
+  override def infix_*(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Const(-1.0)) =&gt; infix_-(0.0, x)
+    case (Const(-1.0), y) =&gt; infix_-(0.0, y)
+    case _ =&gt; super.infix_*(x, y)
+  }
+}
+
+
+
+trait TrigExpOptFFT extends TrigExpOpt {
+  override def cos(x: Exp[Double]) = x match {
+    case Const(x) if { val z = x / math.Pi / 0.5; z != 0 &amp;&amp; z == z.toInt } =&gt; Const(0.0)
+    case _ =&gt; super.cos(x)
+  }
+}
+
+
+trait FlatResult extends BaseExp { // just to make dot output nicer
+
+  case class Result(x: Any) extends Def[Any]
+
+  def result(x: Any): Exp[Any] = toAtom(Result(x))
+
+}
+
+trait ScalaGenFlat extends ScalaGenBase {
+   import IR._
+   type Block[+T] = Exp[T]
+   def getBlockResultFull[T](x: Block[T]): Exp[T] = x
+   def reifyBlock[T:Manifest](x: =&gt;Exp[T]): Block[T] = x
+   def traverseBlock[A](block: Block[A]): Unit = {
+     buildScheduleForResult(block) foreach traverseStm
+   }
+}
+
+
+
+class TestFFT extends FileDiffSuite {
+
+  val prefix = home + "test-out/epfl/test2-"
+
+  def testFFT1 = {
+    withOutFile(prefix+"fft1") {
+      val o = new FFT with ArithExp with TrigExpOpt with FlatResult with DisableCSE //with DisableDCE
+      import o._
+
+      val r = fft(List.tabulate(4)(_ =&gt; Complex(fresh, fresh)))
+      println(globalDefs.mkString("\n"))
+      println(r)
+
+      val p = new ExportGraph with DisableDCE { val IR: o.type = o }
+      p.emitDepGraph(result(r), prefix+"fft1-dot", true)
+    }
+    assertFileEqualsCheck(prefix+"fft1")
+    assertFileEqualsCheck(prefix+"fft1-dot")
+  }
+
+  def testFFT2 = {
+    withOutFile(prefix+"fft2") {
+      val o = new FFT with ArithExpOptFFT with TrigExpOptFFT with FlatResult
+      import o._
+
+      case class Result(x: Any) extends Exp[Any]
+
+      val r = fft(List.tabulate(4)(_ =&gt; Complex(fresh, fresh)))
+      println(globalDefs.mkString("\n"))
+      println(r)
+
+      val p = new ExportGraph { val IR: o.type = o }
+      p.emitDepGraph(result(r), prefix+"fft2-dot", true)
+    }
+    assertFileEqualsCheck(prefix+"fft2")
+    assertFileEqualsCheck(prefix+"fft2-dot")
+  }
+
+  def testFFT3 = {
+    withOutFile(prefix+"fft3") {
+      class FooBar extends FFT
+        with ArithExpOptFFT with TrigExpOptFFT with ArraysExp
+        with CompileScala {
+
+        def ffts(input: Rep[Array[Double]], size: Int) = {
+          val list = List.tabulate(size)(i =&gt; Complex(input(2*i), input(2*i+1)))
+          val r = fft(list)
+          // make a new array for now - doing in-place update would be better
+          makeArray(r.flatMap { case Complex(re,im) =&gt; List(re,im) })
+        }
+
+        val codegen = new ScalaGenFlat with ScalaGenArith with ScalaGenArrays { val IR: FooBar.this.type = FooBar.this } // TODO: find a better way...
+      }
+      val o = new FooBar
+      import o._
+
+      val fft4 = (input: Rep[Array[Double]]) =&gt; ffts(input, 4)
+      codegen.emitSource(fft4, "FFT4", new PrintWriter(System.out))
+      val fft4c = compile(fft4)
+      println(fft4c(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0, 1.0,0.0, 1.0,0.0, 0.0,0.0, 0.0,0.0)).mkString(","))
+    }
+    assertFileEqualsCheck(prefix+"fft3")
+  }
+
+}
+</code></pre>
+
+            </td>
+        </tr><tr>
+            <td class="code">
+                <pre><code class='prettyprint lang-scala'></code></pre>
+            </td>
+        </tr>
+        
+        </tbody>
+    </table>
+</div>
+</body>
+</html>

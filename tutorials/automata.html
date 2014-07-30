@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>01_overview.scala</title>
+    <title>automata.scala</title>
     <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
     <style type="text/css">
         /*--------------------- Layout and Typography ----------------------------*/
@@ -155,7 +155,7 @@
 <div id="container">
     <div id="background"></div>
     <div id="jump_to">
-        01_overview.scala // Jump To &hellip;
+        automata.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_page">
                 
@@ -227,14 +227,14 @@
         </div>
     </div>
 
-    <div><a href="../">LMS</a>|<a href="index.html">Tutorials</a>|01_overview.scala</div><!-- TODO proper nav -->
+    <div><a href="../">LMS</a>|<a href="index.html">Tutorials</a>|automata.scala</div><!-- TODO proper nav -->
     <hr>
 
     <table cellpadding="0" cellspacing="0">
         <thead>
         <!--<tr>
             <th class="docs">
-                <h1>01_overview.scala</h1>
+                <h1>automata.scala</h1>
             </th>
             <th class="code"></th>
         </tr>-->
@@ -246,64 +246,168 @@
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Overview</h1>
-<ol>
-<li>Getting Started<ol>
-<li>About Generative Programming<ol>
-<li>Productivity vs Performance</li>
-<li>About Generative Programming</li>
-<li>Generative Programming Patterns</li>
-<li>Staging and Extensible Compilers</li>
-<li>Domain-Specific Languages</li>
-</ol>
-</li>
-<li>LMS Basics<ol>
-<li>Rep Types</li>
-<li>Staging as a Scala library</li>
-<li>Comparing LMS to other systems</li>
-</ol>
-</li>
-<li>Installing LMS</li>
-<li>Getting Help</li>
-<li>Summary</li>
-</ol>
-</li>
-</ol>
-<h1>Getting Started</h1>
-<p>This chapter will be about getting started with LMS. We will begin by explaining some background on generative programming, then move on to how to get LMS running on your system and finally how to get it set up to start working with. At the end of this chapter you should understand why LMS is around, why you should use it and you should be all set up to do so.</p>
-<h2>About Generative Programming</h2>
-<h3>Productivity vs Performance</h3>
-<p>One of the biggest challenges in software development today is that software performance is increasingly at odds with programmer productivity. This problem is aggravated by a number of trends:</p>
-<p>First, processor clock speeds are no longer doubling every 18 months and instead, computer hardware is rapidly becoming more and more parallel, heterogeneous and distributed. Multi-core CPUs, SIMD units and GPUs are commonplace from servers in data centers all the way down to mobile phones. Programmers need to turn to a variety of low-level programming models to make best use of the available hardware resources.</p>
-<p>Second, programming languages and methodologies focus increasingly on generality and abstraction, enabling programmers to build large systems from simple but versatile parts. This makes it fundamentally difficult for compilers to translate high-level programs to efficient code, because they do not have the capability to reason about domain-specific operations.</p>
-<p>Third, with a shift towards ``Big Data'' workloads in the cloud and a proliferation of mobile devices and embedded systems, there is a growing demand for highly efficient software.</p>
-<p>These trends cause software development teams to invest large efforts into carefully optimizing their code. From a software engineering perspective, this is disconcerting because manual optimization requires programmers to essentially abandon all best practices and benefits of high-level programming, such as abstraction, generality and modularity. Hand-optimized programs are hard to read, hard to maintain, hard to verify and thus likely to attract bugs and security vulnerabilities.</p>
-<h3>Programming Generation and Meta-Programming</h3>
-<p>As an alternative to counting on a ``sufficiently smart'' compiler to optimize a program, programmers can write a program generator &ndash; a program that when run, produces the code of the target program as its output. A program generator can perform all kinds of computation while composing the target program, and thus emit highly efficient code.</p>
-<p>Generative programming, as a subdomain of meta-programming, describes the practice of writing programs that generate other programs as part of their execution. Generative programming makes a pattern explicit that is found in many programs, namely a division into computational <em>stages</em>, separated by frequency of execution or availability of information. Therefore, we also speak of multi-stage programming or <em>staging</em> for short.</p>
-<p>Generative programming can overcome the performance and productivity gap by leveraging productivity where performance does not matter and vice versa: Generating and compiling a piece of code is not performance critical but productivity is paramount to make the development of the multi-stage program affordable. The generated code needs to run fast but since it is generated programmatically and not written by humans, programmer productivity is not a concern.</p>
-<h3>Generative Programming Patterns</h3>
-<p>Generative programming enables a number of interesting programming patterns. Among these are mixed-stage data structures that contain both static and dynamic parts. Another pattern is to specialize generated code based on statically available information.</p>
-<p>A key application is to turn interpreters into compilers: if we specialize an interpreter to a particular program, we obtain the same effect as compiling the program. Therefore, staging an interpreter, which enables specialization for arbitrary programs, effectively turns this interpreter into a compiler!</p>
-<p>The benefit of the staged interpreter pattern is huge. For most languages, an interpreter is almost trivial to write but building a compiler using traditional techniques is a much larger effort by comparison.</p>
-<h3>Staging and Extensible Compilers</h3>
-<p>The staged interpreter pattern can be used to build multi-pass compiler pipelines using generative programming. The key idea is to generated an intermediate representation (IR) instead of target code, and then use a staged IR interpreter to implement a transformation.</p>
-<p>Again, expressing transformations as interpretations is often simpler than implementing low-level IR to IR transformers. Thus, generative programming extends in a natural way from one-step code generation to pipelines that perform multiple translation passes between possibly independent intermediate languages.</p>
-<h3>Domain-Specific Languages</h3>
-<p>A key use for such multi-pass compiler pipelines is in implementing highly efficient domain-specific languages (DSLs). DSLs can outperform general purpose languages because they offer more optimization opportunities. But to be effective, DSL compilers need to perform optimizations on multiple abstraction levels.</p>
-<p>With compilers based on staging, it is easy to first perform purely domain-specific optimizations, say, on the level of linear algebra operations, before lowering the domain-specific operations and data structures to a more generic representation (say, as arrays and loops) on which a different set of optimizations apply.</p>
-<h2>LMS Basics</h2>
-<h3>Rep Types</h3>
-<h3>Staging as a Scala library</h3>
-<p>Hence lightweight (no baked-in language support) and modular (flexible set of staged operations)</p>
-<h3>Comparing LMS to other systems</h3>
-<p>Type safety, evaluation order, multi-pass architecture</p>
-<h2>Installing LMS</h2>
-<p>Clone tutorial repo. Use sbt. Maybe increase memory.</p>
-<h2>Getting Help</h2>
-<p>Community, mailing lists, &hellip;</p>
-<h2>Summary</h2>
-<p>You should have a basic understanding of what LMS is and how it’s different from the program generation approach you may have been using. You should also now have a working version of LMS on your system. It’s now time to learn some LMS basics.</p>
+                <h1>From Functions to Automata: Regex take 2</h1>
+<p>\label{sec:Aregex}</p>
+<p>Specializing string matchers and parsers is a popular benchmark in the partial
+<br  />evaluation and supercompilation literature
+<br  />[(*)](DBLP:journals/ipl/ConselD89,DBLP:journals/toplas/AgerDR06,DBLP:journals/toplas/SperberT00,DBLP:journals/toplas/Turchin86, DBLP:journals/jfp/SorensenGJ96).
+<br  />We consider ``multi-threaded'' regular expression matchers, that spawn a new
+<br  />conceptual thread to process alternatives in parallel. Of course these matchers
+<br  />do not actually spawn OS-level threads, but rather need to be advanced manually
+<br  />by client code. Thus, they are similar to coroutines.</p>
+<p>Here is a simple example for the fixed regular expression <code>.*AAB</code>:</p>
+<pre><code>def findAAB(): NIO = {
+  guard(Set('A')) {
+    guard(Set('A')) {
+      guard(Set('B'), Found)) {
+        stop()
+  }}} ++
+  guard(None) { findAAB() } // in parallel...
+}
+</code></pre>
+<p>We can easily add combinators on top of the core abstractions that take care
+<br  />of producing matchers from textual regular expressions. However  the point
+<br  />here is to demonstrate how the implementation works.</p>
+<p>The given matcher uses an API that models nondeterministic finite automata
+<br  />(NFA):</p>
+<pre><code>type NIO = List[Trans]   // state: many possible transitions
+case class Trans(c: Set[Char], x: Flag, s: () =&gt; NIO)
+
+def guard(cond: Set[Char], flag: Flag)(e: =&gt; NIO): NIO =
+  List(Trans(cond, flag, () =&gt; e))
+def stop(): NIO = Nil
+</code></pre>
+<p>An NFA state consists of a list of possible transitions. Each transition may
+<br  />be guarded by a set of characters and it may  have a flag to be signaled if
+<br  />the transition is taken. It also knows how to compute the following state. We
+<br  />use <code>Char</code>s for simplicity, but of course we could  use generic types as well.
+<br  />Note that the API does not mention where input is obtained from (files,
+<br  />streams, etc).</p>
+<p>We will translate NFAs to DFAs using staging. This is the unstaged DFA API:</p>
+<pre><code>abstract class DfaState {
+  def hasFlag(x: Flag): Boolean
+  def next(c: Char): DfaState
+}
+def dfaFlagged(flag: Flag, link: DfaState) = new DfaState {
+  def hasFlag(x: Flag) = x == flag || link.hasFlag(x)
+  def next(c: Char) = link.next(c)
+}
+def dfaState(f: Char =&gt; DfaState) = new DfaState {
+  def hasFlag(x: Flag) = false
+  def next(c: Char) = f(c)
+}
+</code></pre>
+<p>The staged API is just a thin wrapper:</p>
+<pre><code>type DIO = Rep[DfaState]
+def dfa_flag(x: Flag)(link: DIO): DIO
+def dfa_trans(f: Rep[Char] =&gt; DIO): DIO
+</code></pre>
+<p>Translating an NFA to a DFA is accomplished by creating a DFA state for each
+<br  />encountered NFA configuration (removing duplicate states via <code>canonicalize</code>):</p>
+<pre><code>def convertNFAtoDFA(states: NIO): DIO = {
+  val cstates = canonicalize(state)
+  dfa_trans { c: Rep[Char] =&gt;
+    exploreNFA(cstates, c)(dfa_flag) { next =&gt;
+      convertNFAtoDFA(next)
+    }
+  }
+}
+iterate(findAAB())
+</code></pre>
+<p>The LMS framework memoizes  functions (see <a href="#sec:220functions">here</a>) which
+<br  />ensures  termination if the NFA is indeed finite.</p>
+<p>We use a separate function to explore the NFA space (see
+<br  />Figure~\ref{fig:NFAexplore}), advancing the automaton by a symbolic character
+<br  /><code>cin</code> to invoke its continuations <code>k</code> with a new automaton, i.e. the possible
+<br  />set of states after consuming <code>cin</code>. The given implementation assumes
+<br  />character sets contain either zero or one characters, the empty set <code>Set()</code>
+<br  />denoting a wildcard match. More elaborate cases such as character ranges are
+<br  />easy to add. The algorithm tries to remove as many redundant checks and
+<br  />impossible branches as possible. This only works because the character guards
+<br  />are staging time values.</p>
+<pre><code>def exploreNFA[A](xs: NIO, cin: Rep[Char])(flag: Flag =&gt; Rep[A] =&gt; Rep[A])
+                                          (k: NIO =&gt; Rep[A]):Rep[A] = xs match {
+  case Nil =&gt; k(Nil)
+  case Trans(Set(c), e, s)::rest =&gt;
+    if (cin == c) {
+      // found match: drop transitions that look for other chars and
+      // remove redundant checks
+      val xs1 = rest collect { case Trans(Set(`c`)|None,e,s) =&gt; Trans(Set(),e,s) }
+      val maybeFlag = e map flag getOrElse (x=&gt;x)
+      maybeFlag(exploreNFA(xs1, cin)(acc =&gt; k(acc ++ s())))
+    } else {
+      // no match, drop transitions that look for same char
+      val xs1 = rest filter { case Trans(Set(`c`),_,_) =&gt; false case _ =&gt; true }
+      exploreNFA(xs1, cin)(k)
+    }
+  case Trans(Set(), e, s)::rest =&gt;
+    val maybeFlag = e map flag getOrElse (x=&gt;x)
+    maybeFlag(exploreNFA(rest, cin)(acc =&gt; k(acc ++ s())))
+}
+</code></pre>
+<p>The generated code is shown in Figure~\ref{fig:regexGen}. Each function
+<br  />corresponds to one DFA state. Note how  negative information has been used to
+<br  />prune the transition space: Given input such as <code>...AAB</code> the  automaton jumps
+<br  />back to the initial state, i.e. it recognizes that the last character B
+<br  />cannot also be A and starts looking for two As after the B.</p>
+<p>The generated code can be used as follows:</p>
+<pre><code>var state = stagedFindAAB()
+var input = ...
+while (input.nonEmpty) {
+  state = state.next(input.head)
+  if (state.hasFlag(Found))
+    println("found AAB. rest: " + input.tail)
+  input = input.tail
+}
+</code></pre>
+<p>If the matcher and input iteration logic is generated together, further
+<br  />translations can be applied to transform the mutually recursive lambdas into
+<br  />tight imperative state machines.</p>
+<pre><code>def stagedFindAAB(): DfaState = {
+  val x7 = { x8: (Char) =&gt;  
+    // matched AA
+    val x9 = x8 == B
+    val x15 = if (x9) {
+      x11
+    } else {
+      val x12 = x8 == A
+      val x14 = if (x12) {
+        x13
+      } else {
+        x10
+      }
+      x14
+    }
+    x15
+  }
+  val x13 = dfaState(x7)
+  val x4 = { x5: (Char) =&gt; 
+    // matched A
+    val x6 = x5 == A
+    val x16 = if (x6) {
+      x13
+    } else {
+      x10
+    }
+    x16
+  }
+  val x17 = dfaState(x4)
+  val x1 = { x2: (Char) =&gt; 
+    // matched nothing
+    val x3 = x2 == A
+    val x18 = if (x3) {
+      x17
+    } else {
+      x10
+    }
+    x18
+  }
+  val x10 = dfaState(x1)
+  val x11 = dfaFlagged(Found, x10)
+  x10
+}
+</code></pre>
+<p>Generated matcher code for regular expression <code>.*AAB</code></p>
 
             </td>
         </tr><tr>
