@@ -3,10 +3,10 @@ layout: landing
 title: The LMS Platform
 tagline: Generative Programming and Embedded Compilers in Scala
 ---
-Lightweight Modular Staging (LMS) is a runtime code generation
-approach. The framework provides a library of core components for
-building high performance code generators and embedded compilers in
-Scala.
+
+Lightweight Modular Staging (LMS) is a runtime code generation approach. The
+framework provides a library of core components for building high performance
+code generators and embedded compilers in Scala.
 
 Two closely related projects are [Delite](http://stanford-ppl.github.com/Delite/), 
 a framework for domain specific languages (DSLs) that generates parallel 
