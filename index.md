@@ -20,7 +20,7 @@ News:
 
 - [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation.
 
-We're been holding tutorials on LMS and Delite at major conferences:
+We're holding tutorials on LMS and Delite at major conferences:
 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
   [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html) 
