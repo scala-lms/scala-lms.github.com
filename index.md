@@ -16,6 +16,10 @@ DSLs more seamless.
 
 ## News Flash
 
+News:
+
+- [The Summer of LMS 2014](summer-of-lms-2014.html): polishing, stability, documentation.
+
 We're been holding tutorials on LMS and Delite at major conferences:
 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
