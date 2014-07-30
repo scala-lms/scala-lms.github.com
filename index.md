@@ -101,3 +101,8 @@ Clone the [GitHub repo](http://github.com/TiarkRompf/virtualization-lms-core). I
 
 Be sure to check out the [docs](tutorials/index.html)!
 
+## Community
+
+LMS is developed and used by researchers and practitioners from EPFL, Stanford, ETH, Purdue, 
+University of Rennes, Oracle Labs, Huawei Labs, and other institutions.
+
