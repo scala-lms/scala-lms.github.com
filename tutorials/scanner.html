@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>start.scala</title>
+    <title>scanner.scala</title>
 
     <!-- Bootstrap core CSS -->
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
@@ -313,7 +313,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        start.scala // Jump To &hellip;
+        scanner.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -397,7 +397,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">start.scala</li>
+      <li class="active">scanner.scala</li>
     </ol>
 
 
@@ -409,518 +409,75 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Getting Started</h1>
-<p>Outline:</p>
-<div id="tableofcontents"></div>
-<h2>Staging</h2>
-<p>What is staging? The idea behind staging is to delay computation of
-<br  />certain expressions, generating code to compute them later. The
-<br  />benefit is <em>abstraction without regret</em>.</p>
-<h2>Lightweight Modular Staging (LMS)</h2>
-<p>Lightweight Modular Staging (LMS) is a staging technique driven by
-<br  />types. The technique has been implemented in Scala, in a framework to
-<br  />build compilers.</p>
-<p>In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
-<br  />because it is purely library based. It is also <em>modular</em>, for two
-<br  />reasons: (1) features can be mixed and matched (2) DSL specification
-<br  />and implementation are separate.</p>
-
+                
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
 import scala.virtualization.lms.common._
+import scala.reflect.SourceContext
 
-class DslApiTest extends TutorialFunSuite {
-  val under = &quot;dslapi&quot;
+import java.io.FileReader
+import java.io.BufferedReader
 
+class Scanner(filename: String) {
+  val fieldDelimiter = &quot;,&quot;
 
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_1">&#182;</a>
-                </div>
-                <h3>Rep[T] vs T</h3>
-<p>In LMS, <code>Rep[T]</code> represents a delayed compuation of type <code>T</code>. Thus,
-<br  />during staging, an expression of type <code>Rep[T]</code> becomes part of
-<br  />the generated code, while an expression of bare type <code>T</code> becomes a
-<br  />constant in the generated code. For core Scala features, adding
-<br  /><code>Rep</code> types should be enough to build a program generator, as we
-<br  />will see later.</p>
-<p>Contrast the snippet on the left, where <code>b</code> is a <code>Boolean</code>, with
-<br  />the snippet on the right, where <code>b</code> is a <code>Rep[Boolean]</code>. The
-<br  />expression <code>if (b) 1 else x</code> is executed at staging time when <code>b</code>
-<br  />is a <code>Boolean</code>, while it is delayed causing code to be generated for
-<br  />the <code>if</code> expression when <code>b</code> is a <code>Rep[Boolean]</code> &ndash; indeed, the
-<br  />actual value of <code>b</code> is not known at staging time, but only when the
-<br  />generated code is executed.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;1&quot;) {
-    val snippet = new DslDriver[Int,Int] {
-      //#1
-      def snippet(x: Rep[Int]) = {
-        def compute(b: Boolean): Rep[Int] = {
-          // the if is executed in the first stage
-          if (b) 1 else x
-        }
-        compute(true)+compute(1==1)
-      }
-      //#1
-    }
-    assert(snippet.eval(0) === 2)
-    check(&quot;1&quot;, snippet.code)    
+  val br = new BufferedReader(new FileReader(filename))
+  var pending: List[String] = Nil
+  def next: String = pending match {
+    case Nil =&gt;
+      pending = br.readLine.split(fieldDelimiter).toList
+      next
+    case field::rest =&gt;
+      pending = rest
+      field
   }
+  def hasNext = pending.nonEmpty || br.ready || {br.close; false}
+  def hasNextInLine = pending.nonEmpty
+}
 
-
-  test(&quot;2&quot;) {
-    val snippet = new  DslDriver[Int,Int] {
-      //#2
-      def snippet(x: Rep[Int]) = {
-        def compute(b: Rep[Boolean]): Rep[Int] = {
-          // the if is deferred to the second stage
-          if (b) 1 else x
-        }
-        compute(x==1)
-      }
-      //#2
-    }
-    assert(snippet.eval(2) === 2)
-    check(&quot;2&quot;, snippet.code)
+trait ScannerBase extends Base {
+  implicit class ScannerOps(s: Rep[Scanner]) {
+    def next(implicit pos: SourceContext) = scannerNext(s)
+    def hasNext(implicit pos: SourceContext) = scannerHasNext(s)
   }
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_2">&#182;</a>
-                </div>
-                <pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x1:Int): Int = {
-2
+  def newScanner(fn: Rep[String])(implicit pos: SourceContext): Rep[Scanner]
+  def scannerNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[String]
+  def scannerHasNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[Boolean]
 }
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x3:Int): Int = {
-val x4 = x3 == 1
-val x5 = if (x4) {
-1
-} else {
-x3
-}
-x5
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-</code></pre>
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_3">&#182;</a>
-                </div>
-                <h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
-<p>In the previous snippets, we already notice some <em>abstraction without
-<br  />regret</em>: the <code>compute</code> function exists only at staging time, and is
-<br  />not part of the generated code &ndash; more generally, we can freely use
-<br  />abstractions to structure and compose the staged program, but these
-<br  />abstractions are not part of the generated code when their type is a
-<br  />bare <code>T</code> as opposed of a <code>Rep[T]</code>. In the right snippet,
-<br  /><code>compute</code> has the type <code>Rep[Boolean] =&gt; Rep[Int]</code>, not
-<br  /><code>Rep[Boolean =&gt; Int]</code> &ndash; its type already tells us that the function
-<br  />is known at staging time.</p>
+trait ScannerExp extends ScannerBase with EffectExp {
+  case class ScannerNew(fn: Exp[String]) extends Def[Scanner]
+  case class ScannerNext(s: Exp[Scanner]) extends Def[String]
+  case class ScannerHasNext(s: Exp[Scanner]) extends Def[Boolean]
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;power&quot;) {
-    val snippet = new DslDriver[Int,Int] {
-      //#power
-      def power(b: Rep[Int], x: Int): Rep[Int] = {
-        if (x == 0) 1
-        else b * power(b, x-1)
-      }
-      def snippet(b: Rep[Int]) =
-        power(b, 3)
-      //#power
-    }
-    assert(snippet.eval(2) === 8)
-    check(&quot;power&quot;, snippet.code)
+  override def newScanner(fn: Rep[String])(implicit pos: SourceContext): Rep[Scanner] =
+    reflectMutable(ScannerNew(fn))
+  override def scannerNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[String] =
+    reflectWrite(s)(ScannerNext(s))
+  override def scannerHasNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[Boolean] =
+    reflectWrite(s)(ScannerHasNext(s))
+
+  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {
+    case Reflect(e@ScannerNew(fn), u, es) =&gt; reflectMirrored(Reflect(ScannerNew(f(fn)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
+    case Reflect(ScannerNext(s), u, es) =&gt; reflectMirrored(Reflect(ScannerNext(f(s)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
+    case Reflect(ScannerHasNext(s), u, es) =&gt; reflectMirrored(Reflect(ScannerHasNext(f(s)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
+    case _ =&gt; super.mirror(e,f)
+  }).asInstanceOf[Exp[A]]
+}
+
+trait ScalaGenScanner extends ScalaGenEffect {
+  val IR: ScannerExp
+  import IR._
+
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case ScannerNew(fn) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn)&quot;)
+    case ScannerNext(s) =&gt; emitValDef(sym, src&quot;$s.next&quot;)
+    case ScannerHasNext(s) =&gt; emitValDef(sym, src&quot;$s.hasNext&quot;)
+    case _ =&gt; super.emitNode(sym, rhs)
   }
-
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_4">&#182;</a>
-                </div>
-                <h3>Rep[Range] vs Range</h3>
-<p>Loops can be unrolled in the first stage, or be generated as loops in
-<br  />the second stage, driven by the type of their condition.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;range1&quot;) {
-    val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range1
-          for (i &lt;- (0 until 3): Range) {
-            println(i)
-          }
-          //#range1
-        }
-      }
-    }
-    check(&quot;range1&quot;, snippet.code)
-  }
-
-  test(&quot;range2&quot;) {
-    val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range2
-          for (i &lt;- (0 until x): Rep[Range]) {
-            println(i)
-          }
-          //#range2
-        }
-      }
-    }
-    check(&quot;range2&quot;, snippet.code)
-  }
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_5">&#182;</a>
-                </div>
-                <pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Unit)) {
-def apply(x0:Int): Unit = {
-val x5 = {
-//#for
-// generated code
-val x1 = println(0)
-val x2 = println(1)
-val x3 = println(2)
-()
-//#for
 }
-()
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: for
-/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Unit)) {
-def apply(x0:Int): Unit = {
-val x7 = {
-//#for
-// generated code
-var x2 : Int = 0
-val x5 = while (x2 &lt; x0) {
-val x3 = println(x2)
-
-x2 = x2 + 1
-}
-x5
-//#for
-}
-()
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: for
-</code></pre>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_6">&#182;</a>
-                </div>
-                <h3>Shonan Challenge</h3>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm&quot;) {
-    val snippet = new DslDriver[Array[Int],Array[Int]] {
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_7">&#182;</a>
-                </div>
-                <p>With this fine-grain control, conditional loop unrolling can be
-<br  />implemented at the DSL user level.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      //#unrollIf
-      def unrollIf(range: Range)(cond: Boolean) = new {
-        def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-          if (cond) for (i &lt;- range) f(i)
-          else for (i &lt;- (range.start until range.end): Rep[Range]) f(i)
-        }
-      }
-      //#unrollIf
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_8">&#182;</a>
-                </div>
-                <p>We can use this conditional loop unrolling to optimize multiplying a
-<br  />matrix known at staging time with a vector. For example, consider a
-<br  />matrix with a mix of dense and sparse rows:</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      val A = scala.Array
-      val a =
-        //#ex-a
-        A(A(1, 1, 1, 1, 1), // dense
-          A(0, 0, 0, 0, 0), // null
-          A(0, 0, 1, 0, 0), // sparse
-          A(0, 0, 0, 0, 0),
-          A(0, 0, 1, 0, 1))
-        //#ex-a
-
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_9">&#182;</a>
-                </div>
-                <p>When scanning the columns, we would like to generate a loop for the
-<br  />dense row, and unroll the loop for the sparse rows.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      def infix_at(a: Array[Array[Int]], i: Int, j: Rep[Int]): Rep[Int] = {
-        (staticData(a(i)) apply j)
-      }
-
-      def sparse(ai: Array[Int]): Boolean = {
-        ai.filter(_ != 0).length &lt; 3
-      }
-
-      //#matrix_vector_prod
-      def matrix_vector_prod(a: Array[Array[Int]], v: Rep[Array[Int]]) = {
-        val n = a.length
-        val v1 = NewArray[Int](n)
-        for (i &lt;- 0 until n: Range) {
-          comment(&quot;row_&quot; + i) {
-            for (j &lt;- unrollIf(0 until n)(sparse(a(i)))) {
-              v1(i) = v1(i) + a.at(i, j) * v(j)
-            }
-          }
-        }
-        v1
-      }
-      //#matrix_vector_prod
-
-      def snippet(v: Rep[Array[Int]]) = {
-        matrix_vector_prod(a, v)
-      }
-    }
-    check(&quot;shonan-hmm&quot;, snippet.code)
-  }
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_10">&#182;</a>
-                </div>
-                <p>Let's compare the code generated for a dense vs sparse row.</p>
-<pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet(px5:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
-def apply(x0:Array[Int]): Array[Int] = {
-val x1 = new Array[Int](5)
-val x5 = px5 // static data: Array(1,1,1,1,1)
-val x14 = {
-//#row_0
-// generated code for row 0
-var x3 : Int = 0
-val x12 = while (x3 &lt; 5) {
-val x4 = x1(0)
-val x6 = x5(x3)
-val x7 = x0(x3)
-val x8 = x6 * x7
-val x9 = x4 + x8
-val x10 = x1(0) = x9
-
-x3 = x3 + 1
-}
-x12
-//#row_0
-}
-val x24 = {
-//#row_1
-// generated code for row 1
-val x15 = x1(1)
-val x18 = x1(1) = x15
-()
-//#row_1
-}
-val x20 = x0(2)
-val x31 = {
-//#row_2
-// generated code for row 2
-val x25 = x1(2)
-val x27 = x1(2) = x25
-val x28 = x25 + x20
-val x29 = x1(2) = x28
-()
-//#row_2
-}
-val x36 = {
-//#row_3
-// generated code for row 3
-val x32 = x1(3)
-val x34 = x1(3) = x32
-()
-//#row_3
-}
-val x22 = x0(4)
-val x45 = {
-//#row_4
-// generated code for row 4
-val x37 = x1(4)
-val x39 = x1(4) = x37
-val x40 = x37 + x20
-val x41 = x1(4) = x40
-val x42 = x40 + x22
-val x43 = x1(4) = x42
-()
-//#row_4
-}
-x1
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: row_0
-/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet(px5:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
-def apply(x0:Array[Int]): Array[Int] = {
-val x1 = new Array[Int](5)
-val x5 = px5 // static data: Array(1,1,1,1,1)
-val x14 = {
-//#row_0
-// generated code for row 0
-var x3 : Int = 0
-val x12 = while (x3 &lt; 5) {
-val x4 = x1(0)
-val x6 = x5(x3)
-val x7 = x0(x3)
-val x8 = x6 * x7
-val x9 = x4 + x8
-val x10 = x1(0) = x9
-
-x3 = x3 + 1
-}
-x12
-//#row_0
-}
-val x24 = {
-//#row_1
-// generated code for row 1
-val x15 = x1(1)
-val x18 = x1(1) = x15
-()
-//#row_1
-}
-val x20 = x0(2)
-val x31 = {
-//#row_2
-// generated code for row 2
-val x25 = x1(2)
-val x27 = x1(2) = x25
-val x28 = x25 + x20
-val x29 = x1(2) = x28
-()
-//#row_2
-}
-val x36 = {
-//#row_3
-// generated code for row 3
-val x32 = x1(3)
-val x34 = x1(3) = x32
-()
-//#row_3
-}
-val x22 = x0(4)
-val x45 = {
-//#row_4
-// generated code for row 4
-val x37 = x1(4)
-val x39 = x1(4) = x37
-val x40 = x37 + x20
-val x41 = x1(4) = x40
-val x42 = x40 + x22
-val x43 = x1(4) = x42
-()
-//#row_4
-}
-x1
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: row_2
-</code></pre>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>}
-
 </code></pre>
             </div>
         
