@@ -1,42 +1,220 @@
-<!doctype html>
-<html>
+<!DOCTYPE html>
+<html lang="en">
   <head>
     <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>{{ page.title }}</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="../../favicon.ico">
 
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
-    <script src="javascripts/scale.fix.js"></script>
-    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <title>LMS: Program Generation and Embedded Compilers in Scala</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
+    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
+
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+
+    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
     <![endif]-->
+
+    <!-- Custom styles for this template -->
+    <!-- <link href="bootstrap/carousel.css" rel="stylesheet"> -->
+
+    <!-- font awesome -->
+    <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+    <style type="text/css">
+@import url(stylesheets/pygment_trac.css);
+/* head fancy: Lobster, Pacifico */    
+/* head serif: Arvo, Bitter, Podkova, Roboto Slab */    
+/* dense bold: Squada One, Oswald; */
+@import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+@import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+@import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+body {
+  /*line-height: 1.7;*/
+  /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+  font-family: 'Helvetica Neue';
+  /*font-size: 15pt;*/
+  color: rgb(41,41,41);
+}
+
+h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+  font-family: 'Roboto Slab';
+  font-weight: 700;
+}
+
+
+.container h1,h2 {
+  border-bottom: 1px solid #e5e5e5;
+/*  margin-bottom: 1em;
+  margin-top: 2em;*/
+}
+
+
+
+
+.jumbotron {
+  background: transparent;
+}
+
+/* Space out content a bit */
+/*body {
+  padding-top: 20px;
+  padding-bottom: 20px;
+}*/
+
+/* Everything but the jumbotron gets side spacing for mobile first views */
+.header,
+.marketing,
+.footer {
+  padding-right: 15px;
+  padding-left: 15px;
+}
+
+/* Custom page header */
+.header {
+  border-bottom: 1px solid #e5e5e5;
+}
+/* Make the masthead heading the same height as the navigation */
+.header h3 {
+  padding-bottom: 19px;
+  margin-top: 0;
+  margin-bottom: 0;
+  line-height: 40px;
+}
+
+/* Custom page footer */
+.footer {
+  padding-top: 19px;
+  color: #777;
+  border-top: 1px solid #e5e5e5;
+}
+
+/* Customize container */
+@media (min-width: 768px) {
+  .jumbotron .container {
+    max-width: 730px;
+  }
+  .container {
+    max-width: 730px;
+  }
+}
+.container-narrow > hr {
+  margin: 30px 0;
+}
+
+/* Main marketing message and sign up button */
+.jumbotron {
+  text-align: center;
+  border-bottom: 1px solid #e5e5e5;
+}
+.jumbotron .btn {
+  padding: 14px 24px;
+  font-size: 21px;
+}
+
+/* Supporting marketing content */
+.marketing {
+  margin: 40px 0;
+}
+.marketing p + h4 {
+  margin-top: 28px;
+}
+
+/* Responsive: Portrait tablets and up */
+@media screen and (min-width: 768px) {
+  /* Remove the padding we set earlier */
+  .header,
+  .marketing,
+  .footer {
+    padding-right: 0;
+    padding-left: 0;
+  }
+  /* Space out the masthead */
+  .header {
+    margin-bottom: 30px;
+  }
+  /* Remove the bottom border on the jumbotron for visual effect */
+  .jumbotron {
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+    </style>
+
   </head>
+<!-- NAVBAR
+================================================== -->
   <body>
-    <div class="wrapper">
-      <header>
-        <h1 class="header">{{ page.title }}</h1>
-        <p class="header">{{ page.tagline }}</p>
 
-        <ul>
-          <li class="download"><a class="buttons" href="https://github.com/scala-lms/summer-of-lms-2014/zipball/master">Download ZIP</a></li>
-          <li class="download"><a class="buttons" href="https://github.com/scala-lms/summer-of-lms-2014/tarball/master">Download TAR</a></li>
-          <li><a class="buttons github" href="https://github.com/scala-lms/summer-of-lms-2014">View On GitHub</a></li>
-        </ul>
+        <div class="navbar navbar-default navbar-static-top" role="navigation">
+          <div class="container">
+            <div class="navbar-header">
+              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                <span class="sr-only">Toggle navigation</span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+                <span class="icon-bar"></span>
+              </button>
+              <a class="navbar-brand" href="#">LMS</a>
+            </div>
+            <div class="navbar-collapse collapse">
+              <ul class="nav navbar-nav">
+                <li class="active"><a href="index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                <li><a href="tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+                <li><a href="resources.html">Resources</a></li>
+                <li><a href="publications.html">Publications</a></li>
+                <li><a href="community.html">Community</a></li>
+                <!--<li><a href="community.html">Community</a></li>-->
+                <!--<li class="dropdown">
+                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+                  <ul class="dropdown-menu" role="menu">
+                    <li><a href="#">Action</a></li>
+                    <li><a href="#">Another action</a></li>
+                    <li><a href="#">Something else here</a></li>
+                    <li class="divider"></li>
+                    <li class="dropdown-header">Nav header</li>
+                    <li><a href="#">Separated link</a></li>
+                    <li><a href="#">One more separated link</a></li>
+                  </ul>
+                </li>-->
+              </ul>
+            </div>
+          </div>
+        </div>
 
-        <p class="header">This project is maintained by <a class="header name" href="https://github.com/scala-lms">scala-lms</a></p>
 
-
-      </header>
-      <section>
 {{ content }}
-      </section>
-      <footer>
-        <p><small>Hosted on <a href="http://pages.github.com">GitHub Pages</a> using the Dinky theme</small></p>
-      </footer>
-    </div>
-    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
-		
+
+
+<!-- FOOTER -->
+<div class="footer">
+<div class="container">
+  <p class="pull-right"><a href="#">Back to top</a></p>
+  <p>&copy; 2011-2014 EPFL</p>
+</div>  
+</div>
+
+
+
+      
+   
+
+    <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    <script src="bootstrap/js/bootstrap.min.js"></script>
+    <script src="bootstrap/assets/js/docs.min.js"></script>
   </body>
 </html>

@@ -85,7 +85,7 @@ snippet is run.
 Actually this is only half of the story: The output on the left is not produced
 directly, but going through an extensible intermediate representation (IR) that
 can be further transformed and optimized.
-[Read more...](#docs)
+[Read more...](tutorials/index.html)
 
 
 ## Run Scala Anywhere
