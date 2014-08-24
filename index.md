@@ -8,11 +8,14 @@ Lightweight Modular Staging (LMS) is a runtime code generation approach. The
 framework provides a library of core components for building high performance
 code generators and embedded compilers in Scala.
 
-Two closely related projects are [Delite](http://stanford-ppl.github.com/Delite/), 
-a framework for domain specific languages (DSLs) that generates parallel 
-code for heterogeneous devices, and [Scala Virtualized](https://github.com/tiarkrompf/scala-virtualized/wiki), 
-a set of minimal extensions to the Scala compiler that make embedding 
-DSLs more seamless.
+LMS is used by several other projects, including:
+
+- [Delite](http://ppl.stanford.edu/main/projects.html): 
+  domain-specific languages for heterogeneous parallel computing.
+- [Spiral](http://www.spiral.net/software/spiral-scala.html): 
+  library generators for high-performance numerical kernels.
+- [LegoBase](http://data.epfl.ch/legobase): 
+  query compilation in database systems.
 
 ## News Flash
 
@@ -20,7 +23,7 @@ News:
 
 - [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation.
 
-We're holding tutorials on LMS and Delite at major conferences:
+We're holding tutorials at major conferences:
 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
   [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html) 
@@ -32,6 +35,8 @@ We're holding tutorials on LMS and Delite at major conferences:
   [scala-lms.github.io/ecoop2013](ecoop2013/index.html)
 
 Slides and additional materials are available from the links above.
+
+
 
 ## Abstraction Without Regret
 

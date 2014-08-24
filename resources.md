@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Resources
-category: documentation
+category: resources
 ---
 
 ## Background / Resources {#docs}

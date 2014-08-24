@@ -18,6 +18,8 @@ Some particular work items:
 
 - <span class="label label-warning">In Progress</span> Tutorials and teaching materials:
   LMS has a learning curve - we need to educate our users better!
+
+- <span class="label label-primary">Almost Done</span> Randomized tests with ScalaCheck.
   
 - <span class="label label-success">Done</span> Travis build infrastructure: make sure our pull requests are tested automatically.
 

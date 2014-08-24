@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Publications
-category: documentation
+category: publications
 ---
 
 
