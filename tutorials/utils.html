@@ -366,6 +366,14 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     regex.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scanner.html">
+                    scanner.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
+                    scsv.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
                     shonan.html
                 </a>
@@ -433,10 +441,16 @@ trait TutorialFunSuite extends FunSuite {
     printIndented(content)(out)
     out.close()
   }
-  def check(label: String, code: String) = {
+  def checkOut(label: String, suffix: String, thunk: =&gt; Unit) = {
+    val output = new ByteArrayOutputStream()
+    scala.Console.setOut(new PrintStream(output))
+    thunk
+    check(label, output.toString(), suffix = suffix)
+  }
+  def check(label: String, code: String, suffix: String = &quot;scala&quot;) = {
     val fileprefix = prefix+under+label
-    val name = fileprefix+&quot;.check.scala&quot;
-    val aname = fileprefix+&quot;.actual.scala&quot;
+    val name = fileprefix+&quot;.check.&quot;+suffix
+    val aname = fileprefix+&quot;.actual.&quot;+suffix
     val expected = readFile(name)
     if (expected != code) {
       println(&quot;writing &quot; + aname)

@@ -366,6 +366,14 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     regex.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scanner.html">
+                    scanner.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
+                    scsv.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
                     shonan.html
                 </a>
@@ -463,7 +471,7 @@ trait DslGen extends ScalaGenNumericOps with ScalaGenPrimitiveOps with ScalaGenB
   }
 }
 trait DslImpl extends DslExp { q =&gt;
-  object codegen extends DslGen {
+  val codegen = new DslGen {
     val IR: q.type = q
   }
 }
@@ -474,6 +482,7 @@ abstract class DslSnippet[A:Manifest,B:Manifest] extends Dsl {
 
 abstract class DslDriver[A:Manifest,B:Manifest] extends DslSnippet[A,B] with DslImpl {
   lazy val f = compile(snippet)
+  def precompile: Unit = f
   def eval(x: A): B = f(x)
   lazy val code: String = {
     val source = new java.io.StringWriter()

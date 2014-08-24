@@ -1,8 +1,8 @@
 # requires the following directories side-by-side:
 #
-#	scalocco
-#   scala-lms-tutorials-new
-#   summer-of-lms-2014
+#   scalocco                  https://github.com/tiarkrompf/scalocco
+#   scala-lms-tutorials-new   https://github.com/scala-lms/tutorials branch markdownized
+#   summer-of-lms-2014        this repo
 #
 
 DIR=`(cd ..; pwd)`
