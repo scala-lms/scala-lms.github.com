@@ -474,9 +474,29 @@ class DslApiTest extends TutorialFunSuite {
     assert(snippet.eval(0) === 2)
     check(&quot;1&quot;, snippet.code)    
   }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <pre><code>/*****************************************
+  Emitting Generated Code                  
+*******************************************/
+class Snippet extends ((Int)=&gt;(Int)) {
+def apply(x1:Int): Int = {
+2
+}
+}
+/*****************************************
+  End of Generated Code                  
+*******************************************/
+</code></pre>
 
-
-  test(&quot;2&quot;) {
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;2&quot;) {
     val snippet = new  DslDriver[Int,Int] {
       //#2
       def snippet(x: Rep[Int]) = {
@@ -496,20 +516,9 @@ class DslApiTest extends TutorialFunSuite {
         
             <div class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_2">&#182;</a>
+                    <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
                 <pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x1:Int): Int = {
-2
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-/*****************************************
   Emitting Generated Code                  
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
@@ -527,17 +536,7 @@ x5
   End of Generated Code                  
 *******************************************/
 </code></pre>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_3">&#182;</a>
-                </div>
-                <h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
+<h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
 <p>In the previous snippets, we already notice some <em>abstraction without
 <br  />regret</em>: the <code>compute</code> function exists only at staging time, and is
 <br  />not part of the generated code &ndash; more generally, we can freely use
@@ -593,8 +592,23 @@ x5
     }
     check(&quot;range1&quot;, snippet.code)
   }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_5">&#182;</a>
+                </div>
+                <pre><code>// generated code
+val x1 = println(0)
+val x2 = println(1)
+val x3 = println(2)
+()
+</code></pre>
 
-  test(&quot;range2&quot;) {
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  test(&quot;range2&quot;) {
     val snippet = new DslDriver[Int,Unit] {
       def snippet(x: Rep[Int]) = {
         comment(&quot;for&quot;, verbose = false) {
@@ -608,43 +622,14 @@ x5
     }
     check(&quot;range2&quot;, snippet.code)
   }
-
 </code></pre>
             </div>
         
             <div class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_5">&#182;</a>
+                    <a class="pilcrow" href="#section_6">&#182;</a>
                 </div>
-                <pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Unit)) {
-def apply(x0:Int): Unit = {
-val x5 = {
-//#for
-// generated code
-val x1 = println(0)
-val x2 = println(1)
-val x3 = println(2)
-()
-//#for
-}
-()
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: for
-/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet extends ((Int)=&gt;(Unit)) {
-def apply(x0:Int): Unit = {
-val x7 = {
-//#for
-// generated code
+                <pre><code>// generated code
 var x2 : Int = 0
 val x5 = while (x2 &lt; x0) {
 val x3 = println(x2)
@@ -652,27 +637,8 @@ val x3 = println(x2)
 x2 = x2 + 1
 }
 x5
-//#for
-}
-()
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: for
 </code></pre>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_6">&#182;</a>
-                </div>
-                <h3>Shonan Challenge</h3>
+<h3>Shonan Challenge</h3>
 
             </div>
             <div class="code">
@@ -772,17 +738,8 @@ x5
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_10">&#182;</a>
                 </div>
-                <p>Let's compare the code generated for a dense vs sparse row.</p>
-<pre><code>/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet(px5:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
-def apply(x0:Array[Int]): Array[Int] = {
-val x1 = new Array[Int](5)
-val x5 = px5 // static data: Array(1,1,1,1,1)
-val x14 = {
-//#row_0
-// generated code for row 0
+                <p>Let's compare the code generated for a dense vs sparse row. Dense:</p>
+<pre><code>// generated code for row 0
 var x3 : Int = 0
 val x12 = while (x3 &lt; 5) {
 val x4 = x1(0)
@@ -795,126 +752,14 @@ val x10 = x1(0) = x9
 x3 = x3 + 1
 }
 x12
-//#row_0
-}
-val x24 = {
-//#row_1
-// generated code for row 1
-val x15 = x1(1)
-val x18 = x1(1) = x15
-()
-//#row_1
-}
-val x20 = x0(2)
-val x31 = {
-//#row_2
-// generated code for row 2
+</code></pre>
+<p>Sparse:</p>
+<pre><code>// generated code for row 2
 val x25 = x1(2)
 val x27 = x1(2) = x25
 val x28 = x25 + x20
 val x29 = x1(2) = x28
 ()
-//#row_2
-}
-val x36 = {
-//#row_3
-// generated code for row 3
-val x32 = x1(3)
-val x34 = x1(3) = x32
-()
-//#row_3
-}
-val x22 = x0(4)
-val x45 = {
-//#row_4
-// generated code for row 4
-val x37 = x1(4)
-val x39 = x1(4) = x37
-val x40 = x37 + x20
-val x41 = x1(4) = x40
-val x42 = x40 + x22
-val x43 = x1(4) = x42
-()
-//#row_4
-}
-x1
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: row_0
-/*****************************************
-  Emitting Generated Code                  
-*******************************************/
-class Snippet(px5:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
-def apply(x0:Array[Int]): Array[Int] = {
-val x1 = new Array[Int](5)
-val x5 = px5 // static data: Array(1,1,1,1,1)
-val x14 = {
-//#row_0
-// generated code for row 0
-var x3 : Int = 0
-val x12 = while (x3 &lt; 5) {
-val x4 = x1(0)
-val x6 = x5(x3)
-val x7 = x0(x3)
-val x8 = x6 * x7
-val x9 = x4 + x8
-val x10 = x1(0) = x9
-
-x3 = x3 + 1
-}
-x12
-//#row_0
-}
-val x24 = {
-//#row_1
-// generated code for row 1
-val x15 = x1(1)
-val x18 = x1(1) = x15
-()
-//#row_1
-}
-val x20 = x0(2)
-val x31 = {
-//#row_2
-// generated code for row 2
-val x25 = x1(2)
-val x27 = x1(2) = x25
-val x28 = x25 + x20
-val x29 = x1(2) = x28
-()
-//#row_2
-}
-val x36 = {
-//#row_3
-// generated code for row 3
-val x32 = x1(3)
-val x34 = x1(3) = x32
-()
-//#row_3
-}
-val x22 = x0(4)
-val x45 = {
-//#row_4
-// generated code for row 4
-val x37 = x1(4)
-val x39 = x1(4) = x37
-val x40 = x37 + x20
-val x41 = x1(4) = x40
-val x42 = x40 + x22
-val x43 = x1(4) = x42
-()
-//#row_4
-}
-x1
-}
-}
-/*****************************************
-  End of Generated Code                  
-*******************************************/
-     :include: row_2
 </code></pre>
 
             </div>
