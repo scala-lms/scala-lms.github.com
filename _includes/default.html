@@ -6,19 +6,19 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="{{ site.baseurl }}/favicon.ico">
 
-    <title>LMS: Program Generation and Embedded Compilers in Scala</title>
+    <title>LMS: {% if page.title %} {{ page.title }} {% else %} Program Generation and Embedded Compilers in Scala {% endif %}</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="bootstrap/css/bootstrap.min.css" rel="stylesheet">
+    <link href="{{ site.baseurl }}/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
+    <!--[if lt IE 9]><script src="{{ site.baseurl }}/bootstrap/assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <script src="{{ site.baseurl }}/bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
 
     <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
+    <script src="{{ site.baseurl }}/bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
 
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -27,13 +27,13 @@
     <![endif]-->
 
     <!-- Custom styles for this template -->
-    <!-- <link href="bootstrap/carousel.css" rel="stylesheet"> -->
+    <!-- <link href="{{ site.baseurl }}/bootstrap/carousel.css" rel="stylesheet"> -->
 
     <!-- font awesome -->
     <link href="http://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
     <style type="text/css">
-@import url(stylesheets/pygment_trac.css);
+@import url({{ site.baseurl }}/stylesheets/pygment_trac.css);
 /* head fancy: Lobster, Pacifico */    
 /* head serif: Arvo, Bitter, Podkova, Roboto Slab */    
 /* dense bold: Squada One, Oswald; */
@@ -166,17 +166,17 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
               </button>
-              <a class="navbar-brand" href="index.html">LMS</a>
+              <a class="navbar-brand" href="{{ site.baseurl }}/index.html">LMS</a>
             </div>
             <div class="navbar-collapse collapse">
               <ul class="nav navbar-nav">
                 <!-- TOOD: use jekyll category to set 'active' flag
                 <!--<li class="active"><a href="index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>-->
-                <li><a href="index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                <li><a href="tutorials/index.html"><span class="fa fa-book"></span> Documentation</a></li>
-                <li><a href="resources.html">Resources</a></li>
-                <li><a href="publications.html">Publications</a></li>
-                <li><a href="community.html">Community</a></li>
+                <li><a href="{{ site.baseurl }}/index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+                <li><a href="{{ site.baseurl }}/tutorials/index.html"><span class="fa fa-book"></span> Documentation</a></li>
+                <li><a href="{{ site.baseurl }}/resources.html">Resources</a></li>
+                <li><a href="{{ site.baseurl }}/publications.html">Publications</a></li>
+                <li><a href="{{ site.baseurl }}/community.html">Community</a></li>
                 <!--<li class="dropdown">
                   <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
                   <ul class="dropdown-menu" role="menu">
@@ -215,7 +215,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     ================================================== -->
     <!-- Placed at the end of the document so the pages load faster -->
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="bootstrap/js/bootstrap.min.js"></script>
-    <script src="bootstrap/assets/js/docs.min.js"></script>
+    <script src="{{ site.baseurl }}/bootstrap/js/bootstrap.min.js"></script>
+    <script src="{{ site.baseurl }}/bootstrap/assets/js/docs.min.js"></script>
   </body>
 </html>

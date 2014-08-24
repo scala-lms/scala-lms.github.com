@@ -1,9 +1,12 @@
 ---
-layout: default
+layout: page
 title: Tutorial at ECOOP'13
 tagline: Scala, LMS and Delite for High-Performance DSLs and Program Generators
 ---
 
+## Tutorial at ECOOP'13
+
+_Scala, LMS and Delite for High-Performance DSLs and Program Generators_
 
 This tutorial is an introduction to developing domain specific languages (DSLs) for productivity and performance using Scala, LMS and Delite. Lightweight Modular Staging (LMS) is a pragmatic approach to runtime code generation in Scala and Delite is a compiler framework for embedded DSLs  that simplifies the process of implementing DSLs for parallel computation and heterogeneous targets.
 

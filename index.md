@@ -1,7 +1,5 @@
 ---
 layout: landing
-title: The LMS Platform
-tagline: Generative Programming and Embedded Compilers in Scala
 ---
 
 Lightweight Modular Staging (LMS) is a runtime code generation approach. The

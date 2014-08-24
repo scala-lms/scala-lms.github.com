@@ -1,9 +1,12 @@
 ---
-layout: default
+layout: page
 title: Tutorial at PLDI 2013
 tagline: Scala, LMS and Delite for High-Performance DSLs and Program Generators
 ---
 
+## Tutorial at PLDI 2013
+
+_Scala, LMS and Delite for High-Performance DSLs and Program Generators_
 
 The aim of this tutorial is to equip attendees with the knowledge and tools to develop high-performance DSLs and code generators. Lightweight Modular Staging (LMS) is a pragmatic approach to runtime code generation in Scala, and Delite is a compiler framework for embedded DSLs that simplifies the process of implementing DSLs for parallel computation and heterogeneous targets. This tutorial provides an overview of the technology stack, demonstrates use-cases where it has been successfully applied and guides the attendees step-by-step through creation of simple generators and DSLs.
 
