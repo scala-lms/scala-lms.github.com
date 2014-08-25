@@ -411,6 +411,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 </div>
                 <h1>Shonan Challenge</h1>
 <p>In this tutorial we will develop a solution to the HMM problem from the Shonan Challenge.</p>
+<p>The task is to implement a sparse matrix vector product, where the matrix is statically
+<br  />known but the vector is not. This situation comes up in hidden markov models (HMM),
+<br  />where a single transition matrix is multiplied by many different observation vectors.
+<br  />Therefore, it pays off to generate code that is specialized to a particular matrix.</p>
 <p>For further reference, see:</p>
 <ul>
 <li>Shonan Challenge for Generative Programming
@@ -440,7 +444,7 @@ class ShonanTest extends TutorialFunSuite {
                     <a class="pilcrow" href="#section_1">&#182;</a>
                 </div>
                 <p>We first define our static matrix. We notice that some rows are dense,
-<br  />some rows are sparse, and some rows are fully zero.</p>
+<br  />some rows are sparse, and some rows contain only zeroes.</p>
 
             </div>
             <div class="code">
@@ -493,12 +497,12 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
-                <h2>STEP 0.5: static vs dynamic conditional</h2>
-<p>Now we're adding some basic codegen facilities and play
-<br  />with static vs dynamic expressions. Fully static expressions
-<br  />do not show up in generated code. If we change the
-<br  />condition to depend on the (dynamic) input array, an if/else
-<br  />statement will be generated.</p>
+                <p>We get a concrete vector as result:</p>
+<pre><code>5,0,1,0,2
+</code></pre>
+<h2>STEP 0.5: static vs dynamic conditional</h2>
+<p>Now we add basic code generation facilities and, as a recap how
+<br  />LMS works, play with static vs dynamic expressions.</p>
 
             </div>
             <div class="code">
@@ -525,20 +529,40 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h2>STEP 1: Staging the matrix vector product</h2>
-<p>We want to change the mv prod function to take a dynamic vector
-<br  />and a static matrix. We move it into the DslDriver trait so
-<br  />it can use Rep.</p>
-<p>We generate nested loops by default (Rep[Range]). To make that
-<br  />work, we need to lift the static matrix to a Rep value. We
-<br  />do that using <code>staticData</code>.</p>
-<p>Now we can play with the loops shapes: Range loops are computed
-<br  />statically, i.e. unrolled at staging time. Rep[Range] loops cause
+                <p>The condition above is fully static, so it does not show up in
+<br  />the generated code:</p>
+<pre><code>/*****************************************
+  Emitting Generated Code                  
+*******************************************/
+class Snippet extends ((Array[Int])=&gt;(Array[Int])) {
+def apply(x0:Array[Int]): Array[Int] = {
+val x1 = println("hello")
+x0
+}
+}
+/*****************************************
+  End of Generated Code                  
+*******************************************/
+</code></pre>
+<p>If we change the condition to depend on the (dynamic) input array,
+<br  />an if/else statement will be generated.</p>
+<h2>STEP 1: Staging the matrix vector product</h2>
+<p>We want to change the <code>matrix_vector_prod</code> function to take a dynamic
+<br  />vector and a static matrix. We move it into the <code>DslDriver</code> trait so
+<br  />that it can use <code>Rep</code>.</p>
+<p>We generate nested loops by default (type <code>Rep[Range]</code>). This means that
+<br  />the loop index becomes a <code>Rep[Int]</code> value. To access the static matrix,
+<br  />we need to lift it to a <code>Rep</code> value as well. We accomplish this with
+<br  />the help of <code>staticData</code>.</p>
+<p>We also need to replace <code>new Array</code> with <code>NewArray</code>: instead of creating
+<br  />an array at staging time, we want to generate code to create a the array.</p>
+<p>Now we can play with the loop shapes: <code>Range</code> loops are computed
+<br  />statically, i.e. unrolled at staging time. <code>Rep[Range]</code> loops cause
 <br  />generation of loop code.</p>
 <p>We can make unrolling decisions in a very fine-grained manner:
 <br  />for dense rows we want to generate a loop, for sparse rows
-<br  />we want to unroll. We just add a condition <code>sparse</code> and
-<br  />either do a Range or Rep[Range] loop.</p>
+<br  />we want to unroll. We just add a condition <code>sparse</code> and dispatch
+<br  />to either a <code>Range</code> or a <code>Rep[Range]</code> loop.</p>
 
             </div>
             <div class="code">
@@ -561,7 +585,7 @@ class ShonanTest extends TutorialFunSuite {
               for (j &lt;- (0 until n):Rep[Range]) {
                 v1(i) = v1(i) + a(i).apply(j) * v(j)
               }
-          }
+            }
           }
           v1
         }
@@ -580,14 +604,57 @@ class ShonanTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
-                <h2>STEP 2: Conditional unrolling</h2>
-<p>The code duplication of the loop body above is not very nice.
-<br  />fortunately, we can create arbitrary staging-time abstractions.
-<br  />We create an auxiliary method unrollIf that captures the
-<br  />conditional unrolling pattern in a general way.
-<br  />The mv prod function no longer needs to express the loop
+                <p>Looking at the generated code, we can easily see that we get a while
+<br  />loop for row 0, which is dense, no operations for row 1, and an
+<br  />unrolled loop for row 2, which is sparse:</p>
+<pre><code>/*****************************************
+  Emitting Generated Code                  
+*******************************************/
+class Snippet(px6:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
+def apply(x0:Array[Int]): Array[Int] = {
+val x2 = new Array[Int](5)
+val x6 = px6 // static data: Array(1,1,1,1,1)
+var x4 : Int = 0
+val x13 = while (x4 &lt; 5) {
+val x5 = x2(0)
+val x7 = x6(x4)
+val x8 = x0(x4)
+val x9 = x7 * x8
+val x10 = x5 + x9
+val x11 = x2(0) = x10
+
+x4 = x4 + 1
+}
+val x14 = x2(1)
+val x17 = x2(1) = x14
+val x22 = x2(2)
+val x24 = x2(2) = x22
+val x19 = x0(2)
+val x25 = x22 + x19
+val x26 = x2(2) = x25
+val x27 = x2(3)
+val x29 = x2(3) = x27
+val x30 = x2(4)
+val x32 = x2(4) = x30
+val x33 = x30 + x19
+val x34 = x2(4) = x33
+val x21 = x0(4)
+val x35 = x33 + x21
+val x36 = x2(4) = x35
+x2
+}
+}
+/*****************************************
+  End of Generated Code                  
+*******************************************/
+</code></pre>
+<h2>STEP 2: Conditional unrolling</h2>
+<p>The code duplication of the loop body above is not very nice. Fortunately,
+<br  />we can create arbitrary staging-time abstractions. We create an auxiliary
+<br  />method unrollIf that captures the conditional unrolling pattern in a general
+<br  />way. The <code>matrix_vector_prod</code> function no longer needs to express the loop
 <br  />body twice.</p>
-<p>The generated code is identical. &ldquo;abstraction without regret&rdquo; ftw!</p>
+<p>The generated code is identical: &ldquo;abstraction without regret&rdquo; ftw!</p>
 
             </div>
             <div class="code">
@@ -595,17 +662,12 @@ class ShonanTest extends TutorialFunSuite {
     val snippet = new DslDriver[Array[Int],Array[Int]] {
       def snippet(v: Rep[Array[Int]]) = {
 
-        def unrollIf(c:Boolean,r: Range) = new { def foreach(f: Rep[Int] =&gt; Rep[Unit]) = {
-          if (c) {
-            for (j &lt;- (r.start until r.end):Range) {
-              f(j)
-            }
-          } else {                  
-            for (j &lt;- (r.start until r.end):Rep[Range]) {
-              f(j)
-            }
+        def unrollIf(c:Boolean,r: Range) = new { 
+          def foreach(f: Rep[Int] =&gt; Rep[Unit]) = {
+            if (c) for (j &lt;- (r.start until r.end):Range)      f(j)
+            else   for (j &lt;- (r.start until r.end):Rep[Range]) f(j)
           }
-        }}
+        }
 
         def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
           val n = a0.length
@@ -628,7 +690,20 @@ class ShonanTest extends TutorialFunSuite {
     check(&quot;shonan-hmm1d&quot;, snippet.code)
   }
 
-}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_6">&#182;</a>
+                </div>
+                <h2>What's next?</h2>
+<p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="regex.html">Regular Expression matcher</a>.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>}
 </code></pre>
             </div>
         
@@ -662,7 +737,7 @@ class ShonanTest extends TutorialFunSuite {
         });      
     });
 
-
+/*
         $('#my-affix').affix({
             offset: {
               top: 100
@@ -671,6 +746,7 @@ class ShonanTest extends TutorialFunSuite {
               }
             }
         })
+*/
     </script>
   </body>
 </html>

@@ -412,18 +412,20 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <h1>Getting Started</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
-<h2>Staging</h2>
+<h2>Staging and LMS</h2>
 <p>What is staging? The idea behind staging is to delay computation of
 <br  />certain expressions, generating code to compute them later. The
-<br  />benefit is <em>abstraction without regret</em>.</p>
-<h2>Lightweight Modular Staging (LMS)</h2>
+<br  />benefit is <em>abstraction without regret</em>: using high-level programming
+<br  />abstractions once, to structure generated code, instead of all the
+<br  />time during execution.</p>
 <p>Lightweight Modular Staging (LMS) is a staging technique driven by
-<br  />types. The technique has been implemented in Scala, in a framework to
-<br  />build compilers.</p>
-<p>In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
-<br  />because it is purely library based. It is also <em>modular</em>, for two
-<br  />reasons: (1) features can be mixed and matched (2) DSL specification
-<br  />and implementation are separate.</p>
+<br  />types. In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
+<br  />because it is purely library based. It is also <em>modular</em>, because
+<br  />features can be mixed and matched and the framework is easy to
+<br  />extend.</p>
+<h2>My First Multi-Stage Program</h2>
+<p>This tutorial is a <a href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/start.scala">literate Scala file</a>. We invite you to clone the
+<br  /><a href="https://github.com/scala-lms/tutorials/">GitHub repo</a> and play with the code as you follow along.</p>
 
             </div>
             <div class="code">
@@ -431,7 +433,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 
 import scala.virtualization.lms.common._
 
-class DslApiTest extends TutorialFunSuite {
+class GettingStartedTest extends TutorialFunSuite {
   val under = &quot;dslapi&quot;
 
 
@@ -449,27 +451,20 @@ class DslApiTest extends TutorialFunSuite {
 <br  />constant in the generated code. For core Scala features, adding
 <br  /><code>Rep</code> types should be enough to build a program generator, as we
 <br  />will see later.</p>
-<p>Contrast the snippet on the left, where <code>b</code> is a <code>Boolean</code>, with
-<br  />the snippet on the right, where <code>b</code> is a <code>Rep[Boolean]</code>. The
-<br  />expression <code>if (b) 1 else x</code> is executed at staging time when <code>b</code>
-<br  />is a <code>Boolean</code>, while it is delayed causing code to be generated for
-<br  />the <code>if</code> expression when <code>b</code> is a <code>Rep[Boolean]</code> &ndash; indeed, the
-<br  />actual value of <code>b</code> is not known at staging time, but only when the
-<br  />generated code is executed.</p>
 
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  test(&quot;1&quot;) {
     val snippet = new DslDriver[Int,Int] {
-      //#1
       def snippet(x: Rep[Int]) = {
+
         def compute(b: Boolean): Rep[Int] = {
           // the if is executed in the first stage
           if (b) 1 else x
         }
         compute(true)+compute(1==1)
+
       }
-      //#1
     }
     assert(snippet.eval(0) === 2)
     check(&quot;1&quot;, snippet.code)    
@@ -493,20 +488,26 @@ def apply(x1:Int): Int = {
   End of Generated Code                  
 *******************************************/
 </code></pre>
+<p>Contrast the snippet above, where <code>b</code> is a <code>Boolean</code>, with the snippet
+<br  />below, where <code>b</code> is a <code>Rep[Boolean]</code>. The expression <code>if (b) 1 else x</code>
+<br  />is executed at staging time when <code>b</code> is a <code>Boolean</code>, while it is delayed
+<br  />causing code to be generated for the <code>if</code> expression when <code>b</code> is a
+<br  /><code>Rep[Boolean]</code> &ndash; indeed, the actual value of <code>b</code> is not known at staging
+<br  />time, but only when the generated code is executed.</p>
 
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  test(&quot;2&quot;) {
     val snippet = new  DslDriver[Int,Int] {
-      //#2
       def snippet(x: Rep[Int]) = {
+
         def compute(b: Rep[Boolean]): Rep[Int] = {
           // the if is deferred to the second stage
           if (b) 1 else x
         }
         compute(x==1)
+
       }
-      //#2
     }
     assert(snippet.eval(2) === 2)
     check(&quot;2&quot;, snippet.code)
@@ -551,19 +552,18 @@ x5
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  test(&quot;power&quot;) {
     val snippet = new DslDriver[Int,Int] {
-      //#power
-      def power(b: Rep[Int], x: Int): Rep[Int] = {
+
+      def power(b: Rep[Int], x: Int): Rep[Int] =
         if (x == 0) 1
         else b * power(b, x-1)
-      }
+
       def snippet(b: Rep[Int]) =
         power(b, 3)
-      //#power
+
     }
     assert(snippet.eval(2) === 8)
     check(&quot;power&quot;, snippet.code)
   }
-
 
 </code></pre>
             </div>
@@ -572,7 +572,21 @@ x5
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h3>Rep[Range] vs Range</h3>
+                <pre><code>/*****************************************
+  Emitting Generated Code                  
+*******************************************/
+class Snippet extends ((Int)=&gt;(Int)) {
+def apply(x3:Int): Int = {
+val x4 = x3 * x3
+val x5 = x3 * x4
+x5
+}
+}
+/*****************************************
+  End of Generated Code                  
+*******************************************/
+</code></pre>
+<h3>Rep[Range] vs Range</h3>
 <p>Loops can be unrolled in the first stage, or be generated as loops in
 <br  />the second stage, driven by the type of their condition.</p>
 
@@ -580,14 +594,12 @@ x5
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  test(&quot;range1&quot;) {
     val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range1
-          for (i &lt;- (0 until 3): Range) {
-            println(i)
-          }
-          //#range1
+      def snippet(x: Rep[Int]) = comment(&quot;for&quot;, verbose = false) {
+
+        for (i &lt;- (0 until 3): Range) {
+          println(i)
         }
+
       }
     }
     check(&quot;range1&quot;, snippet.code)
@@ -610,14 +622,12 @@ val x3 = println(2)
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  test(&quot;range2&quot;) {
     val snippet = new DslDriver[Int,Unit] {
-      def snippet(x: Rep[Int]) = {
-        comment(&quot;for&quot;, verbose = false) {
-          //#range2
-          for (i &lt;- (0 until x): Rep[Range]) {
-            println(i)
-          }
-          //#range2
+      def snippet(x: Rep[Int]) = comment(&quot;for&quot;, verbose = false) {
+
+        for (i &lt;- (0 until x): Rep[Range]) {
+          println(i)
         }
+
       }
     }
     check(&quot;range2&quot;, snippet.code)
@@ -638,129 +648,8 @@ x2 = x2 + 1
 }
 x5
 </code></pre>
-<h3>Shonan Challenge</h3>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;shonan-hmm&quot;) {
-    val snippet = new DslDriver[Array[Int],Array[Int]] {
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_7">&#182;</a>
-                </div>
-                <p>With this fine-grain control, conditional loop unrolling can be
-<br  />implemented at the DSL user level.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      //#unrollIf
-      def unrollIf(range: Range)(cond: Boolean) = new {
-        def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-          if (cond) for (i &lt;- range) f(i)
-          else for (i &lt;- (range.start until range.end): Rep[Range]) f(i)
-        }
-      }
-      //#unrollIf
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_8">&#182;</a>
-                </div>
-                <p>We can use this conditional loop unrolling to optimize multiplying a
-<br  />matrix known at staging time with a vector. For example, consider a
-<br  />matrix with a mix of dense and sparse rows:</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      val A = scala.Array
-      val a =
-        //#ex-a
-        A(A(1, 1, 1, 1, 1), // dense
-          A(0, 0, 0, 0, 0), // null
-          A(0, 0, 1, 0, 0), // sparse
-          A(0, 0, 0, 0, 0),
-          A(0, 0, 1, 0, 1))
-        //#ex-a
-
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_9">&#182;</a>
-                </div>
-                <p>When scanning the columns, we would like to generate a loop for the
-<br  />dense row, and unroll the loop for the sparse rows.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>      def infix_at(a: Array[Array[Int]], i: Int, j: Rep[Int]): Rep[Int] = {
-        (staticData(a(i)) apply j)
-      }
-
-      def sparse(ai: Array[Int]): Boolean = {
-        ai.filter(_ != 0).length &lt; 3
-      }
-
-      //#matrix_vector_prod
-      def matrix_vector_prod(a: Array[Array[Int]], v: Rep[Array[Int]]) = {
-        val n = a.length
-        val v1 = NewArray[Int](n)
-        for (i &lt;- 0 until n: Range) {
-          comment(&quot;row_&quot; + i) {
-            for (j &lt;- unrollIf(0 until n)(sparse(a(i)))) {
-              v1(i) = v1(i) + a.at(i, j) * v(j)
-            }
-          }
-        }
-        v1
-      }
-      //#matrix_vector_prod
-
-      def snippet(v: Rep[Array[Int]]) = {
-        matrix_vector_prod(a, v)
-      }
-    }
-    check(&quot;shonan-hmm&quot;, snippet.code)
-  }
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_10">&#182;</a>
-                </div>
-                <p>Let's compare the code generated for a dense vs sparse row. Dense:</p>
-<pre><code>// generated code for row 0
-var x3 : Int = 0
-val x12 = while (x3 &lt; 5) {
-val x4 = x1(0)
-val x6 = x5(x3)
-val x7 = x0(x3)
-val x8 = x6 * x7
-val x9 = x4 + x8
-val x10 = x1(0) = x9
-
-x3 = x3 + 1
-}
-x12
-</code></pre>
-<p>Sparse:</p>
-<pre><code>// generated code for row 2
-val x25 = x1(2)
-val x27 = x1(2) = x25
-val x28 = x25 + x20
-val x29 = x1(2) = x28
-()
-</code></pre>
+<h2>What's next?</h2>
+<p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="shonan.html">Shonan Challenge</a>.</p>
 
             </div>
             <div class="code">
@@ -799,7 +688,7 @@ val x29 = x1(2) = x28
         });      
     });
 
-
+/*
         $('#my-affix').affix({
             offset: {
               top: 100
@@ -808,6 +697,7 @@ val x29 = x1(2) = x28
               }
             }
         })
+*/
     </script>
   </body>
 </html>

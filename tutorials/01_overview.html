@@ -409,11 +409,21 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Getting Started</h1>
-<p>This chapter will be about getting started with LMS. We will begin by explaining some background on generative programming, then move on to how to get LMS running on your system and finally how to get it set up to start working with. At the end of this chapter you should understand why LMS is around, why you should use it and you should be all set up to do so.</p>
+                <h1>About Generative Programming</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
-<h2>About Generative Programming</h2>
+<!--
+Getting Started
+===============
+
+This chapter will be about getting started with LMS. We will begin by explaining some background on generative programming, then move on to how to get LMS running on your system and finally how to get it set up to start working with. At the end of this chapter you should understand why LMS is around, why you should use it and you should be all set up to do so.
+
+Outline:
+<div id="tableofcontents"></div>
+
+About Generative Programming
+----------------------------
+-->
 <h3>Productivity vs Performance</h3>
 <p>One of the biggest challenges in software development today is that software performance is increasingly at odds with programmer productivity. This problem is aggravated by a number of trends:</p>
 <p>First, processor clock speeds are no longer doubling every 18 months and instead, computer hardware is rapidly becoming more and more parallel, heterogeneous and distributed. Multi-core CPUs, SIMD units and GPUs are commonplace from servers in data centers all the way down to mobile phones. Programmers need to turn to a variety of low-level programming models to make best use of the available hardware resources.</p>
@@ -434,18 +444,38 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <h3>Domain-Specific Languages</h3>
 <p>A key use for such multi-pass compiler pipelines is in implementing highly efficient domain-specific languages (DSLs). DSLs can outperform general purpose languages because they offer more optimization opportunities. But to be effective, DSL compilers need to perform optimizations on multiple abstraction levels.</p>
 <p>With compilers based on staging, it is easy to first perform purely domain-specific optimizations, say, on the level of linear algebra operations, before lowering the domain-specific operations and data structures to a more generic representation (say, as arrays and loops) on which a different set of optimizations apply.</p>
-<h2>LMS Basics</h2>
-<h3>Rep Types</h3>
-<h3>Staging as a Scala library</h3>
-<p>Hence lightweight (no baked-in language support) and modular (flexible set of staged operations)</p>
-<h3>Comparing LMS to other systems</h3>
-<p>Type safety, evaluation order, multi-pass architecture</p>
-<h2>Installing LMS</h2>
-<p>Clone tutorial repo. Use sbt. Maybe increase memory.</p>
-<h2>Getting Help</h2>
-<p>Community, mailing lists, &hellip;</p>
-<h2>Summary</h2>
-<p>You should have a basic understanding of what LMS is and how it’s different from the program generation approach you may have been using. You should also now have a working version of LMS on your system. It’s now time to learn some LMS basics.</p>
+<!--
+LMS Basics
+----------
+
+### Rep Types
+
+### Staging as a Scala library
+
+Hence lightweight (no baked-in language support) and modular (flexible set of staged operations)
+
+### Comparing LMS to other systems
+
+Type safety, evaluation order, multi-pass architecture
+
+
+Installing LMS
+--------------
+
+Clone tutorial repo. Use sbt. Maybe increase memory.
+
+
+Getting Help
+------------
+
+Community, mailing lists, ...
+
+
+Summary
+-------
+
+You should have a basic understanding of what LMS is and how it’s different from the program generation approach you may have been using. You should also now have a working version of LMS on your system. It’s now time to learn some LMS basics.
+-->
 
             </div>
             <div class="code">
@@ -482,7 +512,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
         });      
     });
 
-
+/*
         $('#my-affix').affix({
             offset: {
               top: 100
@@ -491,6 +521,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
               }
             }
         })
+*/
     </script>
   </body>
 </html>

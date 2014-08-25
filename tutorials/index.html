@@ -410,15 +410,29 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
                 <h1>Tutorials and Documentation</h1>
-<p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a
-<br  />framework for runtime code generation in Scala.</p>
+<p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a framework for
+<br  />runtime code generation in Scala.</p>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <h2>Quick Start</h2>
-<p>These docs are a collection of literate Scala files. Clone the repo:</p>
-<pre><code>git clone git://github.com/scala-lms/tutorials
+<p>These docs are a collection of literate Scala files. Clone the <a href="http://github.com/scala-lms/tutorials">GitHub repo</a>:</p>
+<pre><code>git clone https://github.com/scala-lms/tutorials.git
 </code></pre>
-<p>Check the README file and start hacking!</p>
+<p>Check the README file for prerequisites and start hacking!</p>
+<h3>Why Generative Programming ?</h3>
+<p>Because it enables <strong>abstraction without regret</strong>: the key idea is to write very high-level
+<br  />and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
+<p>Programming abstractions that would usually be avoided in performance-sensitive code
+<br  />(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
+<br  />affecting performance of the <strong>generated code</strong>.</p>
+<h3>Why LMS ?</h3>
+<p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. It distinguishes
+<br  />expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
+<p>LMS comes with <strong>batteries included</strong>: it goes beyond purely generative approaches by
+<br  />providing an extensible intermediate representation that can be used to implement
+<br  />sophisticated domain-specific compiler pipelines.</p>
+<p>At the same time LMS is <strong>hackable</strong>: since it is just a library, all aspects can be
+<br  />modified or extended to suit a particular purpose.</p>
 <h2>Self-Contained Tutorials</h2>
 <p>The following tutorials are available:</p>
 <ul>
@@ -432,225 +446,95 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <li><p><a href="regex.html">Regular Expressions</a>
 <br  />From interpreters to compilers using staging</p>
 </li>
-<li><p><a href="ack.html">Ackermann's Function</a></p>
+<li><p><a href="ack.html">Ackermann's Function</a>
+<br  />From recursive functions to automata</p>
 </li>
 <li><p><a href="automata.html">Automata and Regexp Take 2</a>
-<br  />Turning recursive functions into automata
 <br  />NFA to DFA conversion using staging</p>
 </li>
-<li><p><a href="csv.html">SQL Engine</a>
+<li><p><a href="scsv.html">SQL Engine</a>
 <br  />Efficient data processing</p>
 </li>
-<li><p><a href="fft.html">Fast Fourier Transform (FFT)</a></p>
+<li><p><a href="fft.html">Fast Fourier Transform (FFT)</a>
+<br  />Numeric kernels and rewriting optimizations</p>
 </li>
-<li><p><a href="stencil.html">Sliding Stencil</a></p>
+<li><p><a href="stencil.html">Sliding Stencil</a>
+<br  />Rearranging loop shapes</p>
 </li>
 </ul>
-<h2>LMS In-Depth</h2>
+<!--
+LMS In-Depth
+------------
+
 <div class="alert alert-danger" role="alert"> <strong>TODO:</strong> flesh out </div>
-<h3>Getting Started</h3>
-<ul>
-<li>Why generative programming?
-<br  /><em>Because abstraction without regret!</em></li>
-<li>Why LMS?
-<br  /><em>Because batteries included and hackable!</em></li>
-<li>Hellow World</li>
-</ul>
-<h3>Design Patterns</h3>
-<p>Purely generative:</p>
-<ul>
-<li>Specialization on static data</li>
-<li>Abstractions in the meta-language</li>
-<li>From interpreter to compiler</li>
-<li>Mixed-stage data structures</li>
-<li>Type classes and generic programming</li>
-</ul>
-<p>Including IR:</p>
-<ul>
-<li>DSLs with multiple abstraction levels</li>
-</ul>
-<h3>From Zero to LMS</h3>
-<ul>
-<li>Program generation with Strings</li>
-<li>Program generation with Trees</li>
-<li>Program generation with Graphs</li>
-</ul>
-<h3>LMS Internals</h3>
-<ul>
-<li>Graph IR</li>
-<li>Effects</li>
-<li>Code Motion</li>
-<li>Transformers</li>
-<li>Code Generators</li>
-</ul>
-<p>Advanced:</p>
-<ul>
-<li>Functions</li>
-<li>Structs</li>
-</ul>
-<h3>Integration</h3>
-<ul>
-<li>LMS for Scala</li>
-<li>LMS for JavaScript</li>
-<li>LMS for C</li>
-</ul>
-<p>Advanced:</p>
-<ul>
-<li>LMS for Scala Macros</li>
-<li>LMS for Vector Intrinsics</li>
-<li>LMS for GPUs</li>
-<li>LMS for FPGAs</li>
-<li>LMS for SMT Solvers</li>
-<li>LMS for Truffle / Graal</li>
-</ul>
-<h2>LMS In Even More Depth</h2>
-<div class="alert alert-danger" role="alert"> <strong>TODO:</strong> integrate above </div>
+
+
+### Getting Started
+
+- Why generative programming?
+    _Because abstraction without regret!_
+- Why LMS?
+    _Because batteries included and hackable!_
+- Hellow World
+
+
+### Design Patterns
+
+Purely generative:
+
+- Specialization on static data
+- Abstractions in the meta-language
+- From interpreter to compiler
+- Mixed-stage data structures
+- Type classes and generic programming
+
+Including IR:
+
+- DSLs with multiple abstraction levels
+
+
+### From Zero to LMS
+
+- Program generation with Strings
+- Program generation with Trees
+- Program generation with Graphs
+
+
+### LMS Internals
+
+- Graph IR
+- Effects
+- Code Motion
+- Transformers
+- Code Generators
+
+Advanced:
+
+- Functions
+- Structs
+
+
+### Integration
+
+- LMS for Scala
+- LMS for JavaScript
+- LMS for C
+
+Advanced:
+
+- LMS for Scala Macros
+- LMS for Vector Intrinsics
+- LMS for GPUs
+- LMS for FPGAs
+- LMS for SMT Solvers
+- LMS for Truffle / Graal
+-->
+<h2>LMS In Depth</h2>
 <ol>
-<li><p><a href="01_overview.html">Getting Started</a></p>
-<ol>
-<li>About Generative Programming<ol>
-<li>Productivity vs Performance</li>
-<li>About Generative Programming</li>
-<li>Generative Programming Patterns</li>
-<li>Staging and Extensible Compilers</li>
-<li>Domain-Specific Languages</li>
-</ol>
-</li>
-<li>LMS Basics<ol>
-<li>Rep Types</li>
-<li>Staging as a Scala library</li>
-<li>Comparing LMS to other systems</li>
-</ol>
-</li>
-<li>Installing LMS</li>
-<li>Getting Help</li>
-<li>Summary</li>
-</ol>
-</li>
-<li><p><a href="02_basics.html">Generative programming and LMS basics</a></p>
-<ol>
-<li>Generative Programming Basics<ol>
-<li>Program Generation with Strings</li>
-<li>Program Generation with Quasi-Quotes</li>
-<li>Syntactic Correctness through Deep Reuse of Syntax</li>
-<li>Scope Correctness through Deep Reuse of Scope</li>
-<li>Type Correctness through Deep Reuse of Types</li>
-<li>Value Correctness is an Open Problem</li>
-<li>Let Insertion as a Remedy</li>
-</ol>
-</li>
-<li>The LMS Way<ol>
-<li>Value Correctness through Deep Reuse of Evaluation Order</li>
-<li>Removing Syntactic Overhead</li>
-<li>Staging as a Library and Modular Definition of Object Languages<ol>
-<li>Syntax correctness through Embedding as Methods</li>
-<li>Scope Correctness through Deep Reuse Of Val Bindings</li>
-<li>Type Correctness through Typed Embedding (Deep Reuse of Types)</li>
-<li>Value Correctness through Deep Reuse of Evaluation Order</li>
-</ol>
-</li>
-<li>Functions and Recursion</li>
-<li>Generating and Loading Executable Code</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p><a href="03_compiler.html">Intermediate representation and optimzations</a></p>
-<ol>
-<li>Intro: Not your Grandfather's Compiler</li>
-<li>Intermediate Representation: Trees<ol>
-<li>Trees Instead of Strings<ol>
-<li>Modularity: Adding IR Node Types</li>
-</ol>
-</li>
-<li>Enabling Analysis and Transformation<ol>
-<li>Modularity: Adding Traversal Passes</li>
-<li>Solving the ''Expression Problem''</li>
-<li>Generating Code</li>
-<li>Modularity: Adding Transformations</li>
-<li>Transformation by Iterated Staging</li>
-</ol>
-</li>
-<li>Problem: Phase Ordering</li>
-</ol>
-</li>
-<li>Intermediate Representation: Graphs<ol>
-<li>Purely Functional Subset</li>
-<li>Modularity: Adding IR Node Types</li>
-<li>Simpler Analysis and More Flexible Transformations<ol>
-<li>Common Subexpression Elimination/Global Value Numbering</li>
-<li>Pattern Rewrites</li>
-<li>Modularity: Adding new Optimizations</li>
-<li>Context- and Flow-Sensitive Transformations</li>
-<li>Graph Transformations</li>
-<li>Dead Code Elimination</li>
-</ol>
-</li>
-<li>From Graphs Back to Trees<ol>
-<li>Code Motion</li>
-<li>Tree-Like Traversals and Transformers</li>
-</ol>
-</li>
-<li>Effects<ol>
-<li>Simple Effect Domain</li>
-<li>Fine Grained Effects: Tracking Mutations per Allocation Site</li>
-</ol>
-</li>
-</ol>
-</li>
-<li>Advanced Optimizations<ol>
-<li>Rewriting<ol>
-<li>Context-Sensitive Rewriting</li>
-<li>Speculative Rewriting: Combining Analyses and Transformations</li>
-<li>Delayed Rewriting and Multi-Level IR</li>
-</ol>
-</li>
-<li>Splitting and Combining Statements<ol>
-<li>Effectful Statements</li>
-<li>Data Structures</li>
-<li>Representation Conversion</li>
-</ol>
-</li>
-<li>Loop Fusion and Deforestation</li>
-</ol>
-</li>
-</ol>
-</li>
-<li><p><a href="04_atwork.html">Staging and LMS at work</a></p>
-<ol>
-<li>Intro: Abstraction Without Regret</li>
-<li>Common Compiler Optimizations</li>
-<li>Delite: An End-to-End System for Embedded Parallel DSLs<ol>
-<li>Building a Simple DSL</li>
-<li>Code Generation</li>
-<li>The Delite Compiler Framework and Runtime</li>
-</ol>
-</li>
-<li>Control Abstraction<ol>
-<li>Leveraging Higher-Order Functions in the Generator</li>
-<li>Using Continuations in the Generator to Implement Backtracking</li>
-<li>Using Continuations in the Generator to Generate Async Code Patterns</li>
-<li>Guarantees by Construction</li>
-</ol>
-</li>
-<li>Data Abstraction<ol>
-<li>Static Data Structures</li>
-<li>Dynamic Data Structures with Partial Evaluation</li>
-<li>Generic Programming with Type Classes</li>
-<li>Unions and Inheritance</li>
-<li>Struct of Array and Other Data Format Conversions</li>
-<li>Loop Fusion and Deforestation</li>
-<li>Extending the Framework</li>
-<li>Lowering Transforms}</li>
-</ol>
-</li>
-<li>Case Studies<ol>
-<li>OptiML Stream Example</li>
-<li>OptiQL Struct Of Arrays Example</li>
-</ol>
-</li>
-</ol>
-</li>
+<li><a href="01_overview.html">About generative programming</a></li>
+<li><a href="02_basics.html">Generative programming and LMS basics</a></li>
+<li><a href="03_compiler.html">Intermediate representation and optimizations</a></li>
+<li><a href="04_atwork.html">Staging and LMS at work</a></li>
 </ol>
 
             </div>
@@ -688,7 +572,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
         });      
     });
 
-
+/*
         $('#my-affix').affix({
             offset: {
               top: 100
@@ -697,6 +581,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
               }
             }
         })
+*/
     </script>
   </body>
 </html>

@@ -410,8 +410,9 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
                 <h1>Ackermann's Function</h1>
-<p>Turning a recursive function into an automaton, i.e. a set of mutually
-<br  />recursive functions.</p>
+<p>By selectively specializing on a subset of the argument, we can turn
+<br  />a recursive function into an automaton, i.e. a set of mutually recursive
+<br  />functions.</p>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 
@@ -432,11 +433,6 @@ trait Ackermann extends Dsl {
   }
 }
 
-class AckermannTest extends TutorialFunSuite {
-  val under = &quot;ack&quot;
-  def specialize(m: Int): DslDriver[Int,Int] = new DslDriver[Int,Int] with Ackermann {
-    def snippet(n: Rep[Int]): Rep[Int] = a(m)(n)
-  }
 </code></pre>
             </div>
         
@@ -444,7 +440,7 @@ class AckermannTest extends TutorialFunSuite {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_1">&#182;</a>
                 </div>
-                <p>Example due to Neil Jones, via Oleg on LtU (http://lambda-the-ultimate.org/node/4039#comment-61431)</p>
+                <p>The example is due to Neil Jones, via Oleg on <a href="http://lambda-the-ultimate.org/node/4039#comment-61431">LtU</a>.</p>
 <p>ack(2,n) should specialize to:</p>
 <p>ack_2(n) =  if n=0 then ack_1(1) else  ack_1(ack_2(n-1))
 <br  />ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))
@@ -452,11 +448,74 @@ class AckermannTest extends TutorialFunSuite {
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  test(&quot;specialize ackermann to m=2&quot;) {
+                <pre><code class='prettyprint lang-scala'>class AckermannTest extends TutorialFunSuite {
+  val under = &quot;ack&quot;
+  def specialize(m: Int): DslDriver[Int,Int] = new DslDriver[Int,Int] with Ackermann {
+    def snippet(n: Rep[Int]): Rep[Int] = a(m)(n)
+  }
+
+  test(&quot;specialize ackermann to m=2&quot;) {
     val ack2 = specialize(2)
     check(&quot;m2&quot;, ack2.code)
   }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <pre><code>/*****************************************
+  Emitting Generated Code                  
+*******************************************/
+class Snippet extends ((Int)=&gt;(Int)) {
+def apply(x0:Int): Int = {
+var x4 = null.asInstanceOf[scala.Function1[Int, Int]]
+var x1 = null.asInstanceOf[scala.Function1[Int, Int]]
+val x7 = {x8: (Int) =&gt; 
+val x9 = x8 + 1
+x9: Int
 }
+val x10 = x7(1)
+x4 = {x5: (Int) =&gt; 
+val x6 = x5 == 0
+val x15 = if (x6) {
+x10
+} else {
+val x11 = x5 - 1
+val x12 = x4(x11)
+val x13 = x7(x12)
+x13
+}
+x15: Int
+}
+x1 = {x2: (Int) =&gt; 
+val x3 = x2 == 0
+val x23 = if (x3) {
+val x17 = x4(1)
+x17
+} else {
+val x19 = x2 - 1
+val x20 = x1(x19)
+val x21 = x4(x20)
+x21
+}
+x23: Int
+}
+val x25 = x1(x0)
+x25
+}
+}
+/*****************************************
+  End of Generated Code                  
+*******************************************/
+</code></pre>
+<h2>What's next?</h2>
+<p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="automata.html">automata-based regex matcher</a>.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>}
 </code></pre>
             </div>
         
@@ -490,7 +549,7 @@ class AckermannTest extends TutorialFunSuite {
         });      
     });
 
-
+/*
         $('#my-affix').affix({
             offset: {
               top: 100
@@ -499,6 +558,7 @@ class AckermannTest extends TutorialFunSuite {
               }
             }
         })
+*/
     </script>
   </body>
 </html>
