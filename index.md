@@ -44,8 +44,8 @@ Turn nice high-level programs into fast low-level code. Strip abstraction overhe
 class Vector[T:Numeric:Manifest](val data: Rep[Array[T]]) {
   def foreach(f: Rep[T] => Rep[Unit]): Rep[Unit] =
     for (i <- 0 until data.length) f(data(i))
-  def sumIf(f: Rep[T] => Rep[Unit]) = { 
-    var n = zero[T]; foreach(x => if (f(x) n += x)); n }
+  def sumIf(f: Rep[T] => Rep[Boolean]) = { 
+    var n = zero[T]; foreach(x => if (f(x)) n += x); n }
 }
 
 val v: Vector[Double] = ...
