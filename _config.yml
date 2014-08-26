@@ -1,5 +1,5 @@
 #auto: true
-pygments: true
+highlighter: pygments
 markdown: kramdown
 
 title: Lightweight Modular Staging
