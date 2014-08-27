@@ -528,7 +528,7 @@ while (input.nonEmpty) {
 <br  />translations can be applied to transform the mutually recursive lambdas into
 <br  />tight imperative state machines.</p>
 <pre><code>def stagedFindAAB(): DfaState = {
-  val x7 = { x8: (Char) =&gt;  
+  val x7 = { x8: (Char) =&gt;
     // matched AA
     val x9 = x8 == B
     val x15 = if (x9) {
@@ -545,7 +545,7 @@ while (input.nonEmpty) {
     x15
   }
   val x13 = dfaState(x7)
-  val x4 = { x5: (Char) =&gt; 
+  val x4 = { x5: (Char) =&gt;
     // matched A
     val x6 = x5 == A
     val x16 = if (x6) {
@@ -556,7 +556,7 @@ while (input.nonEmpty) {
     x16
   }
   val x17 = dfaState(x4)
-  val x1 = { x2: (Char) =&gt; 
+  val x1 = { x2: (Char) =&gt;
     // matched nothing
     val x3 = x2 == A
     val x18 = if (x3) {

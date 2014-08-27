@@ -509,7 +509,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
     case Project(schema, schema2, parent) =&gt;
       execOp(parent) { rec =&gt; yld(Record(schema2.map(k =&gt; rec(k)), schema)) }
     case Join(left, right) =&gt;
-      execOp(left) { rec1 =&gt; 
+      execOp(left) { rec1 =&gt;
         execOp(right) { rec2 =&gt;
           val keySchema = rec1.schema intersect rec2.schema
           val key1 = keySchema.map(rec1 apply _)
@@ -521,7 +521,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
     case HashJoin(left, right) =&gt;
       val keySchema = resultSchema(left) intersect resultSchema(right)
       val m = new HashMap(resultSchema(left))
-      execOp(left) { rec1 =&gt; 
+      execOp(left) { rec1 =&gt;
         m += (keySchema.map(rec1 apply _), rec1.fields)
       }
       execOp(right) { rec2 =&gt;

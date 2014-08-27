@@ -430,7 +430,7 @@ class CSVTest extends TutorialFunSuite {
 
   test(&quot;csv-live&quot;) {
 
-    def FileReader(file: String) = 
+    def FileReader(file: String) =
 &quot;&quot;&quot;Name,Value,Flag
 A,7,no
 B,2,yes&quot;&quot;&quot;.split(&quot;\n&quot;).iterator
@@ -449,8 +449,8 @@ B,2,yes&quot;&quot;&quot;.split(&quot;\n&quot;).iterator
         }
       }
     }
-    
-    for (record &lt;- CSV(&quot;data.txt&quot;)) { 
+
+    for (record &lt;- CSV(&quot;data.txt&quot;)) {
       if (record(&quot;Flag&quot;) == &quot;yes&quot;)
         println(record(&quot;Name&quot;))
     }
@@ -470,11 +470,11 @@ B,2,yes&quot;&quot;&quot;.split(&quot;\n&quot;).iterator
     case class Const(x: Any) extends Ref
 
     def exec(o: Operator)(yld: Record =&gt; Unit): Unit = o match {
-      case Scan(file) =&gt; 
+      case Scan(file) =&gt;
         CSV(file).foreach(yld)
-      case Filter(pred, parent) =&gt; 
+      case Filter(pred, parent) =&gt;
         exec(parent) { rec =&gt; if (evalp(pred)(rec)) yld(rec) }
-      case Project(fields, parent) =&gt; 
+      case Project(fields, parent) =&gt;
         exec(parent) { rec =&gt; yld(new Record(fields map (k =&gt; rec(k)), fields)) }
       case Print(parent) =&gt;
         exec(parent) { rec =&gt; println(rec.fields mkString &quot;,&quot;) }

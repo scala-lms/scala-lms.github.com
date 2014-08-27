@@ -441,7 +441,7 @@ trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with Bool
   }
 
   override def array_apply[T:Manifest](x: Exp[Array[T]], n: Exp[Int])(implicit pos: SourceContext): Exp[T] = (x,n) match {
-    case (Def(StaticData(x:Array[T])), Const(n)) =&gt; 
+    case (Def(StaticData(x:Array[T])), Const(n)) =&gt;
       val y = x(n)
       if (y.isInstanceOf[Int]) unit(y) else staticData(y)
     case _ =&gt; super.array_apply(x,n)
@@ -451,7 +451,7 @@ trait DslGen extends ScalaGenNumericOps with ScalaGenPrimitiveOps with ScalaGenB
   val IR: DslExp
 
   import IR._
-  
+
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case IfThenElse(c,Block(Const(true)),Block(Const(false))) =&gt;
       emitValDef(sym, quote(c))

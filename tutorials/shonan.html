@@ -647,7 +647,7 @@ End of Generated Code
               for (j &lt;- (0 until n):Range) {
                 v1(i) = v1(i) + a(i).apply(j) * v(j)
               }
-            } else {                  
+            } else {
               for (j &lt;- (0 until n):Rep[Range]) {
                 v1(i) = v1(i) + a(i).apply(j) * v(j)
               }
@@ -727,7 +727,7 @@ End of Generated Code
     val snippet = new DslDriver[Array[Int],Array[Int]] {
       def snippet(v: Rep[Array[Int]]) = {
 
-        def unrollIf(c:Boolean,r: Range) = new { 
+        def unrollIf(c:Boolean,r: Range) = new {
           def foreach(f: Rep[Int] =&gt; Rep[Unit]) = {
             if (c) for (j &lt;- (r.start until r.end):Range)      f(j)
             else   for (j &lt;- (r.start until r.end):Rep[Range]) f(j)

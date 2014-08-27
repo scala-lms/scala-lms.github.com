@@ -500,7 +500,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <pre><code>trait FFTC extends FFT { this: Arrays with Compile =&gt;
   def fftc(size: Int) = compile { input: Rep[Array[Double]] =&gt;
     assert(&lt;size is power of 2&gt;) // happens at staging time
-    val arg = Array.tabulate(size) { i =&gt; 
+    val arg = Array.tabulate(size) { i =&gt;
       Complex(input(2*i), input(2*i+1))
     }
     val res = fft(arg)
@@ -527,8 +527,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>We can then define code that creates and uses compiled  FFT `<code>codelets'' by
 &lt;br /&gt;extending</code>FFTC`:</p>
 <pre><code>trait TestFFTC extends FFTC {
-  val fft4: Array[Double] =&gt; Array[Double] = fftc(4) 
-  val fft8: Array[Double] =&gt; Array[Double] = fftc(8) 
+  val fft4: Array[Double] =&gt; Array[Double] = fftc(4)
+  val fft8: Array[Double] =&gt; Array[Double] = fftc(8)
 
   // embedded code using fft4, fft8, ...
 }
@@ -537,7 +537,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <br  />traits) will execute the embedded code:</p>
 <pre><code>val OP: TestFFC = new TestFFTC with CompileScala
   with ArithExpOpt  with ArithExpOptFFT with ScalaGenArith
-  with TrigExpOpt   with ScalaGenTrig 
+  with TrigExpOpt   with ScalaGenTrig
   with ArraysExpOpt with ScalaGenArrays
 </code></pre>
 <p>We can also use the compiled methods from outside the object:</p>

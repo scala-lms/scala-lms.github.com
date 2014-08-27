@@ -568,7 +568,7 @@ type Block[T]   // blocks:     { Stm; ...; Stm; Exp }
 
   // bind definitions to symbols automatically
   // by creating a statement
-  implicit def toAtom[T](d: Def[T]): Exp[T] = 
+  implicit def toAtom[T](d: Def[T]): Exp[T] =
     reflectStm(Stm(fresh[T], d))
 }
 </code></pre>
@@ -667,7 +667,7 @@ trait MyTraversalArith extends MyTraversalBase {
   def main = ... // program code here
 }
 val impl = new Prog with ArithExp
-val res = impl.reifyBlock(impl.main)  
+val res = impl.reifyBlock(impl.main)
 val inspect = MyTraversalArith { val IR: impl.type = impl }
 inspect.traverseBlock(res)
 </code></pre>
@@ -711,11 +711,11 @@ inspect.traverseBlock(res)
 <pre><code>trait SimpleTransformer {
   val IR: Expressions
   import IR._
-  def transformBlock[T](b: Block[T]): Block[T] = 
+  def transformBlock[T](b: Block[T]): Block[T] =
     Block(b.stms.flatMap(transformStm), transformExp(b.res))
-  def transformStm[T](s: Stm[T]): List[Stm] = 
+  def transformStm[T](s: Stm[T]): List[Stm] =
     List(Stm(s.lhs, transformDef(s.rhs)))   // preserve existing symbol s
-  def transformDef[T](d: Def[T]): Def[T]    // default: use reflection 
+  def transformDef[T](d: Def[T]): Def[T]    // default: use reflection
                                             // to map over case classes
 }
 </code></pre>
@@ -725,7 +725,7 @@ inspect.traverseBlock(res)
   import IR._
   // override transformDef for each Def subclass
   def transformDef[T](d: Def[T]): Def[T] = d match {
-    case IfThenElse(c,a,b) =&gt; 
+    case IfThenElse(c,a,b) =&gt;
       IfThenElse(transformExp(c), transformBlock(a), transformBlock(b))
     case _ =&gt; super.transformDef(d)
   }
@@ -748,18 +748,18 @@ inspect.traverseBlock(res)
   var subst: Map[Exp[_],Exp[_]]
   def transformExp[T](s: Exp[T]): Exp[T] = ... // lookup s in subst
   def transformDef[T](d: Def[T]): Exp[T]       // default
-  def transformStm[T](s: Stm[T]): Exp[T] = { 
+  def transformStm[T](s: Stm[T]): Exp[T] = {
     val e = transformDef(s.rhs); subst += (s.sym -&gt; e); e
   }
-  override def traverseStm[T](s: Stm[T]): Unit = { 
+  override def traverseStm[T](s: Stm[T]): Unit = {
     transformStm(s)
   }
-  def reflectBlock[T](b: Block[T]): Exp[T] = withSubstScope { 
+  def reflectBlock[T](b: Block[T]): Exp[T] = withSubstScope {
     traverseBlock(b); transformExp(b.res)
   }
   def transformBlock[T](b: Block[T]): Block[T] = {
-    reifyBlock(reflectBlock(b))  
-  }  
+    reifyBlock(reflectBlock(b))
+  }
 }
 </code></pre>
 <p>Here is a simple identity transformer implementation for conditionals and
@@ -768,9 +768,9 @@ inspect.traverseBlock(res)
   val IR: IfThenElseExp with ArraysExp
   import IR._
   def transformDef[T](d: Def[T]): Exp[T] = d match {
-    case IfThenElse(c,a,b) =&gt; 
+    case IfThenElse(c,a,b) =&gt;
       __ifThenElse(transformExp(c), reflectBlock(a), reflectBlock(b))
-    case ArrayFill(n,i,y) =&gt; 
+    case ArrayFill(n,i,y) =&gt;
       arrayFill(transformExp(n), { j =&gt; withSubstScope(i -&gt; j) { reflectBlock(y) }})
     case _ =&gt; ...
   }
@@ -833,7 +833,7 @@ inspect.traverseBlock(res)
 
   // bind definitions to symbols automatically
   // by creating a statement
-  implicit def toAtom[T](d: Def[T]): Exp[T] = 
+  implicit def toAtom[T](d: Def[T]): Exp[T] =
     reflectPure(d)
 
   def reifyBlock[T](b: =&gt;Exp[T]): Block[T]
@@ -1037,7 +1037,7 @@ trait ArithExpOptFFT extends ArithExp {
 <br  />queried to find out whether <code>mirror</code> is allowed to call context
 <br  />dependent methods:</p>
 <pre><code>override def mirror[A](e: Def[A], f: Transformer): Exp[A] = e match {
-  case IfThenElse(c,a,b) =&gt; 
+  case IfThenElse(c,a,b) =&gt;
     if (f.hasContext)
       __ifThenElse(f(c),f.reflectBlock(a),f.reflectBlock(b))
     else
@@ -1142,7 +1142,7 @@ def symsFreq(e: Any): List[(Sym[Any],   // frequency information (classify
 </code></pre>
 <p>We then need a way to find all uses of a given symbol <code>s</code>, up to but not
 <br  />including the node where the symbol is bound:</p>
-<pre><code>U(s) = {s} $\cup$ { g $\in$ E | syms(findDefinition(g)) $\cap$ U(s) $\ne\emptyset$ 
+<pre><code>U(s) = {s} $\cup$ { g $\in$ E | syms(findDefinition(g)) $\cap$ U(s) $\ne\emptyset$
                   &amp;&amp; s $\notin$ boundSyms(findDefinition(g))) }
 </code></pre>
 <p>We collect all bound symbols and their dependencies. These cannot live on the
@@ -1219,7 +1219,7 @@ if (y)                       foo
 <pre><code>trait Traversal {
   val IR: Expressions; import IR._
   // perform code motion, maintaining current scope
-  def focusExactScope(r: Exp[Any])(body: List[Stm[Any]] =&gt; A): A    
+  def focusExactScope(r: Exp[Any])(body: List[Stm[Any]] =&gt; A): A
   // client interface
   def traverseBlock[T](b: Block[T]): Unit =
     focusExactScope(b.res) { levelScope =&gt;
@@ -1287,7 +1287,7 @@ def reflectEffect[T](d: Def[T]): Exp[T] = createDefinition(Reflect(d, context)).
   val a = reifyBlock(thenp)
   val b = reifyBlock(elsep)
   val ae = summarizeEffects(a) // get summaries of the branches
-  val be = summarizeEffects(b) 
+  val be = summarizeEffects(b)
   val summary = ae orElse be   // compute summary for whole expression
   reflectEffect(IfThenElse(cond, a, b), summary)  // reflect compound expression
                                                   // (effect might be none, i.e. pure)
@@ -1297,11 +1297,11 @@ def reflectEffect[T](d: Def[T]): Exp[T] = createDefinition(Reflect(d, context)).
 <br  />further <code>reflect</code> methods:</p>
 <pre><code>reflectSimple     // a 'simple' effect: serialized with other simple effects
 reflectMutable    // an allocation of a mutable object; result guaranteed unique
-reflectWrite(v)   // a write to v: must refer to a mutable allocation 
+reflectWrite(v)   // a write to v: must refer to a mutable allocation
                   // (reflectMutable IR node)
-reflectRead(v)    // a read of allocation v (not used by programmer, 
+reflectRead(v)    // a read of allocation v (not used by programmer,
                   // inserted implicitly)
-reflectEffect(s)  // provide explicit summary s, specify may/must info for 
+reflectEffect(s)  // provide explicit summary s, specify may/must info for
                   // multiple reads/writes
 </code></pre>
 <p>The framework will serialize reads and writes so to respect data and anti-
@@ -1448,7 +1448,7 @@ if (cond) {            if (cond)              if (cond)
 } else                   b = 1                  c = 3
   c = 3                if (!cond)             println(a+c)
 println(a+c)             c = 3
-                       println(a+c)     
+                       println(a+c)
 </code></pre>
 <p>From the conditional in the initial program (left), splitting creates three
 <br  />separate expressions, one for each referenced variable (middle). Pattern
@@ -1483,9 +1483,9 @@ println(a+c)             c = 3
 <br  />desired value from the embedded hash map.</p>
 <p>We continue by adding a rule that makes the result of a conditional a
 <br  /><code>Struct</code> if the branches return <code>Struct</code>:</p>
-<pre><code>override def ifThenElse[T](cond: Rep[Boolean], a: Rep[T], b: Rep[T]) = 
+<pre><code>override def ifThenElse[T](cond: Rep[Boolean], a: Rep[T], b: Rep[T]) =
 (a,b) match {
-  case (Def(Struct(tagA,elemsA)), Def(Struct(tagB, elemsB))) =&gt; 
+  case (Def(Struct(tagA,elemsA)), Def(Struct(tagB, elemsB))) =&gt;
     assert(tagA == tagB)
     assert(elemsA.keySet == elemsB.keySet)
     Struct(tagA, elemsA.keySet map (k =&gt; ifThenElse(cond, elemsA(k), elemsB(k))))
@@ -1506,8 +1506,8 @@ println(a+c)             c = 3
 <br  />form \c|Array.fill(n) { i => body }| to create a struct with an array for each
 <br  />component of the body if the body itself is a Struct:</p>
 <pre><code>override def arrayFill[T](size: Exp[Int], v: Sym[Int], body: Def[T]) = body match {
-  case Block(Def(Struct(tag, elems))) =&gt; 
-    struct[T](ArraySoaTag(tag,size), 
+  case Block(Def(Struct(tag, elems))) =&gt;
+    struct[T](ArraySoaTag(tag,size),
       elems.map(p =&gt; (p._1, arrayFill(size, v, Block(p._2)))))
   case _ =&gt; super.arrayFill(size, v, body)
 }
@@ -1559,46 +1559,46 @@ Horizontal case (for all types of generators):
 
    loop(s) x1=$\G_1$ { i1 =&gt; $E_1[$ x1 $\yield$ f1(i1) $]$ }
    loop(s) y1=$\G_2$ { i2 =&gt; $E_2[$ x2 $\yield$ f2(i2) $]$ }
----------------------------------------------------------------------   
- loop(s) x1=$\G_1$, x2=$\G_2$ { i =&gt; 
+---------------------------------------------------------------------
+ loop(s) x1=$\G_1$, x2=$\G_2$ { i =&gt;
           $E_1[$ x1 $\yield$ f1(i) $]$; $E_2[$ x2 $\yield$ f2(i) $]$ }
 
 Vertical case (consume collect):
 
   loop(s) x1=Collect { i1 =&gt; $E_1[$ x1 $\yield$ f1(i1) $]$ }
 loop(x1.size) x2=$\G$ { i2 =&gt; $E_2[$ x2 $\yield$ f2(x1(i2)) $]$ }
----------------------------------------------------------------------   
+---------------------------------------------------------------------
 </code></pre>
 <p>loop(s) x1=Collect, x2=$\G$ { i =></p>
 <pre><code>            $E_1[$ x1 $\yield$ f1(i); $E_2[$ x2 $\yield$ f2(f1(i)) $]]$ }
 
 Vertical case (consume bucket collect):
 
-        loop(s) x1=Bucket(Collect) { i1 =&gt; 
+        loop(s) x1=Bucket(Collect) { i1 =&gt;
             $E_1[$ x1 $\yield$ (k1(i1), f1(i1)) $]$ }
-  loop(x1.size) x2=Collect { i2 =&gt;  
-    loop(x1(i2).size) y=$\G$ { j =&gt; 
+  loop(x1.size) x2=Collect { i2 =&gt;
+    loop(x1(i2).size) y=$\G$ { j =&gt;
       $E_2[$ y $\yield$ f2(x1(i2)(j)) $]$ }; x2 $\yield$ y }
----------------------------------------------------------------------   
-loop(s) x1=Bucket(Collect), x2=Bucket($\G$) { i =&gt; 
+---------------------------------------------------------------------
+loop(s) x1=Bucket(Collect), x2=Bucket($\G$) { i =&gt;
     $E_1[$ x1 $\yield$ (k1(i), f1(i));
         $E_2[$ x2 $\yield$ (k1(i), f2(f1(i))) $]]$ }
 </code></pre>
 <p>This model is expressive enough to model many common collection operations:</p>
 <pre><code>x=v.map(f)     loop(v.size) x=Collect { i =&gt; x $\yield$ f(v(i)) }
 x=v.sum        loop(v.size) x=Reduce(+) { i =&gt;  x $\yield$ v(i) }
-x=v.filter(p)  loop(v.size) x=Collect { i =&gt; if (p(v(i))) 
+x=v.filter(p)  loop(v.size) x=Collect { i =&gt; if (p(v(i)))
                                                 x $\yield$ v(i) }
 x=v.flatMap(f) loop(v.size) x=Collect { i =&gt; val w = f(v(i))
                          loop(w.size) { j =&gt; x $\yield$ w(j) }}
-x=v.distinct   loop(v.size) x=Bucket(Reduce(rhs)) { i =&gt; 
+x=v.distinct   loop(v.size) x=Bucket(Reduce(rhs)) { i =&gt;
                                         x $\yield$ (v(i), v(i)) }
 </code></pre>
 <p>Other operations are accommodated by generalizing slightly. Instead of
 <br  />implementing a <code>groupBy</code> operation that returns a sequence of (Key,
 <br  />Seq[Value]) pairs we can return the keys and values in separate data
 <br  />structures. The equivalent of <code>(ks,vs)=v.groupBy(k).unzip</code> is:</p>
-<pre><code>loop(v.size) ks=Bucket(Reduce(rhs)),vs=Bucket(Collect) { i =&gt; 
+<pre><code>loop(v.size) ks=Bucket(Reduce(rhs)),vs=Bucket(Collect) { i =&gt;
   ks $\yield$ (v(i), v(i)); vs $\yield$ (v(i), v(i)) }
 </code></pre>
 <p>In the rules above, multiple instances of <code>f1(i)</code> are subject to CSE and not
@@ -1610,11 +1610,11 @@ x=v.distinct   loop(v.size) x=Bucket(Reduce(rhs)) { i =&gt;
 <br  />optimization opportunities inside fused loop bodies (including fusion of
 <br  />nested loops).</p>
 <p>Fixed size array construction <code>Array(a,b,c)</code> can be expressed as</p>
-<pre><code>loop(3) x=Collect { case 0 =&gt; x $\yield$ a 
+<pre><code>loop(3) x=Collect { case 0 =&gt; x $\yield$ a
                     case 1 =&gt; x $\yield$ b case 2 =&gt; x $\yield$ c }
 </code></pre>
 <p>and concatenation <code>xs ++ ys</code> as <code>Array(xs,ys).flatMap(i=&gt;i)</code>:</p>
-<pre><code>loop(2) x=Collect { case 0 =&gt; loop(xs.size) { i =&gt; x $\yield$ xs(i) } 
+<pre><code>loop(2) x=Collect { case 0 =&gt; loop(xs.size) { i =&gt; x $\yield$ xs(i) }
                     case 1 =&gt; loop(ys.size) { i =&gt; x $\yield$ ys(i) }}
 </code></pre>
 <p>Fusing these patterns with a consumer will duplicate the consumer code into

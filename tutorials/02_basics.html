@@ -419,11 +419,11 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <div id="tableofcontents"></div>
 <h2>Program Generation with Strings</h2>
 <p>As a simple example, let us turn the power function:</p>
-<pre><code>def power(b: Double, n: Int): Double = 
+<pre><code>def power(b: Double, n: Int): Double =
   if (n == 0) 1.0 else b * power(b, n - 1)
 </code></pre>
 <p>into a code generator:</p>
-<pre><code>def power(b: String, n: Int): String = 
+<pre><code>def power(b: String, n: Int): String =
   if (n == 0) "1.0" else "(" + b + " * " + power(b, n - 1) + ")"
 </code></pre>
 <p>As result of an invocation we obtain:</p>
@@ -431,7 +431,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 </code></pre>
 <p>However there is a problem: We can produce arbitrary strings that might not be
 <br  />valid code.  It is very easy to make subtle mistakes:</p>
-<pre><code>def power(b: String, n: Int): String = 
+<pre><code>def power(b: String, n: Int): String =
   if (n == 0) "1.0" else "b * " + power(b, n - 1) + ")"
 </code></pre>
 <p>We have accidentally omitted a parenthesis, so the result is not syntactically
@@ -451,7 +451,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>Strings model concrete syntax, but we can also use abstract syntax. This idea
 <br  />is inspired by Lisp's ''''code as data'' model.  We start with a slightly more
 <br  />convenient string notation, denoted by <code>s"..."</code> quotes:</p>
-<pre><code>def power(b: String, n: Int): String = 
+<pre><code>def power(b: String, n: Int): String =
   if (n == 0) s"1.0" else s"($b * ${ power(b, n - 1) })"
 </code></pre>
 <p>The notation <code>${ ... }</code> denotes a hole in the string, to be filled by the
@@ -459,7 +459,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>The same idea applies to abstract syntax. Let <code>[[ ... ]]</code> denote the AST of
 <br  />the enclosed expression, and let <code>Tree</code> be the type of AST nodes. Holes will
 <br  />require an expression of type <code>Tree</code>:</p>
-<pre><code>def power(b: Tree, n: Int): Tree = 
+<pre><code>def power(b: Tree, n: Int): Tree =
   if (n == 0) [[ 1.0 ]] else [[$b * ${ power(b, n - 1) } ]]"
 </code></pre>
 <p>Now we have a program generator that assembles AST nodes.</p>
@@ -494,7 +494,7 @@ $[[$ val y = 7; $\$${ x = y }$]]$
 <p>With syntax and scoping out of the way, we turn our attention to type
 <br  />correctness. Fortunately, type correctness falls out naturally if parametric
 <br  />types are available. We just replace type <code>Tree</code> with <code>Tree[T]</code>:</p>
-<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = 
+<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] =
 </code></pre>
 <p>Now the type system ensures that <code>power</code> is only applied to AST nodes that
 <br  />compute <code>Double</code> values in the next stage.</p>
@@ -551,7 +551,7 @@ power($[[$computeB() + $\$$x$]]$, 4)
 <br  />result. If we applied staging to obtaining better performance we have not
 <br  />achieved our goal.</p>
 <p>As another example, let us switch to a better algorithm:</p>
-<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = 
+<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] =
   if (n == 0) $[[$ 1.0 $]]$
   else if ((n&amp;1) == 0) { val y = power(b, n/2); $[[ \$y$ * $\$y ]]$ }
   else $[[ \$b$ * $\$\{$ power(b, n - 1) $\} ]]$
@@ -631,16 +631,16 @@ def accumulate(res: =&gt; Code): String
 <p>Note the by-name argument of accumulate. The <code>Code</code> type and the method
 <br  />implementations can remain abstract for the moment.</p>
 <p>We can put perform and accumulate to use in the power example as follows:</p>
-<pre><code>def power(b: Code, n: Int): Code = 
-  if (n == 0) perform("1.0") else 
+<pre><code>def power(b: Code, n: Int): Code =
+  if (n == 0) perform("1.0") else
   perform("(" + accumulate { b } + " * " + accumulate { power(b, n - 1) } + ")")
 </code></pre>
 <p>We define perform and accumulate in the following way to perform automatic
 <br  />eager let insertion. The private constructor <code>code</code> builds a <code>Code</code> object
 <br  />from a string:</p>
-<pre><code>accumulate { E[ perform("str") ] } 
+<pre><code>accumulate { E[ perform("str") ] }
     $\longrightarrow$ "{ val fresh = str; " + accumulate { E[ code("fresh") ] } + "}"
-accumulate { code("str") }         
+accumulate { code("str") }
     $\longrightarrow$ "str"
 </code></pre>
 <p>Where <code>E</code> is an accumulate-free evaluation context and <code>fresh</code> a fresh
@@ -677,7 +677,7 @@ q" foo $\$${ bar } baz " $\longrightarrow$ perform(" foo " + accumulate { bar } 
 <br  />holes with accumulate.</p>
 <p>We get back to a power implementation using quasiquotes. This time
 <br  />we use type Code, although we are still working with concrete syntax:</p>
-<pre><code>def power(b: Code, n: Int): Code = 
+<pre><code>def power(b: Code, n: Int): Code =
   if (n == 0) q"1.0" else  q"($\$$b * $\$${ power(b, n - 1) } )"
 </code></pre>
 <p>The same mechanism can be used to implement order preserving
@@ -738,7 +738,7 @@ x8
 <br  />/ quasi quoting from client programs.</p>
 <p>Programs, such as power, use quasiquotes for two purposes: lifting primitives
 <br  />and operations:</p>
-<pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
   if (n == 0) q"1.0" else  q"($\$$b * $\$${ power(b, n - 1) } )"
 </code></pre>
 <p>We already identify object code via <code>Code[T]</code> types. Instead of quasiquotes we
@@ -748,12 +748,12 @@ x8
 def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
 </code></pre>
 <p>Now power can be implemented like this:</p>
-<pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
   if (n == 0) liftDouble(1.0) else infix_*(b, power(b, n - 1))
 </code></pre>
 <p>But we can simplify further. In fact, the Scala compiler will do most of  the
 <br  />work for us and we can write just this:</p>
-<pre><code>def power(b: Code[Double], n: Int): Code[Double] = 
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
   if (n == 0) 1.0 else b * power(b, n - 1)
 </code></pre>
 <p>Apart from the <code>Code[_]</code> types, we have re-engineered exactly the regular,
@@ -943,7 +943,7 @@ $\hookrightarrow$ true
 <br  />above.</p>
 <h2>Semi-Automatic BTA through Deep Reuse of Type Inference</h2>
 <p>Given a method or function implementation:</p>
-<pre><code>def power(b: _, n: Int) = 
+<pre><code>def power(b: _, n: Int) =
   if (n == 0) 1.0 else b * power(b, n - 1)
 </code></pre>
 <p>Scala's type inference can determine whether the operations and the result
@@ -986,7 +986,7 @@ if (c)    // c: Rep[Boolean]
   def compile[A,B](f: Rep[A] =&gt; Rep[B]) = {
     val x = fresh[A]
     val y = accumulate { f(x) }
-    // emit header 
+    // emit header
     emitBlock(y)
     // emit footer
     // invoke compiler
