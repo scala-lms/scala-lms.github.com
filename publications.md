@@ -32,7 +32,7 @@ category: publications
   Tiark Rompf, Martin Odersky.
   Commun. ACM 55(6): 121-130 (2012)
 
-* __Implementing Domain-Specific Languages for Heterogeneous Parallel Computing. __
+* __Implementing Domain-Specific Languages for Heterogeneous Parallel Computing.__
   HyoukJoong Lee, Kevin J. Brown, Arvind K. Sujeeth, Hassan Chafi, Tiark Rompf, Martin Odersky, Kunle Olukotun.
   IEEE Micro: Special Issue on CPU, GPU, and Hybrid Computing, September/October 2011
 
