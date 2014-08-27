@@ -418,7 +418,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>These docs are a collection of literate Scala files. Clone the <a href="http://github.com/scala-lms/tutorials">GitHub repo</a>:</p>
 <pre><code>git clone https://github.com/scala-lms/tutorials.git
 </code></pre>
-<p>Check the README file for prerequisites and start hacking!</p>
+<p>Check the <a href="https://github.com/scala-lms/tutorials/blob/master/README.md"><code>README.md</code></a> file for prerequisites and start hacking!</p>
 <h3>Why Generative Programming ?</h3>
 <p>Because it enables <strong>abstraction without regret</strong>: the key idea is to write very high-level
 <br  />and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
@@ -426,9 +426,9 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <br  />(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
 <br  />affecting performance of the <strong>generated code</strong>.</p>
 <h3>Why LMS ?</h3>
-<p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. It distinguishes
+<p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. With types, it distinguishes
 <br  />expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
-<p>LMS comes with <strong>batteries included</strong>: it goes beyond purely generative approaches by
+<p>LMS comes with <strong>batteries included</strong>: it provides many optimizations such as common subexpression elimination out of the box, and it goes beyond purely generative approaches by
 <br  />providing an extensible intermediate representation that can be used to implement
 <br  />sophisticated domain-specific compiler pipelines.</p>
 <p>At the same time LMS is <strong>hackable</strong>: since it is just a library, all aspects can be

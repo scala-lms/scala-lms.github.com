@@ -417,10 +417,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <br  />Therefore, it pays off to generate code that is specialized to a particular matrix.</p>
 <p>For further reference, see:</p>
 <ul>
-<li>Shonan Challenge for Generative Programming
-<br  />Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13
-<br  />https://www.cs.rutgers.edu/~ccshan/metafx/pepm2013.pdf</li>
-<li>https://github.com/StagedHPC/shonan-challenge</li>
+<li>Shonan Challenge for Generative Programming (<a href="https://www.cs.rutgers.edu/~ccshan/metafx/pepm2013.pdf">PDF</a>) (<a href="(https://github.com/StagedHPC/shonan-challenge)">official code repository</a>)
+<br  />Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13</li>
 </ul>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
@@ -501,7 +499,7 @@ class ShonanTest extends TutorialFunSuite {
 <pre><code>5,0,1,0,2
 </code></pre>
 <h2>STEP 0.5: static vs dynamic conditional</h2>
-<p>Now we add basic code generation facilities and, as a recap how
+<p>Now we add basic code generation facilities and, as a recap of how
 <br  />LMS works, play with static vs dynamic expressions.</p>
 
             </div>
@@ -510,7 +508,7 @@ class ShonanTest extends TutorialFunSuite {
     val snippet = new DslDriver[Array[Int],Array[Int]] {
       def snippet(v: Rep[Array[Int]]) = {
 
-        val x = 100 - 5 //* v0.length
+        val x = 100 - 5
 
         if (x &gt; 10) {
           println(&quot;hello&quot;)
@@ -545,8 +543,76 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>If we change the condition to depend on the (dynamic) input array,
-<br  />an if/else statement will be generated.</p>
-<h2>STEP 1: Staging the matrix vector product</h2>
+<br  />an <code>if/else</code> statement will be generated.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>   test(&quot;shonan-hmm1b_dyn&quot;) {
+    val snippet = new DslDriver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+
+        val x = 100 - v.length
+
+        if (x &gt; 10) {
+          println(&quot;hello&quot;)
+        }
+
+        v
+      }
+    }
+    check(&quot;shonan-hmm1b_dyn&quot;, snippet.code)
+  }
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_5">&#182;</a>
+                </div>
+                <p>Notice the <code>if/else</code> statement in the generated code.</p>
+<pre><code>/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Array[Int])=&gt;(Array[Int])) {
+  def apply(x0:Array[Int]): Array[Int] = {
+    val x1 = x0.length
+    val x2 = 100 - x1
+    val x3 = x2 &gt; 10
+    val x6 = if (x3) {
+      val x4 = println("hello")
+      x4
+    } else {
+      ()
+    }
+    x0
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<p>Aside: LMS relies on Scala's local type inference to propagate dynamic
+<br  />expressions (<code>Rep</code> types) automatically within a method, and on
+<br  />Scala's type checker to ensure the binding times (dynamic vs static)
+<br  />are consistent.</p>
+<p>Aside: In the snippet, the <code>if/else</code> statement with the dynamic
+<br  />condition is peculiar, because its condition is not a plain <code>Boolean</code>
+<br  />but a <code>Rep[Boolean]</code>. Hence, LMS also relies on virtualization of
+<br  />control structures to overload the meaning of contorl structures such
+<br  />as <code>if/else</code> and <code>while</code> &ndash; in the same way that the <code>for</code> syntax is
+<br  />overloaded in Scala.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'></code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_6">&#182;</a>
+                </div>
+                <h2>STEP 1: Staging the matrix vector product</h2>
 <p>We want to change the <code>matrix_vector_prod</code> function to take a dynamic
 <br  />vector and a static matrix. We move it into the <code>DslDriver</code> trait so
 <br  />that it can use <code>Rep</code>.</p>
@@ -602,7 +668,7 @@ End of Generated Code
         
             <div class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_5">&#182;</a>
+                    <a class="pilcrow" href="#section_7">&#182;</a>
                 </div>
                 <p>Looking at the generated code, we can easily see that we get a while
 <br  />loop for row 0, which is dense, no operations for row 1, and an
@@ -695,7 +761,7 @@ End of Generated Code
         
             <div class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_6">&#182;</a>
+                    <a class="pilcrow" href="#section_8">&#182;</a>
                 </div>
                 <h2>What's next?</h2>
 <p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="regex.html">Regular Expression matcher</a>.</p>
