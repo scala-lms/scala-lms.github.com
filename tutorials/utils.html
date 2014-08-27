@@ -452,13 +452,21 @@ trait TutorialFunSuite extends FunSuite {
     val name = fileprefix+&quot;.check.&quot;+suffix
     val aname = fileprefix+&quot;.actual.&quot;+suffix
     val expected = readFile(name)
-    if (expected != code) {
+    val code1 = indent(code)
+    if (expected != code1) {
       println(&quot;writing &quot; + aname)
-      writeFile(aname, code)
+      writeFile(aname, code1)
+    } else {
+      val f = new File(aname)
+      if (f.exists) f.delete
     }
-    assert(expected == code, name)
+    assert(expected == code1, name)
   }
-
+  def indent(str: String) = {
+    val s = new StringWriter
+    printIndented(str)(new PrintWriter(s))
+    s.toString
+  }
   def printIndented(str: String)(out: PrintWriter): Unit = {
     val lines = str.split(&quot;[\n\r]&quot;)
     var indent = 0

@@ -477,15 +477,15 @@ class GettingStartedTest extends TutorialFunSuite {
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
                 <pre><code>/*****************************************
-  Emitting Generated Code                  
+Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x1:Int): Int = {
-2
-}
+  def apply(x1:Int): Int = {
+    2
+  }
 }
 /*****************************************
-  End of Generated Code                  
+End of Generated Code
 *******************************************/
 </code></pre>
 <p>Contrast the snippet above, where <code>b</code> is a <code>Boolean</code>, with the snippet
@@ -520,21 +520,21 @@ def apply(x1:Int): Int = {
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
                 <pre><code>/*****************************************
-  Emitting Generated Code                  
+Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x3:Int): Int = {
-val x4 = x3 == 1
-val x5 = if (x4) {
-1
-} else {
-x3
-}
-x5
-}
+  def apply(x3:Int): Int = {
+    val x4 = x3 == 1
+    val x5 = if (x4) {
+      1
+    } else {
+      x3
+    }
+    x5
+  }
 }
 /*****************************************
-  End of Generated Code                  
+End of Generated Code
 *******************************************/
 </code></pre>
 <h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
@@ -573,17 +573,17 @@ x5
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
                 <pre><code>/*****************************************
-  Emitting Generated Code                  
+Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-def apply(x3:Int): Int = {
-val x4 = x3 * x3
-val x5 = x3 * x4
-x5
-}
+  def apply(x3:Int): Int = {
+    val x4 = x3 * x3
+    val x5 = x3 * x4
+    x5
+  }
 }
 /*****************************************
-  End of Generated Code                  
+End of Generated Code
 *******************************************/
 </code></pre>
 <h3>Rep[Range] vs Range</h3>
@@ -611,11 +611,11 @@ x5
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
-                <pre><code>// generated code
-val x1 = println(0)
-val x2 = println(1)
-val x3 = println(2)
-()
+                <pre><code>      // generated code
+      val x1 = println(0)
+      val x2 = println(1)
+      val x3 = println(2)
+      ()
 </code></pre>
 
             </div>
@@ -639,14 +639,13 @@ val x3 = println(2)
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_6">&#182;</a>
                 </div>
-                <pre><code>// generated code
-var x2 : Int = 0
-val x5 = while (x2 &lt; x0) {
-val x3 = println(x2)
-
-x2 = x2 + 1
-}
-x5
+                <pre><code>      // generated code
+      var x2 : Int = 0
+      val x5 = while (x2 &lt; x0) {
+        val x3 = println(x2)
+        x2 = x2 + 1
+      }
+      x5
 </code></pre>
 <h2>What's next?</h2>
 <p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="shonan.html">Shonan Challenge</a>.</p>

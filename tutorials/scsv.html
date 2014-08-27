@@ -453,13 +453,17 @@ trait StagedCSV extends Dsl with ScannerBase {
     println(pretty(fields.toList))
   }
 
+  def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(unit(true)) { (a,b) =&gt; a &amp;&amp; b._1 == b._2 }
+
 
   sealed abstract class Operator
   // the definition of operators in order of incremental development
-  case class Scan(filename: Rep[String], schema: Schema) extends Operator
+  def Scan(filename: String) = new Scan(filename, loadSchema(filename))
+  case class Scan(filename: String, schema: Schema) extends Operator
   case class PrintCSV(parent: Operator) extends Operator
-  case class Project(schema: Schema, parent: Operator) extends Operator
+  case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
   case class Filter(pred: Predicate, parent: Operator) extends Operator
+  case class Join(parent1: Operator, parent2: Operator) extends Operator
 
   // these utilities are (for now) only needed for filtering
   sealed abstract class Predicate
@@ -482,17 +486,28 @@ trait StagedCSV extends Dsl with ScannerBase {
   def resultSchema(o: Operator): Schema = o match {
     case Scan(filename, schema)  =&gt; schema
     case Filter(pred, parent)    =&gt; resultSchema(parent)
-    case Project(schema, parent) =&gt; schema
+    case Project(schema, _, _)   =&gt; schema
+    case Join(left, right)       =&gt; resultSchema(left) ++ resultSchema(right)
     case PrintCSV(parent)        =&gt; Schema()
   }
 
   def execOp(o: Operator)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = o match {
     case Scan(filename, schema) =&gt;
-      processCSV(filename,schema)(yld)
+      processCSV(filename, schema)(yld)
     case Filter(pred, parent) =&gt;
       execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
-    case Project(schema, parent) =&gt;
-      execOp(parent) { rec =&gt; yld(Record(schema.map(k =&gt; rec(k)), schema)) }
+    case Project(schema, schema2, parent) =&gt;
+      execOp(parent) { rec =&gt; yld(Record(schema2.map(k =&gt; rec(k)), schema)) }
+    case Join(left, right) =&gt;
+      execOp(left) { rec1 =&gt; 
+        execOp(right) { rec2 =&gt;
+          val keySchema = rec1.schema intersect rec2.schema
+          val key1 = keySchema.map(rec1 apply _)
+          val key2 = keySchema.map(rec2 apply _)
+          if (fieldsEqual(key1, key2))
+            yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
+        }
+      }
     case PrintCSV(parent) =&gt;
       val schema = resultSchema(parent)
       printSchema(schema)
@@ -505,42 +520,62 @@ abstract class StagedQuery extends DslDriver[String,Unit] with StagedCSV with Sc
   override val codegen = new DslGen with ScalaGenScanner {
     val IR: q.type = q
   }
-  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query(fn))
-  def query(fn: Rep[String]): Operator
+  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query)
+  def filePath(csv: String) = &quot;src/data/&quot; + csv
+  def query: Operator
 }
 
 class StagedCSVTest extends TutorialFunSuite {
   val under = &quot;query_&quot;
 
-  def testquery(name: String, csv: String, query: StagedQuery) {
+  def testquery(name: String, query: StagedQuery) {
     test(name) {
       check(name, query.code)
       query.precompile
-      checkOut(name, &quot;csv&quot;, query.eval(&quot;src/data/&quot; + csv))
+      checkOut(name, &quot;csv&quot;, query.eval(&quot;&quot;))
     }
   }
 
-  testquery(&quot;t1&quot;, &quot;t.csv&quot;, new StagedQuery {
-    def query(fn: Rep[String]) =
+  testquery(&quot;t1&quot;, new StagedQuery {
+    def query =
       PrintCSV(
-        Scan(fn, Schema(&quot;Name&quot;, &quot;Value&quot;, &quot;Flag&quot;))
+        Scan(filePath(&quot;t.csv&quot;))
       )
   })
 
-  testquery(&quot;t2&quot;, &quot;t.csv&quot;, new StagedQuery {
-    def query(fn: Rep[String]) =
-      PrintCSV(Project(Schema(&quot;Name&quot;),
-        Scan(fn, Schema(&quot;Name&quot;, &quot;Value&quot;, &quot;Flag&quot;))
+  testquery(&quot;t2&quot;, new StagedQuery {
+    def query =
+      PrintCSV(Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;),
+        Scan(filePath(&quot;t.csv&quot;))
       ))
   })
 
-  testquery(&quot;t3&quot;, &quot;t.csv&quot;, new StagedQuery {
-    def query(fn: Rep[String]) =
-      PrintCSV(Project(Schema(&quot;Name&quot;),
+  testquery(&quot;t3&quot;, new StagedQuery {
+    def query =
+      PrintCSV(Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;),
         Filter(Eq(Field(&quot;Flag&quot;), Value(&quot;yes&quot;)),
-          Scan(fn, loadSchema(&quot;src/data/t.csv&quot;)) //Schema(&quot;Name&quot;, &quot;Value&quot;, &quot;Flag&quot;)
+          Scan(filePath(&quot;t.csv&quot;))
       )))
   })
+
+  testquery(&quot;t4&quot;, new StagedQuery {
+    def query =
+      PrintCSV(
+        Join(
+          Scan(filePath(&quot;t.csv&quot;)),
+          Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+      ))
+  })
+
+  testquery(&quot;t5&quot;, new StagedQuery {
+    def query =
+      PrintCSV(
+        Join(
+          Scan(filePath(&quot;t.csv&quot;)),
+          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+      ))
+  })
+
 }
 </code></pre>
             </div>
