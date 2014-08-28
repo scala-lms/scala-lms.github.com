@@ -25,3 +25,4 @@ Some particular work items:
 
 - <span class="label label-success">Done</span> Website updates: future-proof our online presence. 
 
+Additional status information and notes for contributors are available [directly on GitHub](https://github.com/scala-lms/summer-of-lms-2014).
