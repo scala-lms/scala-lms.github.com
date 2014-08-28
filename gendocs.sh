@@ -1,6 +1,6 @@
 # requires the following directories side-by-side:
 #
-#   scalocco                  https://github.com/tiarkrompf/scalocco
+#   scalocco                  https://github.com/scala-lms/scalocco
 #   scala-lms-tutorials       https://github.com/scala-lms/tutorials
 #   scala-lms.github.com      this repo
 #
