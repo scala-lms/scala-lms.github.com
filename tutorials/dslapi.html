@@ -417,23 +417,29 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import scala.virtualization.lms.common._
 import scala.reflect.SourceContext
 
-trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables {
+trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with UncheckedOps {
   implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])
   def infix_&amp;&amp;&amp;(lhs: Rep[Boolean], rhs: =&gt; Rep[Boolean]): Rep[Boolean] =
     __ifThenElse(lhs, rhs, unit(false))
-  def comment[A:Manifest](l: String, verbose: Boolean = true)(b: =&gt; Rep[A])
+  def comment[A:Manifest](l: String, verbose: Boolean = true)(b: =&gt; Rep[A]): Rep[A]
+
+  // TODO: clean up / add in LMS (and remove any `with \w*UncheckedOps\w*` mixin)
+  def infix_HashCode(a: Rep[Any]) = unchecked[Long](a,&quot;.##&quot;)
+  def infix_ToString(a: Rep[Any]) = if (a.asInstanceOf[{def tp: Manifest[Any]}].tp == manifest[String]) a.asInstanceOf[Rep[String]]
+                                    else unchecked[String](a,&quot;.toString&quot;)
 }
-trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with CompileScala with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExp {
+
+trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with UncheckedOpsExp {
   override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {
     case Const(false) =&gt; rhs
     case _ =&gt; super.boolean_or(lhs, rhs)
   }
 
   case class Comment[A:Manifest](l: String, verbose: Boolean, b: Block[A]) extends Def[A]
-  def comment[A:Manifest](l: String, verbose: Boolean)(b: =&gt; Rep[A]) = {
+  def comment[A:Manifest](l: String, verbose: Boolean)(b: =&gt; Rep[A]): Rep[A] = {
     val br = reifyEffects(b)
     val be = summarizeEffects(br)
-    reflectEffect(Comment(l, verbose, br), be)
+    reflectEffect[A](Comment(l, verbose, br), be)
   }
   override def boundSyms(e: Any): List[Sym[Any]] = e match {
     case Comment(_, _, b) =&gt; effectSyms(b)
@@ -447,7 +453,13 @@ trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with Bool
     case _ =&gt; super.array_apply(x,n)
   }
 }
-trait DslGen extends ScalaGenNumericOps with ScalaGenPrimitiveOps with ScalaGenBooleanOps with ScalaGenIfThenElse with ScalaGenEqual with ScalaGenRangeOps with ScalaGenOrderingOps with ScalaGenMiscOps with ScalaGenArrayOps with ScalaGenStringOps with ScalaGenSeqOps with ScalaGenFunctions with ScalaGenWhile with ScalaGenStaticData with ScalaGenVariables {
+trait DslGen extends ScalaGenNumericOps
+    with ScalaGenPrimitiveOps with ScalaGenBooleanOps with ScalaGenIfThenElse
+    with ScalaGenEqual with ScalaGenRangeOps with ScalaGenOrderingOps
+    with ScalaGenMiscOps with ScalaGenArrayOps with ScalaGenStringOps
+    with ScalaGenSeqOps with ScalaGenFunctions with ScalaGenWhile
+    with ScalaGenStaticData with ScalaGenVariables
+    with ScalaGenUncheckedOps {
   val IR: DslExp
 
   import IR._
@@ -474,16 +486,68 @@ trait DslImpl extends DslExp { q =&gt;
   val codegen = new DslGen {
     val IR: q.type = q
   }
+  // TODO: should this be in LMS?
+  override def isPrimitiveType[T](m: Manifest[T]) = (m == manifest[String]) || super.isPrimitiveType(m)
 }
+
+trait DslGenC extends CGenNumericOps
+    with CGenPrimitiveOps with CGenBooleanOps with CGenIfThenElse
+    with CGenEqual with CGenRangeOps with CGenOrderingOps
+    with CGenMiscOps with CGenArrayOps with CGenStringOps
+    with CGenSeqOps with CGenFunctions with CGenWhile
+    with CGenStaticData with CGenVariables
+    with CGenUncheckedOps{
+  val IR: DslExp
+  import IR._
+
+  // FIXME
+  def getMemoryAllocString(count: String, memType: String): String = {
+      &quot;(&quot; + memType + &quot;*)malloc(&quot; + count + &quot; * sizeof(&quot; + memType + &quot;));&quot;
+  }
+  override def remap[A](m: Manifest[A]): String = m.toString match {
+    case &quot;Any&quot; =&gt; &quot;(void*)&quot;
+    case _ =&gt; super.remap(m)
+  }
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case a@ArrayNew(n) =&gt;
+      val arrType = remap(a.m)
+      stream.println(arrType + &quot;* &quot; + quote(sym) + &quot; = &quot; + getMemoryAllocString(quote(n), arrType))
+    case StringPlus(a,b) =&gt;
+      stream.println(quote(a) + &quot;+&quot; + quote(b) + &quot;// strcat&quot;)
+    case Comment(s, verbose, b) =&gt;
+      stream.println(&quot;val &quot; + quote(sym) + &quot; = {&quot;)
+      stream.println(&quot;//#&quot; + s)
+      if (verbose) {
+        stream.println(&quot;// generated code for &quot; + s.replace('_', ' '))
+      } else {
+        stream.println(&quot;// generated code&quot;)
+      }
+      emitBlock(b)
+      emitValDef(sym, quote(getBlockResult(b)))
+      stream.println(&quot;//#&quot; + s)
+    case _ =&gt; super.emitNode(sym,rhs)
+  }}
+
 
 abstract class DslSnippet[A:Manifest,B:Manifest] extends Dsl {
   def snippet(x: Rep[A]): Rep[B]
 }
 
-abstract class DslDriver[A:Manifest,B:Manifest] extends DslSnippet[A,B] with DslImpl {
+abstract class DslDriver[A:Manifest,B:Manifest] extends DslSnippet[A,B] with DslImpl with CompileScala {
   lazy val f = compile(snippet)
   def precompile: Unit = f
   def eval(x: A): B = f(x)
+  lazy val code: String = {
+    val source = new java.io.StringWriter()
+    codegen.emitSource(snippet, &quot;Snippet&quot;, new java.io.PrintWriter(source))
+    source.toString
+  }
+}
+
+abstract class DslDriverC[A:Manifest,B:Manifest] extends DslSnippet[A,B] with DslExp { q =&gt;
+  val codegen = new DslGenC {
+    val IR: q.type = q
+  }
   lazy val code: String = {
     val source = new java.io.StringWriter()
     codegen.emitSource(snippet, &quot;Snippet&quot;, new java.io.PrintWriter(source))

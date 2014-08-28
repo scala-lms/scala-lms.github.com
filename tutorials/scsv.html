@@ -409,7 +409,11 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                
+                <h1>A SQL Query Compiler</h1>
+<p>Abstraction without regret for efficient data processing.</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
+
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
@@ -417,29 +421,32 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import scala.virtualization.lms.common._
 import org.scalatest.FunSuite
 
-trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
+trait StagedCSV extends Dsl with ScannerBase {
 
   // low-level processing
 
   type Schema = Vector[String]
   def Schema(schema: String*): Schema = schema.toVector
-  type Fields = Vector[Rep[String]]
+  type Fields = Vector[Rep[Any]]
 
   case class Record(fields: Fields, schema: Schema) {
-    def apply(key: String): Rep[String] = fields(schema indexOf key)
+    def apply(key: String): Rep[Any] = fields(schema indexOf key)
+    def apply(keys: Schema): Fields = keys.map(this apply _)
   }
 
   def loadSchema(filename: String): Schema = {
     val s = new Scanner(filename)
     var schema: Schema = Schema() // force present-stage var
     do (schema :+= s.next) while (s.hasNextInLine)
+    s.close
     schema
   }
 
   def processCSV(filename: Rep[String], schema: Schema)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = {
     val s = newScanner(filename)
     def nextRecord = Record(schema.map{_ =&gt; s.next}, schema)
-    // the right thing would be to check the schema, but it clutters the generated code
+    // the right thing would be to dynamically re-check the schema,
+    // but it clutters the generated code
     // schema.foreach(f =&gt; if (s.next != f) println(&quot;ERROR: schema mismatch&quot;))
     nextRecord // ignore csv header
     while (s.hasNext) yld(nextRecord)
@@ -448,9 +455,9 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
   def printSchema(schema: Schema) = println(schema.mkString(&quot;,&quot;))
 
   def printFields(fields: Fields) = {
-    def pretty(xs: List[Rep[String]]): Rep[String] = xs match {
+    def pretty(xs: List[Rep[Any]]): Rep[String] = xs match {
       case Nil =&gt; &quot;&quot;
-      case x::Nil =&gt; x
+      case x::Nil =&gt; x.ToString
       case x::xs =&gt; x+&quot;,&quot;+pretty(xs)
     }
     println(pretty(fields.toList))
@@ -459,8 +466,6 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
   def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(unit(true)) { (a,b) =&gt; a &amp;&amp; b._1 == b._2 }
 
   def fieldsHash(a: Fields) = a.foldLeft(unit(0L)) { _ * 41L + _.HashCode }
-
-  def infix_HashCode(a: Rep[Any]) = unchecked[Long](a,&quot;.##&quot;) // TODO: clean up / add in LMS
 
   // query operators
 
@@ -472,6 +477,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
   case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
   case class Filter(pred: Predicate, parent: Operator) extends Operator
   case class Join(parent1: Operator, parent2: Operator) extends Operator
+  case class Group(keys: Schema, agg: Schema, parent: Operator) extends Operator
   case class HashJoin(parent1: Operator, parent2: Operator) extends Operator
 
   // these utilities are (for now) only needed for filtering
@@ -486,7 +492,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
   }
 
-  def evalRef(r: Ref)(rec: Record): Rep[String] = r match {
+  def evalRef(r: Ref)(rec: Record): Rep[Any] = r match {
     case Field(name) =&gt; rec(name)
     case Value(x) =&gt; x
   }
@@ -497,6 +503,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
     case Filter(pred, parent)    =&gt; resultSchema(parent)
     case Project(schema, _, _)   =&gt; schema
     case Join(left, right)       =&gt; resultSchema(left) ++ resultSchema(right)
+    case Group(keys, agg, parent)=&gt; keys ++ agg
     case HashJoin(left, right)   =&gt; resultSchema(left) ++ resultSchema(right)
     case PrintCSV(parent)        =&gt; Schema()
   }
@@ -506,27 +513,32 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
       processCSV(filename, schema)(yld)
     case Filter(pred, parent) =&gt;
       execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
-    case Project(schema, schema2, parent) =&gt;
-      execOp(parent) { rec =&gt; yld(Record(schema2.map(k =&gt; rec(k)), schema)) }
+    case Project(newSchema, parentSchema, parent) =&gt;
+      execOp(parent) { rec =&gt; yld(Record(rec(parentSchema), newSchema)) }
     case Join(left, right) =&gt;
       execOp(left) { rec1 =&gt;
         execOp(right) { rec2 =&gt;
-          val keySchema = rec1.schema intersect rec2.schema
-          val key1 = keySchema.map(rec1 apply _)
-          val key2 = keySchema.map(rec2 apply _)
-          if (fieldsEqual(key1, key2))
+          val keys = rec1.schema intersect rec2.schema
+          if (fieldsEqual(rec1(keys), rec2(keys)))
             yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
         }
       }
+    case Group(keys, agg, parent) =&gt;
+      val hm = new HashMapAgg(keys, agg)
+      execOp(parent) { rec =&gt;
+        hm += (rec(keys), rec(agg))
+      }
+      hm foreach { (k,a) =&gt;
+        yld(Record(k ++ a, keys ++ agg))
+      }
     case HashJoin(left, right) =&gt;
-      val keySchema = resultSchema(left) intersect resultSchema(right)
-      val m = new HashMap(resultSchema(left))
+      val keys = resultSchema(left) intersect resultSchema(right)
+      val hm = new HashMapBuffer(keys, resultSchema(left))
       execOp(left) { rec1 =&gt;
-        m += (keySchema.map(rec1 apply _), rec1.fields)
+        hm += (rec1(keys), rec1.fields)
       }
       execOp(right) { rec2 =&gt;
-        val key2 = keySchema.map(rec2 apply _)
-        m(key2) foreach { rec1 =&gt;
+        hm(rec2(keys)) foreach { rec1 =&gt;
           yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
         }
       }
@@ -539,7 +551,15 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
 
   // data structure implementations
 
-  class HashMap(schema: Schema) {
+  class HashMapAgg(keySchema: Schema, schema: Schema) {
+
+    // TODO: finish
+    def +=(k: Fields, v: Fields) = ???
+
+    def foreach(f: (Fields,Fields) =&gt; Rep[Unit]): Rep[Unit] = ???
+  }
+
+  class HashMapBuffer(keySchema: Schema, schema: Schema) {
 
     // FIXME: hard coded data sizes
     val hashSize = (1 &lt;&lt; 8)
@@ -552,27 +572,23 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
     val dataCount = var_new(0)
 
     val buckets = NewArray[Int](dataSize)
-    val bucketHash = NewArray[Int](hashSize)
+    val bucketKey = new ArrayBuffer(hashSize, keySchema)
     val bucketCounts = NewArray[Int](hashSize)
 
     for (i &lt;- 0 until hashSize) {
-        bucketHash(i) = -1
         bucketCounts(i) = 0
     }
 
     val hashMask = hashSize - 1
 
-    def lookup(put: Boolean)(k: Fields): Rep[Int] = {
+    def lookup(put: Boolean)(k: Fields): Rep[Int] = comment[Int](&quot;hash_lookup&quot;) {
         val h = fieldsHash(k).toInt
         var bucket = h &amp; hashMask
-        var curHash = bucketHash(bucket)
-        while (curHash != -1 &amp;&amp; curHash != h) {
-          // TODO: need to compare keys in full, not just hash code
+        while (bucketCounts(bucket) != 0 &amp;&amp; !fieldsEqual(bucketKey(bucket),k)) {
           bucket = (bucket + 1) &amp; hashMask
-          curHash = bucketHash(bucket)
         }
-        if (put) bucketHash(bucket) = h
-        bucket
+        if (put) bucketKey(bucket) = k
+        bucket: Rep[Int]
     }
 
     def +=(k: Fields, v: Fields) = {
@@ -580,7 +596,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
       data(dataPos) = v
       dataCount += 1
 
-      val bucket = lookup(true)(k)
+      val bucket = lookup(put = true)(k)
       val bucketPos = bucketCounts(bucket)
       buckets(bucket * bucketSize + bucketPos) = dataPos
       bucketCounts(bucket) = bucketPos + 1
@@ -588,7 +604,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
 
     def apply(k: Fields) = new {
       def foreach(f: Record =&gt; Rep[Unit]): Rep[Unit] = {
-        val bucket = lookup(false)(k)
+        val bucket = lookup(put = false)(k)
 
         val bucketLen = bucketCounts(bucket)
         val bucketStart = bucket * bucketSize
@@ -601,7 +617,7 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
   }
 
   class ArrayBuffer(dataSize: Int, schema: Schema) {
-    val buf = schema.map(f =&gt; NewArray[String](dataSize))
+    val buf = schema.map(f =&gt; NewArray[Any](dataSize))
     var len = 0
     def +=(x: Fields) = {
       this(len) = x
@@ -618,15 +634,22 @@ trait StagedCSV extends Dsl with ScannerBase with UncheckedOps {
 
 }
 
-abstract class StagedQuery extends DslDriver[String,Unit] with StagedCSV with ScannerExp with UncheckedOpsExp { q =&gt;
-  override val codegen = new DslGen with ScalaGenScanner with ScalaGenUncheckedOps {
+abstract class StagedQuery extends DslDriver[String,Unit] with StagedCSV with ScannerExp { q =&gt;
+  override val codegen = new DslGen with ScalaGenScanner {
     val IR: q.type = q
   }
   override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query)
   def filePath(csv: String) = &quot;src/data/&quot; + csv
   def query: Operator
+}
 
-  override def isPrimitiveType[T](m: Manifest[T]) = (m == manifest[String]) || super.isPrimitiveType(m) // TODO: should this be in LMS?
+abstract class StagedQueryC extends DslDriverC[String,Unit] with StagedCSV with ScannerExp { q =&gt;
+  override val codegen = new DslGenC with CGenScanner {
+    val IR: q.type = q
+  }
+  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query)
+  def filePath(csv: String) = &quot;src/data/&quot; + csv
+  def query: Operator
 }
 
 class StagedCSVTest extends TutorialFunSuite {
@@ -637,6 +660,13 @@ class StagedCSVTest extends TutorialFunSuite {
       check(name, query.code)
       query.precompile
       checkOut(name, &quot;csv&quot;, query.eval(&quot;&quot;))
+    }
+  }
+  def testquery(name: String, query: StagedQueryC) {
+    test(name) {
+      check(name, query.code, suffix = &quot;c&quot;)
+      //query.precompile
+      //checkOut(name, &quot;csv&quot;, query.eval(&quot;&quot;))
     }
   }
 
@@ -698,6 +728,14 @@ class StagedCSVTest extends TutorialFunSuite {
       ))
   })
 
+  testquery(&quot;t5hc&quot;, new StagedQueryC {
+    def query =
+      PrintCSV(
+        HashJoin(
+          Scan(filePath(&quot;t.csv&quot;)),
+          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+      ))
+  })
 }
 </code></pre>
             </div>

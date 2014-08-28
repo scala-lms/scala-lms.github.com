@@ -435,6 +435,7 @@ class Scanner(filename: String) {
   }
   def hasNext = pending.nonEmpty || br.ready || {br.close; false}
   def hasNextInLine = pending.nonEmpty
+  def close = br.close
 }
 
 trait ScannerBase extends Base {
@@ -465,12 +466,31 @@ trait ScannerExp extends ScannerBase with EffectExp {
     case Reflect(ScannerHasNext(s), u, es) =&gt; reflectMirrored(Reflect(ScannerHasNext(f(s)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
     case _ =&gt; super.mirror(e,f)
   }).asInstanceOf[Exp[A]]
+
+
 }
 
 trait ScalaGenScanner extends ScalaGenEffect {
   val IR: ScannerExp
   import IR._
 
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case ScannerNew(fn) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn)&quot;)
+    case ScannerNext(s) =&gt; emitValDef(sym, src&quot;$s.next&quot;)
+    case ScannerHasNext(s) =&gt; emitValDef(sym, src&quot;$s.hasNext&quot;)
+    case _ =&gt; super.emitNode(sym, rhs)
+  }
+}
+
+trait CGenScanner extends CGenEffect {
+  val IR: ScannerExp
+  import IR._
+
+  // FXIME: C impl
+  override def remap[A](m: Manifest[A]): String = m.toString match {
+    case &quot;scala.lms.tutorial.Scanner&quot; =&gt; &quot;Scanner&quot;
+    case _ =&gt; super.remap(m)
+  }
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case ScannerNew(fn) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn)&quot;)
     case ScannerNext(s) =&gt; emitValDef(sym, src&quot;$s.next&quot;)
