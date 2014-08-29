@@ -10,6 +10,18 @@
 
     <title>scanner.scala</title>
 
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+      ga('send', 'pageview');
+
+    </script>
+
     <!-- Bootstrap core CSS -->
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -370,6 +382,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     scanner.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
+                    scannerlib.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
                     scsv.html
                 </a>
@@ -417,51 +433,30 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import scala.virtualization.lms.common._
 import scala.reflect.SourceContext
 
-import java.io.FileReader
-import java.io.BufferedReader
-
-class Scanner(filename: String) {
-  val fieldDelimiter = &quot;,&quot;
-
-  val br = new BufferedReader(new FileReader(filename))
-  var pending: List[String] = Nil
-  def next: String = pending match {
-    case Nil =&gt;
-      pending = br.readLine.split(fieldDelimiter).toList
-      next
-    case field::rest =&gt;
-      pending = rest
-      field
-  }
-  def hasNext = pending.nonEmpty || br.ready || {br.close; false}
-  def hasNextInLine = pending.nonEmpty
-  def close = br.close
-}
-
 trait ScannerBase extends Base {
   implicit class ScannerOps(s: Rep[Scanner]) {
     def next(implicit pos: SourceContext) = scannerNext(s)
     def hasNext(implicit pos: SourceContext) = scannerHasNext(s)
   }
-  def newScanner(fn: Rep[String])(implicit pos: SourceContext): Rep[Scanner]
+  def newScanner(fn: Rep[String], d: Rep[Char])(implicit pos: SourceContext): Rep[Scanner]
   def scannerNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[String]
   def scannerHasNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[Boolean]
 }
 
 trait ScannerExp extends ScannerBase with EffectExp {
-  case class ScannerNew(fn: Exp[String]) extends Def[Scanner]
+  case class ScannerNew(fn: Exp[String], d: Exp[Char]) extends Def[Scanner]
   case class ScannerNext(s: Exp[Scanner]) extends Def[String]
   case class ScannerHasNext(s: Exp[Scanner]) extends Def[Boolean]
 
-  override def newScanner(fn: Rep[String])(implicit pos: SourceContext): Rep[Scanner] =
-    reflectMutable(ScannerNew(fn))
+  override def newScanner(fn: Rep[String], d: Rep[Char])(implicit pos: SourceContext): Rep[Scanner] =
+    reflectMutable(ScannerNew(fn, d))
   override def scannerNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[String] =
     reflectWrite(s)(ScannerNext(s))
   override def scannerHasNext(s: Rep[Scanner])(implicit pos: SourceContext): Rep[Boolean] =
     reflectWrite(s)(ScannerHasNext(s))
 
   override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {
-    case Reflect(e@ScannerNew(fn), u, es) =&gt; reflectMirrored(Reflect(ScannerNew(f(fn)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
+    case Reflect(e@ScannerNew(fn, d), u, es) =&gt; reflectMirrored(Reflect(ScannerNew(f(fn), f(d)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
     case Reflect(ScannerNext(s), u, es) =&gt; reflectMirrored(Reflect(ScannerNext(f(s)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
     case Reflect(ScannerHasNext(s), u, es) =&gt; reflectMirrored(Reflect(ScannerHasNext(f(s)), mapOver(f,u), f(es)))(mtype(manifest[A]), pos)
     case _ =&gt; super.mirror(e,f)
@@ -475,7 +470,7 @@ trait ScalaGenScanner extends ScalaGenEffect {
   import IR._
 
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
-    case ScannerNew(fn) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn)&quot;)
+    case ScannerNew(fn, d) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn, $d)&quot;)
     case ScannerNext(s) =&gt; emitValDef(sym, src&quot;$s.next&quot;)
     case ScannerHasNext(s) =&gt; emitValDef(sym, src&quot;$s.hasNext&quot;)
     case _ =&gt; super.emitNode(sym, rhs)
@@ -492,9 +487,9 @@ trait CGenScanner extends CGenEffect {
     case _ =&gt; super.remap(m)
   }
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
-    case ScannerNew(fn) =&gt; emitValDef(sym, src&quot;new scala.lms.tutorial.Scanner($fn)&quot;)
-    case ScannerNext(s) =&gt; emitValDef(sym, src&quot;$s.next&quot;)
-    case ScannerHasNext(s) =&gt; emitValDef(sym, src&quot;$s.hasNext&quot;)
+    case ScannerNew(fn, d) =&gt; emitValDef(sym, src&quot;null/*TODO*/&quot;)
+    case ScannerNext(s) =&gt; emitValDef(sym, src&quot;null/*TODO*/&quot;)
+    case ScannerHasNext(s) =&gt; emitValDef(sym, src&quot;null/*TODO*/&quot;)
     case _ =&gt; super.emitNode(sym, rhs)
   }
 }

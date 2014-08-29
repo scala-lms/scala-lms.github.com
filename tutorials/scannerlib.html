@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>regex.scala</title>
+    <title>scannerlib.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        regex.scala // Jump To &hellip;
+        scannerlib.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -413,7 +413,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">regex.scala</li>
+      <li class="active">scannerlib.scala</li>
     </ol>
 
 
@@ -425,280 +425,35 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>From Interpreter to Compiler</h1>
-<p>Outline:</p>
-<div id="tableofcontents"></div>
-<p>A staged interpreter is a compiler. This is useful, because an
-<br  />interpreter is usually much easier to implement than a compiler. In
-<br  />this section, we illustrate how to turn a vanilla interpreter into a
-<br  />compiler, using lightweight modular staging (LMS). The gist is to let
-<br  />LMS generate code for the interpreter specialized to a particular
-<br  />program &ndash; the program is fixed at staging time, while the input(s) to
-<br  />the program may vary in the generated code. Hence, staging an
-<br  />interpreter should be as simple as wrapping the types of expressions
-<br  />that vary in <code>Rep[_]</code> while leaving the types of expressions we want
-<br  />specialized as is.</p>
-<p>As a case study, we stage a simple regular expression matcher. Our
-<br  />vanilla regular expression matcher is invoked on a regular expression
-<br  />string and an input string. The staged regular expression matcher is
-<br  />invoked on a <em>static</em> regular expression constant string and a <em>dynamic</em> input
-<br  />string of type <code>Rep[String]</code>, and generates code specialized to match
-<br  />any input string against the constant regular expression pattern.</p>
-<p>We could further optimize the generated code by additional staged
-<br  />transformations, but here, we only illustrate the basic process of
-<br  />staging an interpreter. This process is widely applicable. For
-<br  />example, we used the same process to stage a bytecode interpreter into
-<br  />a bytecode compiler.</p>
-
+                
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import org.scalatest.FunSuite
+import java.io.FileReader
+import java.io.BufferedReader
 
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_1">&#182;</a>
-                </div>
-                <h2>Regular Expression Matcher</h2>
-<p>We start with a small regular expression matcher, ported to Scala from
-<br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">a C version, written by Rob Pike and Brian Kernighan</a>.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>trait RegexpMatcher {
-
-  /* search for regexp anywhere in text */
-  def matchsearch(regexp: String, text: String): Boolean = {
-    if (regexp(0) == '^')
-      matchhere(regexp, 1, text, 0)
-    else {
-      var start = -1
-      var found = false
-      while (!found &amp;&amp; start &lt; text.length) {
-        start += 1
-        found = matchhere(regexp, 0, text, start)
-      }
-      found
-    }
+class Scanner(filename: String, fieldDelimiter: Char) {
+  val br = new BufferedReader(new FileReader(filename))
+  var pending: List[String] = Nil
+  def next: String = pending match {
+    case Nil =&gt;
+      pending = br.readLine.split(fieldDelimiter).toList
+      next
+    case field::rest =&gt;
+      pending = rest
+      field
   }
-
-
-  /* search for restart of regexp at start of text */
-  def matchhere(regexp: String, restart: Int, text: String, start: Int): Boolean = {
-    if (restart==regexp.length)
-      true
-    else if (regexp(restart)=='$' &amp;&amp; restart+1==regexp.length)
-      start==text.length
-    else if (restart+1 &lt; regexp.length &amp;&amp; regexp(restart+1)=='*')
-      matchstar(regexp(restart), regexp, restart+2, text, start)
-    else if (start &lt; text.length &amp;&amp; matchchar(regexp(restart), text(start)))
-      matchhere(regexp, restart+1, text, start+1)
-    else false
-  }
-
-  /* search for c* followed by restart of regexp at start of text */
-  def matchstar(c: Char, regexp: String, restart: Int, text: String, start: Int): Boolean = {
-    var sstart = start
-    var found = matchhere(regexp, restart, text, sstart)
-    var failed = false
-    while (!failed &amp;&amp; !found &amp;&amp; sstart &lt; text.length) {
-      failed = !matchchar(c, text(sstart))
-      sstart += 1
-      found = matchhere(regexp, restart, text, sstart)
-    }
-    !failed &amp;&amp; found
-  }
-
-  def matchchar(c: Char, t: Char): Boolean = {
-    c == '.' || c == t
-  }
+  def hasNext = pending.nonEmpty || br.ready || {br.close; false}
+  def hasNextInLine = pending.nonEmpty
+  def close = br.close
 }
-
-class RegexpMatcherTest extends FunSuite with RegexpMatcher {
-  def testmatch(regexp: String, text: String, expected: Boolean) {
-    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
-      assertResult(expected){matchsearch(regexp, text)}
-    }
-  }
-
-  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
-  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
-  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
-  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
-  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
-  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
-  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
-  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
-  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
-  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
-  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
-}
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_2">&#182;</a>
-                </div>
-                <h2>Staged Interpreter</h2>
-<p>The staged interpreter simply consist in wrapping the variable
-<br  />parameters in <code>Rep[_]</code> types. Otherwise, the code is the same.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>trait StagedRegexpMatcher extends Dsl {
-
-  /* search for regexp anywhere in text */
-  def matchsearch(regexp: String, text: Rep[String]): Rep[Boolean] = {
-    if (regexp(0) == '^')
-      matchhere(regexp, 1, text, 0)
-    else {
-      val start = var_new(unit(-1))
-      val found = var_new(unit(false))
-      while (!found &amp;&amp;&amp; start &lt; text.length) {
-        start += 1
-        found = matchhere(regexp, 0, text, start)
-      }
-      found
-    }
-  }
-
-  /* search for restart of regexp at start of text */
-  def matchhere(regexp: String, restart: Int, text: Rep[String], start: Rep[Int]): Rep[Boolean] = {
-    if (restart==regexp.length)
-      true
-    else if (regexp(restart)=='$' &amp;&amp; restart+1==regexp.length)
-      start==text.length
-    else if (restart+1 &lt; regexp.length &amp;&amp; regexp(restart+1)=='*')
-      matchstar(regexp(restart), regexp, restart+2, text, start)
-    else if (start &lt; text.length &amp;&amp;&amp; matchchar(regexp(restart), text(start)))
-      matchhere(regexp, restart+1, text, start+1)
-    else false
-  }
-
-  /* search for c* followed by restart of regexp at start of text */
-  def matchstar(c: Char, regexp: String, restart: Int, text: Rep[String], start: Rep[Int]): Rep[Boolean] = {
-    val sstart = var_new(start)
-    val found = var_new(matchhere(regexp, restart, text, sstart))
-    val failed = var_new(unit(false))
-    while (!failed &amp;&amp;&amp; !found &amp;&amp;&amp; sstart &lt; text.length) {
-      failed = !matchchar(c, text(sstart))
-      sstart += 1
-      found = matchhere(regexp, restart, text, sstart)
-    }
-    !failed &amp;&amp;&amp; found
-  }
-
-  def matchchar(c: Char, t: Rep[Char]): Rep[Boolean] = {
-    c == '.' || c == t
-  }
-}
-
-class StagedRegexpMatcherTest extends TutorialFunSuite {
-  val under = &quot;sre&quot;
-  var m = Map.empty[String, DslDriver[String,Boolean]]
-  def cache(k: String, b: =&gt; DslDriver[String,Boolean]): DslDriver[String,Boolean] = {
-    m.get(k) match {
-      case Some(v) =&gt; v
-      case None =&gt;
-        m = m.updated(k, b)
-        m(k)
-    }
-  }
-  def testmatch(regexp: String, text: String, expected: Boolean) {
-    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
-      val snippet = cache(regexp,
-        new DslDriver[String,Boolean] with StagedRegexpMatcher {
-          def snippet(x: Rep[String]) = matchsearch(regexp, x)
-        })
-      check(&quot;_&quot;+regexp.replace(&quot;^&quot;, &quot;_b&quot;).replace(&quot;*&quot;, &quot;_s&quot;).replace(&quot;$&quot;, &quot;_e&quot;),
-            snippet.code)
-      assertResult(expected){snippet.eval(text)}
-    }
-  }
-
-  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
-  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
-  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
-  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
-  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
-  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
-  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
-  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
-  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
-  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
-  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
-
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_3">&#182;</a>
-                </div>
-                <h2>Generated Code</h2>
-<p>As an example, here is the code generated for <code>^ab</code>.</p>
-<pre><code class="prettyprint lang-scala">/*****************************************
-Emitting Generated Code
-*******************************************/
-class Snippet extends ((java.lang.String)=&gt;(Boolean)) {
-  def apply(x0:java.lang.String): Boolean = {
-    val x1 = x0.length
-    val x2 = 0 &lt; x1
-    val x5 = if (x2) {
-      val x3 = x0(0)
-      val x4 = 'a' == x3
-      x4
-    } else {
-      false
-    }
-    val x11 = if (x5) {
-      val x6 = 1 &lt; x1
-      val x9 = if (x6) {
-        val x7 = x0(1)
-        val x8 = 'b' == x7
-        x8
-      } else {
-        false
-      }
-      val x10 = x9
-      x10
-    } else {
-      false
-    }
-    x11
-  }
-}
-/*****************************************
-End of Generated Code
-*******************************************/
-</code></pre>
-<h2>What's next?</h2>
-<p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="ack.html">Ackermann's Function</a>.</p>
-
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>}
 </code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/regex.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/scannerlib.scala">View this file on GitHub</a>.
         </p>
 
     </div>

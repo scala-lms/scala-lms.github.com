@@ -10,6 +10,18 @@
 
     <title>scsv.scala</title>
 
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+      ga('send', 'pageview');
+
+    </script>
+
     <!-- Bootstrap core CSS -->
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -370,6 +382,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     scanner.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
+                    scannerlib.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
                     scsv.html
                 </a>
@@ -422,6 +438,7 @@ import scala.virtualization.lms.common._
 import org.scalatest.FunSuite
 
 trait StagedCSV extends Dsl with ScannerBase {
+  val defaultFieldDelimiter = ','
 
   // low-level processing
 
@@ -435,30 +452,32 @@ trait StagedCSV extends Dsl with ScannerBase {
   }
 
   def loadSchema(filename: String): Schema = {
-    val s = new Scanner(filename)
+    val s = new Scanner(filename, defaultFieldDelimiter)
     var schema: Schema = Schema() // force present-stage var
     do (schema :+= s.next) while (s.hasNextInLine)
     s.close
     schema
   }
 
-  def processCSV(filename: Rep[String], schema: Schema)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = {
-    val s = newScanner(filename)
+  def processCSV(filename: Rep[String], schema: Schema, fieldDelimiter: Char, externalSchema: Boolean)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = {
+    val s = newScanner(filename, fieldDelimiter)
     def nextRecord = Record(schema.map{_ =&gt; s.next}, schema)
-    // the right thing would be to dynamically re-check the schema,
-    // but it clutters the generated code
-    // schema.foreach(f =&gt; if (s.next != f) println(&quot;ERROR: schema mismatch&quot;))
-    nextRecord // ignore csv header
+    if (!externalSchema) {
+      // the right thing would be to dynamically re-check the schema,
+      // but it clutters the generated code
+      // schema.foreach(f =&gt; if (s.next != f) println(&quot;ERROR: schema mismatch&quot;))
+      nextRecord // ignore csv header
+    }
     while (s.hasNext) yld(nextRecord)
   }
 
-  def printSchema(schema: Schema) = println(schema.mkString(&quot;,&quot;))
+  def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
 
   def printFields(fields: Fields) = {
     def pretty(xs: List[Rep[Any]]): Rep[String] = xs match {
       case Nil =&gt; &quot;&quot;
       case x::Nil =&gt; x.ToString
-      case x::xs =&gt; x+&quot;,&quot;+pretty(xs)
+      case x::xs =&gt; x+defaultFieldDelimiter.toString+pretty(xs)
     }
     println(pretty(fields.toList))
   }
@@ -471,8 +490,9 @@ trait StagedCSV extends Dsl with ScannerBase {
 
   sealed abstract class Operator
   // the definition of operators in order of incremental development
-  def Scan(filename: String) = new Scan(filename, loadSchema(filename))
-  case class Scan(filename: String, schema: Schema) extends Operator
+  def Scan(filename: String) = new Scan(filename, loadSchema(filename), defaultFieldDelimiter, false)
+  def Scan(filename: Rep[String], schema: Schema, fieldDelimiter: Char) = new Scan(filename, schema, fieldDelimiter, true)
+  case class Scan(filename: Rep[String], schema: Schema, fieldDelimiter: Char, externalSchema: Boolean) extends Operator
   case class PrintCSV(parent: Operator) extends Operator
   case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
   case class Filter(pred: Predicate, parent: Operator) extends Operator
@@ -499,7 +519,7 @@ trait StagedCSV extends Dsl with ScannerBase {
   // end of utilities for filtering
 
   def resultSchema(o: Operator): Schema = o match {
-    case Scan(filename, schema)  =&gt; schema
+    case Scan(_, schema, _, _)   =&gt; schema
     case Filter(pred, parent)    =&gt; resultSchema(parent)
     case Project(schema, _, _)   =&gt; schema
     case Join(left, right)       =&gt; resultSchema(left) ++ resultSchema(right)
@@ -509,8 +529,8 @@ trait StagedCSV extends Dsl with ScannerBase {
   }
 
   def execOp(o: Operator)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = o match {
-    case Scan(filename, schema) =&gt;
-      processCSV(filename, schema)(yld)
+    case Scan(filename, schema, fieldDelimiter, externalSchema) =&gt;
+      processCSV(filename, schema, fieldDelimiter, externalSchema)(yld)
     case Filter(pred, parent) =&gt;
       execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
     case Project(newSchema, parentSchema, parent) =&gt;
@@ -638,18 +658,20 @@ abstract class StagedQuery extends DslDriver[String,Unit] with StagedCSV with Sc
   override val codegen = new DslGen with ScalaGenScanner {
     val IR: q.type = q
   }
-  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query)
+  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query(fn))
   def filePath(csv: String) = &quot;src/data/&quot; + csv
-  def query: Operator
+  def testfn: String
+  def query(fn: Rep[String]): Operator
 }
 
 abstract class StagedQueryC extends DslDriverC[String,Unit] with StagedCSV with ScannerExp { q =&gt;
   override val codegen = new DslGenC with CGenScanner {
     val IR: q.type = q
   }
-  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query)
+  override def snippet(fn: Rep[String]): Rep[Unit] = execQuery(query(fn))
   def filePath(csv: String) = &quot;src/data/&quot; + csv
-  def query: Operator
+  def testfn: String
+  def query(fn: Rep[String]): Operator
 }
 
 class StagedCSVTest extends TutorialFunSuite {
@@ -659,83 +681,131 @@ class StagedCSVTest extends TutorialFunSuite {
     test(name) {
       check(name, query.code)
       query.precompile
-      checkOut(name, &quot;csv&quot;, query.eval(&quot;&quot;))
+      checkOut(name, &quot;csv&quot;, query.eval(query.testfn))
     }
   }
   def testquery(name: String, query: StagedQueryC) {
     test(name) {
       check(name, query.code, suffix = &quot;c&quot;)
       //query.precompile
-      //checkOut(name, &quot;csv&quot;, query.eval(&quot;&quot;))
+      //checkOut(name, &quot;csv&quot;, query.eval(query.testfn))
     }
   }
 
   testquery(&quot;t1&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
-        Scan(filePath(&quot;t.csv&quot;))
+        Scan(testfn)
       )
   })
 
   testquery(&quot;t2&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;),
-        Scan(filePath(&quot;t.csv&quot;))
+        Scan(testfn)
       ))
   })
 
   testquery(&quot;t3&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;),
         Filter(Eq(Field(&quot;Flag&quot;), Value(&quot;yes&quot;)),
-          Scan(filePath(&quot;t.csv&quot;))
+          Scan(testfn)
       )))
   })
 
   testquery(&quot;t4&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
         Join(
-          Scan(filePath(&quot;t.csv&quot;)),
-          Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+          Scan(testfn),
+          Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), Scan(testfn))
       ))
   })
 
   testquery(&quot;t5&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
         Join(
-          Scan(filePath(&quot;t.csv&quot;)),
-          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+          Scan(testfn),
+          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(testfn))
       ))
   })
 
   testquery(&quot;t4h&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
         HashJoin(
-          Scan(filePath(&quot;t.csv&quot;)),
-          Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+          Scan(testfn),
+          Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), Scan(testfn))
       ))
   })
 
   testquery(&quot;t5h&quot;, new StagedQuery {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
         HashJoin(
-          Scan(filePath(&quot;t.csv&quot;)),
-          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+          Scan(testfn),
+          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(testfn))
       ))
   })
 
   testquery(&quot;t5hc&quot;, new StagedQueryC {
-    def query =
+    def testfn = filePath(&quot;t.csv&quot;)
+    def query(fn: Rep[String]) =
       PrintCSV(
         HashJoin(
-          Scan(filePath(&quot;t.csv&quot;)),
-          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(filePath(&quot;t.csv&quot;)))
+          Scan(testfn),
+          Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), Scan(testfn))
       ))
   })
+
+  testquery(&quot;t1gram1&quot;, new StagedQuery with NGramQuery {
+    def testfn = filePath(&quot;t1gram.csv&quot;)
+    def query(fn: Rep[String]) = query_id(fn)
+  })
+
+  testquery(&quot;t1gram2&quot;, new StagedQuery with NGramQuery {
+    def testfn = filePath(&quot;t1gram.csv&quot;)
+    def query(fn: Rep[String]) = query_filter(&quot;Auswanderung&quot;)(fn)
+  })
+}
+
+
+trait NGramQuery extends StagedCSV {
+  val ngramSchema = Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)
+  def ScanNGram(fn: Rep[String]) = Scan(fn, ngramSchema, '\t')
+  def query_id(fn: Rep[String]) =  PrintCSV(ScanNGram(fn))
+  def query_filter(v: String)(fn: Rep[String]) =
+    PrintCSV(
+      Filter(Eq(Field(&quot;Phrase&quot;), Value(v)),
+       ScanNGram(fn)
+  ))
+}
+
+object RunQuery {
+  def run(fn: String) = {
+    val query = new StagedQuery with NGramQuery {
+      def testfn = fn
+      def query(fn: Rep[String]) = query_filter(&quot;Auswanderung&quot;)(fn)
+    }
+    query.precompileSilently
+    query.eval(fn)
+  }
+  def main(args: Array[String]): Unit = {
+    if (args.length != 1) {
+      println(&quot;usage: query &lt;filename&gt;&quot;)
+    } else {
+      run(args(0))
+    }
+  }
 }
 </code></pre>
             </div>

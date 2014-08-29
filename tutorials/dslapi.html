@@ -10,6 +10,18 @@
 
     <title>dslapi.scala</title>
 
+    <!-- Google Analytics -->
+    <script>
+      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+      ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+      ga('send', 'pageview');
+
+    </script>
+
     <!-- Bootstrap core CSS -->
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
@@ -370,6 +382,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     scanner.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
+                    scannerlib.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
                     scsv.html
                 </a>
@@ -456,6 +472,9 @@ trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with Bool
       if (y.isInstanceOf[Int]) unit(y) else staticData(y)
     case _ =&gt; super.array_apply(x,n)
   }
+
+  // TODO: should this be in LMS?
+  override def isPrimitiveType[T](m: Manifest[T]) = (m == manifest[String]) || super.isPrimitiveType(m)
 }
 trait DslGen extends ScalaGenNumericOps
     with ScalaGenPrimitiveOps with ScalaGenBooleanOps with ScalaGenIfThenElse
@@ -492,8 +511,6 @@ trait DslImpl extends DslExp { q =&gt;
   val codegen = new DslGen {
     val IR: q.type = q
   }
-  // TODO: should this be in LMS?
-  override def isPrimitiveType[T](m: Manifest[T]) = (m == manifest[String]) || super.isPrimitiveType(m)
 }
 
 trait DslGenC extends CGenNumericOps
@@ -521,7 +538,6 @@ trait DslGenC extends CGenNumericOps
     case StringPlus(a,b) =&gt;
       stream.println(quote(a) + &quot;+&quot; + quote(b) + &quot;// strcat&quot;)
     case Comment(s, verbose, b) =&gt;
-      stream.println(&quot;val &quot; + quote(sym) + &quot; = {&quot;)
       stream.println(&quot;//#&quot; + s)
       if (verbose) {
         stream.println(&quot;// generated code for &quot; + s.replace('_', ' '))
@@ -542,6 +558,7 @@ abstract class DslSnippet[A:Manifest,B:Manifest] extends Dsl {
 abstract class DslDriver[A:Manifest,B:Manifest] extends DslSnippet[A,B] with DslImpl with CompileScala {
   lazy val f = compile(snippet)
   def precompile: Unit = f
+  def precompileSilently: Unit = utils.devnull(f)
   def eval(x: A): B = f(x)
   lazy val code: String = {
     val source = new java.io.StringWriter()
