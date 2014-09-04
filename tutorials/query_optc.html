@@ -464,7 +464,7 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  class RScanner(name: Rep[String]) {
+                <pre><code class='prettyprint lang-scala'>  class Scanner(name: Rep[String]) {
     val fd = open(name)
     val fl = filelen(fd)
     val data = mmap[Char](fd,fl)
@@ -537,7 +537,7 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
   }
 
   def processCSV(filename: Rep[String], schema: Schema, fieldDelimiter: Char, externalSchema: Boolean)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = {
-    val s = new RScanner(filename)
+    val s = new Scanner(filename)
     val last = schema.last
     def nextField(name: String) = {
       val d = if (name==last) '\n' else fieldDelimiter
