@@ -466,21 +466,38 @@ import org.scalatest.FunSuite
   object Grammar extends JavaTokenParsers with PackratParsers {
     def fieldIdent: Parser[String] = &quot;&quot;&quot;[\w\#]+&quot;&quot;&quot;.r
     def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r | &quot;?&quot;
-    def fieldList: Parser[Schema]  = repsep(fieldIdent,&quot;,&quot;) ^^ { fs =&gt; Schema(fs:_*) }
+    def fieldList:  Parser[(Schema,Schema)] = 
+      repsep(fieldIdent ~ opt(&quot;as&quot; ~&gt; fieldIdent), &quot;,&quot;) ^^ { fs2s =&gt; 
+        val (fs,fs1) = fs2s.map { case a~b =&gt; (b.getOrElse(a),a) }.unzip
+        (Schema(fs:_*),Schema(fs1:_*))
+      }
+    def fieldList1:  Parser[Schema] = repsep(fieldIdent,&quot;,&quot;) ^^ (fs =&gt; Schema(fs:_*))
 
     def predicate: Parser[Predicate] = ref ~ &quot;=&quot; ~ ref ^^ { case a ~ _ ~ b =&gt; Eq(a,b) }
     def ref: Parser[Ref] = fieldIdent ^^ Field | &quot;&quot;&quot;'\w*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |       
           &quot;&quot;&quot;[0-9]+&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.toInt))
-    def fromClause: Parser[Operator] = 
-      &quot;from&quot; ~&gt; tableIdent ~ opt(&quot;schema&quot; ~&gt; fieldList) ~ opt(&quot;delim&quot; ~&gt; (&quot;&quot;&quot;\t&quot;&quot;&quot; ^^ (_ =&gt; '\t') | &quot;&quot;&quot;.&quot;&quot;&quot;.r ^^ (_.head))) ^^ { 
+    def tableClause: Parser[Operator] = 
+      tableIdent ~ opt(&quot;schema&quot; ~&gt; fieldList1) ~ opt(&quot;delim&quot; ~&gt; (&quot;&quot;&quot;\t&quot;&quot;&quot; ^^ (_ =&gt; '\t') | &quot;&quot;&quot;.&quot;&quot;&quot;.r ^^ (_.head))) ^^ { 
         case table ~ schema ~ delim =&gt; Scan(table, schema, delim)
-      }
+      } |
+      (&quot;(&quot; ~&gt; stm &lt;~ &quot;)&quot;)
+    def fromClause: Parser[Operator] = 
+      &quot;from&quot; ~&gt; joinClause
+    def joinClause: Parser[Operator] = 
+      (&quot;nestedloops&quot; ~&gt; repsep(tableClause, &quot;join&quot;) ^^ { _.reduceLeft((a,b) =&gt; Join(a,b)) }) |
+      (repsep(tableClause, &quot;join&quot;) ^^ { _.reduceLeft((a,b) =&gt; HashJoin(a,b)) })
+
     def selectClause: Parser[Operator=&gt;Operator] = 
-      &quot;select&quot; ~&gt; (&quot;*&quot; ^^ { _ =&gt; (op:Operator) =&gt; op } | fieldList ^^ { fs =&gt; Project(fs,fs,_:Operator) })
+      &quot;select&quot; ~&gt; (&quot;*&quot; ^^ { _ =&gt; (op:Operator) =&gt; op } | fieldList ^^ { case (fs,fs1) =&gt; Project(fs,fs1,_:Operator) })
     def whereClause: Parser[Operator=&gt;Operator] = 
       opt(&quot;where&quot; ~&gt; predicate ^^ { p =&gt; Filter(p, _:Operator) }) ^^ { _.getOrElse(op =&gt; op)}
 
-    def stm: Parser[Operator] = selectClause ~ fromClause ~ whereClause ^^ { case p ~ s ~ f =&gt; p(f(s)) }
+    def groupClause: Parser[Operator=&gt;Operator] = 
+      opt(&quot;group&quot; ~&gt; &quot;by&quot; ~&gt; fieldList1 ~ (&quot;sum&quot; ~&gt; fieldList1) ^^ { case p1 ~ p2 =&gt; Group(p1,p2, _:Operator) }) ^^ { _.getOrElse(op =&gt; op)}
+
+    def stm: Parser[Operator] = selectClause ~ fromClause ~ whereClause ~ groupClause ^^ { 
+      case p ~ s ~ f ~ g =&gt; g(p(f(s)))
+    }
   }
   def parseSql(input: String) = Grammar.parseAll(Grammar.stm, input).get // cleaner error reporting?
 }
@@ -663,15 +680,12 @@ import org.scalatest.FunSuite
       val IR: q.type = q
     }
     override def runtest: Unit = {
-      if (version == &quot;query_staged0&quot; &amp;&amp; query.isEmpty) return ()
+      if (version == &quot;query_staged0&quot; &amp;&amp; List(&quot;Group&quot;,&quot;HashJoin&quot;).exists(parsedQuery.toString contains _)) return ()
       test(version+&quot; &quot;+name) {
         assert(expectedAstForTest(name)==parsedQuery)
-        /* FIXME: group by currently not supported in staged Scala version*/
-        if (!parsedQuery.toString.contains(&quot;Group(&quot;)) {
-          check(name, code)
-          precompile
-          checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
-        }
+        check(name, code)
+        precompile
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -734,11 +748,11 @@ import org.scalatest.FunSuite
   testquery(&quot;t1&quot;, &quot;select * from t.csv&quot;)
   testquery(&quot;t2&quot;, &quot;select Name from t.csv&quot;)
   testquery(&quot;t3&quot;, &quot;select Name from t.csv where Flag='yes'&quot;)
-  testquery(&quot;t4&quot;)
-  testquery(&quot;t5&quot;)
-  testquery(&quot;t4h&quot;)
-  testquery(&quot;t5h&quot;)
-  testquery(&quot;t6&quot;)
+  testquery(&quot;t4&quot;, &quot;select * from nestedloops t.csv join (select Name as Name1 from t.csv)&quot;)
+  testquery(&quot;t5&quot;, &quot;select * from nestedloops t.csv join (select Name from t.csv)&quot;)
+  testquery(&quot;t4h&quot;,&quot;select * from t.csv join (select Name as Name1 from t.csv)&quot;)
+  testquery(&quot;t5h&quot;,&quot;select * from t.csv join (select Name from t.csv)&quot;)
+  testquery(&quot;t6&quot;, &quot;select * from t.csv group by Name sum Value&quot;) // not 100% right syntax, but hey ...
 
   val defaultEvalTable = dataFilePath(&quot;t1gram.csv&quot;)
   testquery(&quot;t1gram1&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)

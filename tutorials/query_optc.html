@@ -449,8 +449,7 @@ import scala.virtualization.lms.common._
 
 object query_optc {
 trait QueryCompiler extends Dsl with StagedQueryProcessor
-  with ScannerLowerBase
-{
+with ScannerLowerBase {
   override def version = &quot;query_optc&quot;
 
 </code></pre>
@@ -551,6 +550,7 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
       nextRecord // ignore csv header
     }
     while (s.hasNext) yld(nextRecord)
+    s.close
   }
 
   def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
@@ -574,7 +574,7 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
-                <h2>Query Interpretation</h2>
+                <h2>Query Interpretation = Compilation</h2>
 
             </div>
             <div class="code">
@@ -667,36 +667,33 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
     val keys = new ArrayBuffer(keysSize, keySchema)
     val keyCount = var_new(0)
 
-    val htable = NewArray[Int](hashSize)
-
-    for (i &lt;- 0 until hashSize) {
-        htable(i) = -1
-    }
-
     val hashMask = hashSize - 1
+    val htable = NewArray[Int](hashSize)
+    for (i &lt;- 0 until hashSize) { htable(i) = -1 }
 
-    def lookup(k: Fields): Rep[Int] = lookupInternal(k,None)
-    def lookupOrUpdate(k: Fields)(init: Rep[Int]=&gt;Rep[Unit]): Rep[Int] = lookupInternal(k,Some(init))
-    def lookupInternal(k: Fields, init: Option[Rep[Int]=&gt;Rep[Unit]]): Rep[Int] = comment[Int](&quot;hash_lookup&quot;) {
-        val h = fieldsHash(k).toInt
-        var pos = h &amp; hashMask
-        while (htable(pos) != -1 &amp;&amp; !fieldsEqual(keys(htable(pos)),k)) {
-          pos = (pos + 1) &amp; hashMask
-        }
-        if (init.isDefined) {
-          if (htable(pos) == -1) {
-            val keyPos = keyCount: Rep[Int] // force read
-            keys(keyPos) = k
-            keyCount += 1
-            htable(pos) = keyPos
-            init.get(keyPos)
-            keyPos
-          } else {
-            htable(pos)
-          }
+    def lookup(k: Fields) = lookupInternal(k,None)
+    def lookupOrUpdate(k: Fields)(init: Rep[Int]=&gt;Rep[Unit]) = lookupInternal(k,Some(init))
+    def lookupInternal(k: Fields, init: Option[Rep[Int]=&gt;Rep[Unit]]): Rep[Int] = 
+    comment[Int](&quot;hash_lookup&quot;) {
+      val h = fieldsHash(k).toInt
+      var pos = h &amp; hashMask
+      while (htable(pos) != -1 &amp;&amp;&amp; !fieldsEqual(keys(htable(pos)),k)) {
+        pos = (pos + 1) &amp; hashMask
+      }
+      if (init.isDefined) {
+        if (htable(pos) == -1) {
+          val keyPos = keyCount: Rep[Int] // force read
+          keys(keyPos) = k
+          keyCount += 1
+          htable(pos) = keyPos
+          init.get(keyPos)
+          keyPos
         } else {
           htable(pos)
         }
+      } else {
+        htable(pos)
+      }
     }
   }
 
@@ -786,8 +783,7 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
       case StringColBuffer(b,l) =&gt; RString(b(i),l(i))
     }
   }
-}
-}
+}}
 </code></pre>
             </div>
         
