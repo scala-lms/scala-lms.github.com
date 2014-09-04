@@ -493,7 +493,8 @@ import org.scalatest.FunSuite
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
                 <h2>Relational Algebra AST</h2>
-<p>The parser takes a string and convers it to an AST.</p>
+<p>The parser takes a SQL string and converts it to tree of relational
+<br  />algebra operators.</p>
 
             </div>
             <div class="code">
@@ -568,7 +569,7 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h3>A (plain) Query Interpreter</h3>
+                <h3>A (Plain) Query Interpreter</h3>
 <p>We start with a plain query processor: an interpreter.</p>
 <ul>
 <li><a href="query_unstaged.html">query_unstaged.scala</a></li>
@@ -588,13 +589,18 @@ import org.scalatest.FunSuite
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
                 <h3>A Staged Query Interpreter (= Compiler)</h3>
+<p>Staging our query interpreter yields a query compiler.
+<br  />In the first iteration we generate Scala code:</p>
 <ul>
-<li><p><a href="query_staged0.scala">query_staged0</a></p>
+<li><p><a href="query_staged0.html">query_staged0</a></p>
 </li>
-<li><p><a href="query_staged.scala">query_staged</a></p>
+<li><p><a href="query_staged.html">query_staged</a></p>
 </li>
-<li><p><a href="query_optc.scala">query_optc</a></p>
-</li>
+</ul>
+<p>For additional low-level optimizations we switch to
+<br  />generating C code:</p>
+<ul>
+<li><a href="query_optc.html">query_optc</a></li>
 </ul>
 
             </div>
@@ -737,6 +743,33 @@ import org.scalatest.FunSuite
   val defaultEvalTable = dataFilePath(&quot;t1gram.csv&quot;)
   testquery(&quot;t1gram1&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
   testquery(&quot;t1gram2&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
+}
+
+object Run {
+  def time[A](a: =&gt; A) = {
+    val now = System.nanoTime
+    val result = a
+    val micros = (System.nanoTime - now) / 1000
+    println(&quot;%d microseconds&quot;.format(micros))
+    result
+  }
+  def main(args: Array[String]) {
+    val query = args(0)
+    lazy val fn = args(1)
+
+    trait Engine {
+      def eval: Unit
+    }
+    val engine =
+      new Engine with SQLParser with QueryProcessor with query_unstaged.QueryInterpreter {
+        override def dynamicFilePath(table: String): Table =
+          if (table == &quot;?&quot;) fn else filePath(table)
+        override def eval: Unit =
+          execQuery(PrintCSV(parseSql(query)))
+      }
+
+    time(engine.eval)
+  }
 }
 </code></pre>
             </div>
