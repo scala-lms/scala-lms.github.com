@@ -26,7 +26,8 @@ We're holding tutorials at major conferences:
 - [SPLASH 2014](http://2014.splashcon.org): Portland, October 22. More info: 
   [2014.splashcon.org](http://2014.splashcon.org/track/splash2014-tutorials) 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
-  [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html) 
+  [scala-lms.github.io/cufp2014](cufp2014/index.html)
+<!--  [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html) -->
 - [ECOOP 2013](http://www.lirmm.fr/ecoop13/): Montpellier, July 3-5. More info: 
   [scala-lms.github.io/ecoop2013](ecoop2013/index.html)
 - [PLDI 2013](http://pldi2013.ucombinator.org): Seattle, June 16. More info: 
