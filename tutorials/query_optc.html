@@ -437,7 +437,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Query Compiler III &copy;</h1>
+                <h1>Query Compiler III (C Code)</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 
@@ -453,10 +453,18 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
 {
   override def version = &quot;query_optc&quot;
 
-/*
-Input File Tokenizer
---------------------
-  class RScanner(name: Rep[String]) {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Input File Tokenizer</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  class RScanner(name: Rep[String]) {
     val fd = open(name)
     val fl = filelen(fd)
     val data = mmap[Char](fd,fl)
@@ -485,10 +493,18 @@ Input File Tokenizer
     def close = fclose(fd)
   }
 
-/*
-Low-Level Processing Logic
---------------------------
-  abstract class RField {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>Low-Level Processing Logic</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  abstract class RField {
     def print()
     def compare(o: RField): Rep[Boolean]
     def hash: Rep[Long]
@@ -551,10 +567,18 @@ Low-Level Processing Logic
 
   def fieldsHash(a: Fields) = a.foldLeft(unit(0L)) { _ * 41L + _.hash }
 
-/*
-Query Interpretation
---------------------
-  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_3">&#182;</a>
+                </div>
+                <h2>Query Interpretation</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) compare evalRef(a2)(rec)
   }
 
@@ -615,11 +639,18 @@ Query Interpretation
   }
   def execQuery(q: Operator): Unit = execOp(q) { _ =&gt; }
 
-/*
-Data Structure Implementations
-------------------------------
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_4">&#182;</a>
+                </div>
+                <h2>Data Structure Implementations</h2>
 
-  // defaults for hash sizes etc
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  // defaults for hash sizes etc
 
   object hashDefaults {
     val hashSize   = (1 &lt;&lt; 8)

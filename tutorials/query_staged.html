@@ -452,10 +452,18 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
 with ScannerBase {
   override def version = &quot;query_staged&quot;
 
-/*
-Low-Level Processing Logic
---------------------------
-  type RField = Rep[String]
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Low-Level Processing Logic</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  type RField = Rep[String]
   type Fields = Vector[RField]
 
   case class Record(fields: Fields, schema: Schema) {
@@ -485,10 +493,18 @@ Low-Level Processing Logic
 
   def fieldsHash(a: Fields) = a.foldLeft(unit(0L)) { _ * 41L + _.HashCode }
 
-/*
-Query Interpretation
---------------------
-  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>Query Interpretation</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
   }
 
@@ -548,10 +564,18 @@ Query Interpretation
   }
   def execQuery(q: Operator): Unit = execOp(q) { _ =&gt; }
 
-/*
-Data Structure Implementations
-------------------------------
-  class HashMapAgg(keySchema: Schema, schema: Schema) {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_3">&#182;</a>
+                </div>
+                <h2>Data Structure Implementations</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  class HashMapAgg(keySchema: Schema, schema: Schema) {
 
     // TODO: finish
     def +=(k: Fields, v: Fields) = ???
