@@ -465,7 +465,7 @@ import org.scalatest.FunSuite
   import scala.util.parsing.combinator._
   object Grammar extends JavaTokenParsers with PackratParsers {
     def fieldIdent: Parser[String] = &quot;&quot;&quot;[\w\#]+&quot;&quot;&quot;.r
-    def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r
+    def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r | &quot;?&quot;
     def fieldList: Parser[Schema]  = repsep(fieldIdent,&quot;,&quot;) ^^ { fs =&gt; Schema(fs:_*) }
 
     def predicate: Parser[Predicate] = ref ~ &quot;=&quot; ~ ref ^^ { case a ~ _ ~ b =&gt; Eq(a,b) }
@@ -492,7 +492,7 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
-                <h2>AST</h2>
+                <h2>Relational Algebra AST</h2>
 <p>The parser takes a string and convers it to an AST.</p>
 
             </div>
@@ -568,7 +568,7 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h3>a (plain) Query Interpreter</h3>
+                <h3>A (plain) Query Interpreter</h3>
 <p>We start with a plain query processor: an interpreter.</p>
 <ul>
 <li><a href="query_unstaged.html">query_unstaged.scala</a></li>
@@ -578,7 +578,6 @@ import org.scalatest.FunSuite
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>trait PlainQueryProcessor extends QueryProcessor {
   type Table = String
-  def dynamicFilePath(table: String) = filePath(table)
 }
 
 </code></pre>
@@ -588,7 +587,7 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
-                <h3>a Staged Query Interpreter (= Compiler)</h3>
+                <h3>A Staged Query Interpreter (= Compiler)</h3>
 <ul>
 <li><p><a href="query_staged0.scala">query_staged0</a></p>
 </li>
@@ -603,8 +602,6 @@ import org.scalatest.FunSuite
                 <pre><code class='prettyprint lang-scala'>trait StagedQueryProcessor extends QueryProcessor with Dsl {
   type Table = Rep[String] // dynamic filename
   override def filePath(table: String) = if (table == &quot;?&quot;) throw new Exception(&quot;file path for table ? not available&quot;) else super.filePath(table)
-  def dynamicFileName: Table
-  def dynamicFilePath(table: String) = if (table == &quot;?&quot;) dynamicFileName else unit(filePath(table))
 }
 
 </code></pre>
@@ -623,9 +620,7 @@ import org.scalatest.FunSuite
 
   trait TestDriver extends SQLParser with QueryProcessor with ExpectedASTs {
     def runtest: Unit
-    override def filePath(table: String) = {
-      &quot;src/data/&quot; + table
-    }
+    override def filePath(table: String) = dataFilePath(table)
 
     def name: String
     def query: String
@@ -633,11 +628,15 @@ import org.scalatest.FunSuite
   }
 
   trait PlainTestDriver extends TestDriver with PlainQueryProcessor {
-    def eval(fn: Table): Unit = execQuery(PrintCSV(parsedQuery))
+    override def dynamicFilePath(table: String): Table = if (table == &quot;?&quot;) defaultEvalTable else filePath(table)
+    def eval(fn: Table): Unit = {
+      execQuery(PrintCSV(parsedQuery))
+    }
   }
 
   trait StagedTestDriver extends TestDriver with StagedQueryProcessor {
     var dynamicFileName: Table = _
+    override def dynamicFilePath(table: String): Table = if (table == &quot;?&quot;) dynamicFileName else unit(filePath(table))
     def snippet(fn: Table): Rep[Unit] = {
       dynamicFileName = fn
       execQuery(PrintCSV(parsedQuery))
@@ -665,7 +664,7 @@ import org.scalatest.FunSuite
         if (!parsedQuery.toString.contains(&quot;Group(&quot;)) {
           check(name, code)
           precompile
-          checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+          checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
         }
       }
     }
@@ -680,7 +679,7 @@ import org.scalatest.FunSuite
         assert(expectedAstForTest(name)==parsedQuery)
         check(name, code, &quot;c&quot;)
         //precompile
-        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -703,7 +702,7 @@ import org.scalatest.FunSuite
 
   trait ExpectedASTs extends QueryAST {
     val scan_t = Scan(&quot;t.csv&quot;)
-    val scan_t1gram = Scan(&quot;t1gram.csv&quot;,Some(Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)),Some('\t'))
+    val scan_t1gram = Scan(&quot;?&quot;,Some(Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)),Some('\t'))
 
     val expectedAstForTest = Map(
       &quot;t1&quot; -&gt; scan_t,
@@ -735,8 +734,9 @@ import org.scalatest.FunSuite
   testquery(&quot;t5h&quot;)
   testquery(&quot;t6&quot;)
 
-  testquery(&quot;t1gram1&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
-  testquery(&quot;t1gram2&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
+  val defaultEvalTable = dataFilePath(&quot;t1gram.csv&quot;)
+  testquery(&quot;t1gram1&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
+  testquery(&quot;t1gram2&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
 }
 </code></pre>
             </div>
