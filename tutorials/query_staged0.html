@@ -437,8 +437,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>A SQL Query Compiler</h1>
-<p>Abstraction without regret for efficient data processing.</p>
+                <h1>Query Compiler I (Scala)</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 
@@ -453,7 +452,9 @@ trait QueryCompiler extends Dsl with StagedQueryProcessor
 with ScannerBase {
   override def version = &quot;query_staged0&quot;
 
-  // low-level processing
+/*
+Low-Level Processing Logic
+--------------------------
   type RField = Rep[String]
   type Fields = Vector[RField]
 
@@ -480,6 +481,9 @@ with ScannerBase {
 
   def printFields(fields: Fields) = printf(fields.map{_ =&gt; &quot;%s&quot;}.mkString(&quot;\&quot;&quot;, defaultFieldDelimiter.toString, &quot;\\n\&quot;&quot;), fields: _*)
 
+/*
+Query Interpretation
+--------------------
   def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
   }
