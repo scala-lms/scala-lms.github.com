@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>index.scala</title>
+    <title>query_unstaged.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        index.scala // Jump To &hellip;
+        query_unstaged.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -425,7 +425,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">index.scala</li>
+      <li class="active">query_unstaged.scala</li>
     </ol>
 
 
@@ -437,143 +437,118 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Tutorials and Documentation</h1>
-<p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a framework for
-<br  />runtime code generation in Scala.</p>
-<p>Outline:</p>
-<div id="tableofcontents"></div>
-<h2>Quick Start</h2>
-<p>These docs are a collection of literate Scala files. Clone the <a href="http://github.com/scala-lms/tutorials">GitHub repo</a>:</p>
-<pre><code>git clone https://github.com/scala-lms/tutorials.git
-</code></pre>
-<p>Check the <a href="https://github.com/scala-lms/tutorials/blob/master/README.md"><code>README.md</code></a> file for prerequisites and start hacking!</p>
-<h3>Why Generative Programming ?</h3>
-<p>Because it enables <strong>abstraction without regret</strong>: the key idea is to write very high-level
-<br  />and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
-<p>Programming abstractions that would usually be avoided in performance-sensitive code
-<br  />(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
-<br  />affecting performance of the <strong>generated code</strong>.</p>
-<h3>Why LMS ?</h3>
-<p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. With types, it distinguishes
-<br  />expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
-<p>LMS comes with <strong>batteries included</strong>: it provides many optimizations such as common subexpression elimination out of the box, and it goes beyond purely generative approaches by
-<br  />providing an extensible intermediate representation that can be used to implement
-<br  />sophisticated domain-specific compiler pipelines.</p>
-<p>At the same time LMS is <strong>hackable</strong>: since it is just a library, all aspects can be
-<br  />modified or extended to suit a particular purpose.</p>
-<h2>Self-Contained Tutorials</h2>
-<p>The following tutorials are available:</p>
-<ul>
-<li><p><a href="start.html">Getting Started</a>
-<br  />Rep[T] vs T</p>
-</li>
-<li><p><a href="shonan.html">Shonan HMM Challenge</a>
-<br  />Sparse matrix vector multiplication
-<br  />Selective unrolling and precomputation</p>
-</li>
-<li><p><a href="regex.html">Regular Expressions</a>
-<br  />From interpreters to compilers using staging</p>
-</li>
-<li><p><a href="ack.html">Ackermann's Function</a>
-<br  />From recursive functions to automata
-<br  />Automatic specialization using staging</p>
-</li>
-<li><p><a href="automata.html">Automata-Based Regex Matcher</a>
-<br  />NFA to DFA conversion using staging</p>
-</li>
-<li><p><a href="query.html">SQL Engine</a>
-<br  />Efficient data processing</p>
-</li>
-<li><p><a href="fft.html">Fast Fourier Transform (FFT)</a>
-<br  />Numeric kernels and rewriting optimizations</p>
-</li>
-<li><p><a href="stencil.html">Sliding Stencil</a>
-<br  />Rearranging loop shapes</p>
-</li>
-</ul>
-<!--
-LMS In-Depth
-------------
-
-<div class="alert alert-danger" role="alert"> <strong>TODO:</strong> flesh out </div>
-
-
-### Getting Started
-
-- Why generative programming?
-    _Because abstraction without regret!_
-- Why LMS?
-    _Because batteries included and hackable!_
-- Hellow World
-
-
-### Design Patterns
-
-Purely generative:
-
-- Specialization on static data
-- Abstractions in the meta-language
-- From interpreter to compiler
-- Mixed-stage data structures
-- Type classes and generic programming
-
-Including IR:
-
-- DSLs with multiple abstraction levels
-
-
-### From Zero to LMS
-
-- Program generation with Strings
-- Program generation with Trees
-- Program generation with Graphs
-
-
-### LMS Internals
-
-- Graph IR
-- Effects
-- Code Motion
-- Transformers
-- Code Generators
-
-Advanced:
-
-- Functions
-- Structs
-
-
-### Integration
-
-- LMS for Scala
-- LMS for JavaScript
-- LMS for C
-
-Advanced:
-
-- LMS for Scala Macros
-- LMS for Vector Intrinsics
-- LMS for GPUs
-- LMS for FPGAs
-- LMS for SMT Solvers
-- LMS for Truffle / Graal
--->
-<h2>LMS In Depth</h2>
-<ol>
-<li><a href="01_overview.html">About generative programming</a></li>
-<li><a href="02_basics.html">Generative programming and LMS basics</a></li>
-<li><a href="03_compiler.html">Intermediate representation and optimizations</a></li>
-<li><a href="04_atwork.html">Staging and LMS at work</a></li>
-</ol>
-
+                
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import scala.virtualization.lms.common._
+
+object query_unstaged {
+trait QueryInterpreter extends PlainQueryProcessor {
+  override def version = &quot;query_unstaged&quot;
+
+  // low-level processing
+  type Fields = Vector[String]
+
+  case class Record(fields: Fields, schema: Schema) {
+    def apply(key: String): String = fields(schema indexOf key)
+    def apply(keys: Schema): Fields = keys.map(this apply _)
+  }
+
+  def processCSV(filename: String, schema: Schema, fieldDelimiter: Char, externalSchema: Boolean)(yld: Record =&gt; Unit): Unit = {
+    val s = new Scanner(filename)
+    val last = schema.last
+    def nextRecord = Record(schema.map{x =&gt; s.next(if (x==last) '\n' else fieldDelimiter)}, schema)
+    if (!externalSchema) {
+      // the right thing would be to dynamically re-check the schema,
+      // but it clutters the generated code
+      // schema.foreach(f =&gt; if (s.next != f) println(&quot;ERROR: schema mismatch&quot;))
+      nextRecord // ignore csv header
+    }
+    while (s.hasNext) yld(nextRecord)
+  }
+
+  def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
+
+  def printFields(fields: Fields) = printf(fields.map{_ =&gt; &quot;%s&quot;}.mkString(&quot;&quot;, defaultFieldDelimiter.toString, &quot;\n&quot;), fields: _*)
+
+  def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(true) { (a,b) =&gt; a &amp;&amp; b._1 == b._2 }
+
+  def fieldsHash(a: Fields) = a.foldLeft(0L) { _ * 41L + _.hashCode }
+
+
+  def evalPred(p: Predicate)(rec: Record): Boolean = p match {
+    case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
+  }
+
+  def evalRef(r: Ref)(rec: Record): String = r match {
+    case Field(name) =&gt; rec(name)
+    case Value(x) =&gt; x.toString
+  }
+
+  import scala.collection.mutable.{ArrayBuffer,HashMap}
+
+  def resultSchema(o: Operator): Schema = o match {
+    case Scan(_, schema, _, _)   =&gt; schema
+    case Filter(pred, parent)    =&gt; resultSchema(parent)
+    case Project(schema, _, _)   =&gt; schema
+    case Join(left, right)       =&gt; resultSchema(left) ++ resultSchema(right)
+    case Group(keys, agg, parent)=&gt; keys ++ agg
+    case HashJoin(left, right)   =&gt; resultSchema(left) ++ resultSchema(right)
+    case PrintCSV(parent)        =&gt; Schema()
+  }
+
+  def execOp(o: Operator)(yld: Record =&gt; Unit): Unit = o match {
+    case Scan(filename, schema, fieldDelimiter, externalSchema) =&gt;
+      processCSV(tableFor(filename), schema, fieldDelimiter, externalSchema)(yld)
+    case Filter(pred, parent) =&gt;
+      execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
+    case Project(newSchema, parentSchema, parent) =&gt;
+      execOp(parent) { rec =&gt; yld(Record(rec(parentSchema), newSchema)) }
+    case Join(left, right) =&gt;
+      execOp(left) { rec1 =&gt;
+        execOp(right) { rec2 =&gt;
+          val keys = rec1.schema intersect rec2.schema
+          if (fieldsEqual(rec1(keys), rec2(keys)))
+            yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
+        }
+      }
+    case Group(keys, agg, parent) =&gt;
+      val hm = new HashMap[Fields,Seq[Int]]
+      execOp(parent) { rec =&gt;
+        val kvs = rec(keys)
+        val sums = hm.getOrElseUpdate(kvs,agg.map(_ =&gt; 0))
+        hm(kvs) = (sums,rec(agg).map(_.toInt)).zipped map (_ + _)
+      }
+      hm foreach { case (k,a) =&gt;
+        yld(Record(k ++ a.map(_.toString), keys ++ agg))
+      }
+    case HashJoin(left, right) =&gt;
+      val keys = resultSchema(left) intersect resultSchema(right)
+      val hm = new HashMap[Fields,ArrayBuffer[Record]]
+      execOp(left) { rec1 =&gt;
+        val buf = hm.getOrElseUpdate(rec1(keys), new ArrayBuffer[Record])
+        buf += rec1
+      }
+      execOp(right) { rec2 =&gt;
+        hm(rec2(keys)) foreach { rec1 =&gt;
+          yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
+        }
+      }
+    case PrintCSV(parent) =&gt;
+      val schema = resultSchema(parent)
+      printSchema(schema)
+      execOp(parent) { rec =&gt; printFields(rec.fields) }
+  }
+  def execQuery(q: Operator): Unit = execOp(q) { _ =&gt; }
+}}
+</code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/index.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_unstaged.scala">View this file on GitHub</a>.
         </p>
 
     </div>

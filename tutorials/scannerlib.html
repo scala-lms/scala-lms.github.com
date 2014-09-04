@@ -354,10 +354,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     automata.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
-                    csv.html
-                </a>
-                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
                     dslapi.html
                 </a>
@@ -374,6 +370,26 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query.html">
+                    query.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
+                    query_optc.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged.html">
+                    query_staged.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged0.html">
+                    query_staged0.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_unstaged.html">
+                    query_unstaged.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
                     regex.html
                 </a>
@@ -384,10 +400,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
                     scannerlib.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
-                    scsv.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
@@ -433,19 +445,21 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import java.io.FileReader
 import java.io.BufferedReader
 
-class Scanner(filename: String, fieldDelimiter: Char) {
+class Scanner(filename: String) {
   val br = new BufferedReader(new FileReader(filename))
-  var pending: List[String] = Nil
-  def next: String = pending match {
-    case Nil =&gt;
-      pending = br.readLine.split(fieldDelimiter).toList
-      next
-    case field::rest =&gt;
-      pending = rest
+  var pending: String = &quot;&quot;
+  def next(delim: Char): String = {
+    val i = pending.indexOf(delim)
+    if (i == -1) {
+      pending = br.readLine()+'\n'
+      next(delim)
+    } else {
+      val (field,rest) = pending.splitAt(i)
+      pending = rest.substring(1)
       field
+    }
   }
-  def hasNext = pending.nonEmpty || br.ready || {br.close; false}
-  def hasNextInLine = pending.nonEmpty
+  def hasNext = pending.nonEmpty || br.ready
   def close = br.close
 }
 </code></pre>

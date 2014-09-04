@@ -354,10 +354,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     automata.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
-                    csv.html
-                </a>
-                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
                     dslapi.html
                 </a>
@@ -374,6 +370,26 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query.html">
+                    query.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
+                    query_optc.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged.html">
+                    query_staged.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged0.html">
+                    query_staged0.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_unstaged.html">
+                    query_unstaged.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
                     regex.html
                 </a>
@@ -384,10 +400,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
                     scannerlib.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
-                    scsv.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
@@ -433,7 +445,11 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import java.io._
 import org.scalatest.FunSuite
 
-trait TutorialFunSuite extends FunSuite {
+trait LibSuite extends FunSuite {
+  def dataFilePath(csv: String) = &quot;src/data/&quot; + csv
+}
+
+trait TutorialFunSuite extends LibSuite {
   val overwriteCheckFiles = false // should be false; temporary set to true only to simplify development
 
   val prefix = &quot;src/out/&quot;

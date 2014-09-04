@@ -354,10 +354,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     automata.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/csv.html">
-                    csv.html
-                </a>
-                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/dslapi.html">
                     dslapi.html
                 </a>
@@ -374,6 +370,26 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query.html">
+                    query.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
+                    query_optc.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged.html">
+                    query_staged.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_staged0.html">
+                    query_staged0.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_unstaged.html">
+                    query_unstaged.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/regex.html">
                     regex.html
                 </a>
@@ -384,10 +400,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
                     scannerlib.html
-                </a>
-                
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scsv.html">
-                    scsv.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
@@ -433,20 +445,47 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 import scala.virtualization.lms.common._
 import scala.reflect.SourceContext
 
-trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with UncheckedOps {
+// TODO: clean up at least, maybe add to LMS?
+trait HashCodeOps extends Base {
+  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext): Rep[Long]
+}
+trait HashCodeOpsExp extends HashCodeOps with BaseExp {
+  case class ObjHashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) extends Def[Long]
+  def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) = ObjHashCode(o)
+
+  override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {
+    case e@ObjHashCode(a) =&gt; infix_HashCode(f(a))
+    case _ =&gt; super.mirror(e,f)
+  }).asInstanceOf[Exp[A]]
+}
+trait ScalaGenHashCodeOps extends ScalaGenBase {
+  val IR: HashCodeOpsExp
+  import IR._
+
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case ObjHashCode(o) =&gt; emitValDef(sym, src&quot;$o.##&quot;)
+    case _ =&gt; super.emitNode(sym, rhs)
+  }
+}
+trait CGenHashCodeOps extends CGenBase {
+  val IR: HashCodeOpsExp
+  import IR._
+
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case ObjHashCode(o) =&gt; emitValDef(sym, if (o.tp &lt;:&lt; manifest[String]) src&quot;hash($o)&quot; else src&quot;1/*TODO:improve hash*/&quot;)
+    case _ =&gt; super.emitNode(sym, rhs)
+  }
+}
+
+trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with HashCodeOps {
   implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])
   def infix_&amp;&amp;&amp;(lhs: Rep[Boolean], rhs: =&gt; Rep[Boolean]): Rep[Boolean] =
     __ifThenElse(lhs, rhs, unit(false))
   def generate_comment(l: String): Rep[Unit]
   def comment[A:Manifest](l: String, verbose: Boolean = true)(b: =&gt; Rep[A]): Rep[A]
-
-  // TODO: clean up / add in LMS (and remove any `with \w*UncheckedOps\w*` mixin)
-  def infix_HashCode(a: Rep[Any]) = unchecked[Long](a,&quot;.##&quot;)
-  def infix_ToString(a: Rep[Any]) = if (a.asInstanceOf[{def tp: Manifest[Any]}].tp == manifest[String]) a.asInstanceOf[Rep[String]]
-                                    else unchecked[String](a,&quot;.toString&quot;)
 }
 
-trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with UncheckedOpsExp {
+trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with HashCodeOpsExp {
   override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {
     case Const(false) =&gt; rhs
     case _ =&gt; super.boolean_or(lhs, rhs)
@@ -482,11 +521,18 @@ trait DslGen extends ScalaGenNumericOps
     with ScalaGenMiscOps with ScalaGenArrayOps with ScalaGenStringOps
     with ScalaGenSeqOps with ScalaGenFunctions with ScalaGenWhile
     with ScalaGenStaticData with ScalaGenVariables
-    with ScalaGenUncheckedOps {
+    with ScalaGenObjectOps
+    with ScalaGenHashCodeOps {
   val IR: DslExp
 
   import IR._
 
+  override def quote(x: Exp[Any]) = x match {
+    case Const('\n') if x.tp == manifest[Char] =&gt; &quot;'\\n'&quot;
+    case Const('\t') if x.tp == manifest[Char] =&gt; &quot;'\\t'&quot;
+    case Const('\0') if x.tp == manifest[Char] =&gt; &quot;'\\0'&quot;
+    case _ =&gt; super.quote(x)
+  }
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case IfThenElse(c,Block(Const(true)),Block(Const(false))) =&gt;
       emitValDef(sym, quote(c))
@@ -513,30 +559,73 @@ trait DslImpl extends DslExp { q =&gt;
   }
 }
 
+// TODO: currently part of this is specific to the query tests. generalize? move?
 trait DslGenC extends CGenNumericOps
     with CGenPrimitiveOps with CGenBooleanOps with CGenIfThenElse
     with CGenEqual with CGenRangeOps with CGenOrderingOps
     with CGenMiscOps with CGenArrayOps with CGenStringOps
     with CGenSeqOps with CGenFunctions with CGenWhile
     with CGenStaticData with CGenVariables
-    with CGenUncheckedOps{
+    with CGenObjectOps
+    with CGenHashCodeOps {
   val IR: DslExp
   import IR._
 
-  // FIXME
   def getMemoryAllocString(count: String, memType: String): String = {
       &quot;(&quot; + memType + &quot;*)malloc(&quot; + count + &quot; * sizeof(&quot; + memType + &quot;));&quot;
   }
   override def remap[A](m: Manifest[A]): String = m.toString match {
-    case &quot;Any&quot; =&gt; &quot;(void*)&quot;
+    case &quot;java.lang.String&quot; =&gt; &quot;char*&quot;
+    case &quot;Array[Char]&quot; =&gt; &quot;char*&quot;
+    case &quot;Char&quot; =&gt; &quot;char&quot;
     case _ =&gt; super.remap(m)
+  }
+  def format(s: Exp[Any]): String = {
+    remap(s.tp) match {
+      case &quot;uint16_t&quot; =&gt; &quot;%c&quot;
+      case &quot;bool&quot; | &quot;int8_t&quot; | &quot;int16_t&quot; | &quot;int32_t&quot; =&gt; &quot;%d&quot;
+      case &quot;int64_t&quot; =&gt; &quot;%ld&quot;
+      case &quot;float&quot; | &quot;double&quot; =&gt; &quot;%f&quot;
+      case &quot;string&quot; =&gt; &quot;%s&quot;
+      case &quot;char*&quot; =&gt; &quot;%s&quot;
+      case &quot;char&quot; =&gt; &quot;%c&quot;
+      case &quot;void&quot; =&gt; &quot;%c&quot;
+      case _ =&gt;
+        import scala.virtualization.lms.internal.GenerationFailedException
+        throw new GenerationFailedException(&quot;CGenMiscOps: cannot print type &quot; + remap(s.tp))
+    }
+  }
+  def quoteRawString(s: Exp[Any]): String = {
+    remap(s.tp) match {
+      case &quot;string&quot; =&gt; quote(s) + &quot;.c_str()&quot;
+      case _ =&gt; quote(s)
+    }
+  }
+  // we treat string as a primitive type to prevent memory management on strings
+  // strings are always stack allocated and freed automatically at the scope exit
+  override def isPrimitiveType(tpe: String) : Boolean = {
+    tpe match {
+      case &quot;char*&quot; =&gt; true
+      case &quot;char&quot; =&gt; true
+      case _ =&gt; super.isPrimitiveType(tpe)
+    }
+  }
+
+  override def quote(x: Exp[Any]) = x match {
+    case Const(s: String) =&gt; &quot;\&quot;&quot;+s.replace(&quot;\&quot;&quot;, &quot;\\\&quot;&quot;)+&quot;\&quot;&quot; // TODO: more escapes?
+    case Const('\n') if x.tp == manifest[Char] =&gt; &quot;'\\n'&quot;
+    case Const('\t') if x.tp == manifest[Char] =&gt; &quot;'\\t'&quot;
+    case Const('\0') if x.tp == manifest[Char] =&gt; &quot;'\\0'&quot;
+    case _ =&gt; super.quote(x)
   }
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case a@ArrayNew(n) =&gt;
       val arrType = remap(a.m)
       stream.println(arrType + &quot;* &quot; + quote(sym) + &quot; = &quot; + getMemoryAllocString(quote(n), arrType))
-    case StringPlus(a,b) =&gt;
-      stream.println(quote(a) + &quot;+&quot; + quote(b) + &quot;// strcat&quot;)
+    case ArrayApply(x,n) =&gt; emitValDef(sym, quote(x) + &quot;[&quot; + quote(n) + &quot;]&quot;)
+    case ArrayUpdate(x,n,y) =&gt; stream.println(quote(x) + &quot;[&quot; + quote(n) + &quot;] = &quot; + quote(y) + &quot;;&quot;)
+    case PrintLn(s) =&gt; stream.println(&quot;printf(\&quot;&quot; + format(s) + &quot;\\n\&quot;,&quot; + quoteRawString(s) + &quot;);&quot;)
+    case StringCharAt(s,i) =&gt; emitValDef(sym, &quot;%s[%s]&quot;.format(quote(s), quote(i)))
     case Comment(s, verbose, b) =&gt;
       stream.println(&quot;//#&quot; + s)
       if (verbose) {
@@ -548,7 +637,57 @@ trait DslGenC extends CGenNumericOps
       emitValDef(sym, quote(getBlockResult(b)))
       stream.println(&quot;//#&quot; + s)
     case _ =&gt; super.emitNode(sym,rhs)
-  }}
+  }
+  override def emitSource[A:Manifest](args: List[Sym[_]], body: Block[A], functionName: String, out: java.io.PrintWriter) = {
+    withStream(out) {
+      stream.println(&quot;&quot;&quot;
+      #include &lt;fcntl.h&gt;
+      #include &lt;errno.h&gt;
+      #include &lt;err.h&gt;
+      #include &lt;sys/mman.h&gt;
+      #include &lt;sys/stat.h&gt;
+      #include &lt;stdio.h&gt;
+      #include &lt;stdint.h&gt;
+      #ifndef MAP_FILE
+      #define MAP_FILE MAP_SHARED
+      #endif
+      int fsize(int fd) {
+        struct stat stat;
+        int res = fstat(fd,&amp;stat);
+        return stat.st_size;
+      }
+      int printll(char* s) {
+        while (*s != '\n' &amp;&amp; *s != ',' &amp;&amp; *s != '\t') {
+          putchar(*s++);
+        }
+        return 0;
+      }
+      unsigned long hash(unsigned char *str) // FIXME: need to take length!
+      {
+        unsigned long hash = 5381;
+        int c;
+
+        while ((c = *str++))
+          hash = ((hash &lt;&lt; 5) + hash) + c; /* hash * 33 + c */
+
+        return hash;
+      }
+      void Snippet(char*);
+      int main(int argc, char *argv[])
+      {
+        if (argc != 2) {
+          printf(&quot;usage: query &lt;filename&gt;\n&quot;);
+          return 0;
+        }
+        Snippet(argv[1]);
+        return 0;
+      }
+
+      &quot;&quot;&quot;)
+    }
+    super.emitSource[A](args, body, functionName, out)
+  }
+}
 
 
 abstract class DslSnippet[A:Manifest,B:Manifest] extends Dsl {
@@ -575,6 +714,16 @@ abstract class DslDriverC[A:Manifest,B:Manifest] extends DslSnippet[A,B] with Ds
     val source = new java.io.StringWriter()
     codegen.emitSource(snippet, &quot;Snippet&quot;, new java.io.PrintWriter(source))
     source.toString
+  }
+  def eval(a:A): Unit = { // TBD: should read result of type B?
+    val out = new java.io.PrintWriter(&quot;/tmp/snippet.c&quot;)
+    out.println(code)
+    out.close
+    //TODO: use precompile
+    (new java.io.File(&quot;/tmp/snippet&quot;)).delete
+    import scala.sys.process._
+    (s&quot;cc -std=c99 -O3 /tmp/snippet.c -o /tmp/snippet&quot;:ProcessBuilder).lines.foreach(Console.println _)
+    (s&quot;/tmp/snippet $a&quot;:ProcessBuilder).lines.foreach(Console.println _)
   }
 }
 </code></pre>

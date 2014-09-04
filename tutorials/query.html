@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>index.scala</title>
+    <title>query.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        index.scala // Jump To &hellip;
+        query.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -425,7 +425,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">index.scala</li>
+      <li class="active">query.scala</li>
     </ol>
 
 
@@ -437,143 +437,313 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Tutorials and Documentation</h1>
-<p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a framework for
-<br  />runtime code generation in Scala.</p>
+                <h1>A SQL Query Compiler</h1>
+<p>Abstraction without regret for efficient data processing.</p>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
-<h2>Quick Start</h2>
-<p>These docs are a collection of literate Scala files. Clone the <a href="http://github.com/scala-lms/tutorials">GitHub repo</a>:</p>
-<pre><code>git clone https://github.com/scala-lms/tutorials.git
-</code></pre>
-<p>Check the <a href="https://github.com/scala-lms/tutorials/blob/master/README.md"><code>README.md</code></a> file for prerequisites and start hacking!</p>
-<h3>Why Generative Programming ?</h3>
-<p>Because it enables <strong>abstraction without regret</strong>: the key idea is to write very high-level
-<br  />and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
-<p>Programming abstractions that would usually be avoided in performance-sensitive code
-<br  />(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
-<br  />affecting performance of the <strong>generated code</strong>.</p>
-<h3>Why LMS ?</h3>
-<p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. With types, it distinguishes
-<br  />expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
-<p>LMS comes with <strong>batteries included</strong>: it provides many optimizations such as common subexpression elimination out of the box, and it goes beyond purely generative approaches by
-<br  />providing an extensible intermediate representation that can be used to implement
-<br  />sophisticated domain-specific compiler pipelines.</p>
-<p>At the same time LMS is <strong>hackable</strong>: since it is just a library, all aspects can be
-<br  />modified or extended to suit a particular purpose.</p>
-<h2>Self-Contained Tutorials</h2>
-<p>The following tutorials are available:</p>
-<ul>
-<li><p><a href="start.html">Getting Started</a>
-<br  />Rep[T] vs T</p>
-</li>
-<li><p><a href="shonan.html">Shonan HMM Challenge</a>
-<br  />Sparse matrix vector multiplication
-<br  />Selective unrolling and precomputation</p>
-</li>
-<li><p><a href="regex.html">Regular Expressions</a>
-<br  />From interpreters to compilers using staging</p>
-</li>
-<li><p><a href="ack.html">Ackermann's Function</a>
-<br  />From recursive functions to automata
-<br  />Automatic specialization using staging</p>
-</li>
-<li><p><a href="automata.html">Automata-Based Regex Matcher</a>
-<br  />NFA to DFA conversion using staging</p>
-</li>
-<li><p><a href="query.html">SQL Engine</a>
-<br  />Efficient data processing</p>
-</li>
-<li><p><a href="fft.html">Fast Fourier Transform (FFT)</a>
-<br  />Numeric kernels and rewriting optimizations</p>
-</li>
-<li><p><a href="stencil.html">Sliding Stencil</a>
-<br  />Rearranging loop shapes</p>
-</li>
-</ul>
-<!--
-LMS In-Depth
-------------
-
-<div class="alert alert-danger" role="alert"> <strong>TODO:</strong> flesh out </div>
-
-
-### Getting Started
-
-- Why generative programming?
-    _Because abstraction without regret!_
-- Why LMS?
-    _Because batteries included and hackable!_
-- Hellow World
-
-
-### Design Patterns
-
-Purely generative:
-
-- Specialization on static data
-- Abstractions in the meta-language
-- From interpreter to compiler
-- Mixed-stage data structures
-- Type classes and generic programming
-
-Including IR:
-
-- DSLs with multiple abstraction levels
-
-
-### From Zero to LMS
-
-- Program generation with Strings
-- Program generation with Trees
-- Program generation with Graphs
-
-
-### LMS Internals
-
-- Graph IR
-- Effects
-- Code Motion
-- Transformers
-- Code Generators
-
-Advanced:
-
-- Functions
-- Structs
-
-
-### Integration
-
-- LMS for Scala
-- LMS for JavaScript
-- LMS for C
-
-Advanced:
-
-- LMS for Scala Macros
-- LMS for Vector Intrinsics
-- LMS for GPUs
-- LMS for FPGAs
-- LMS for SMT Solvers
-- LMS for Truffle / Graal
--->
-<h2>LMS In Depth</h2>
-<ol>
-<li><a href="01_overview.html">About generative programming</a></li>
-<li><a href="02_basics.html">Generative programming and LMS basics</a></li>
-<li><a href="03_compiler.html">Intermediate representation and optimizations</a></li>
-<li><a href="04_atwork.html">Staging and LMS at work</a></li>
-</ol>
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'></code></pre>
+                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import scala.virtualization.lms.common._
+import org.scalatest.FunSuite
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Parser</h2>
+<p>We start with a parser for a SQL(-like) language.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait SQLParser extends QueryAST {
+  import scala.util.parsing.combinator._
+  object Grammar extends JavaTokenParsers with PackratParsers {
+    def fieldIdent: Parser[String] = &quot;&quot;&quot;[\w\#]+&quot;&quot;&quot;.r
+    def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r
+    def fieldList: Parser[Schema]  = repsep(fieldIdent,&quot;,&quot;) ^^ { fs =&gt; Schema(fs:_*) }
+
+    def predicate: Parser[Predicate] = ref ~ &quot;=&quot; ~ ref ^^ { case a ~ _ ~ b =&gt; Eq(a,b) }
+    def ref: Parser[Ref] = fieldIdent ^^ Field | &quot;&quot;&quot;'\w*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |       
+          &quot;&quot;&quot;[0-9]+&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.toInt))
+    def fromClause: Parser[Operator] = 
+      &quot;from&quot; ~&gt; tableIdent ~ opt(&quot;schema&quot; ~&gt; fieldList) ~ opt(&quot;delim&quot; ~&gt; (&quot;&quot;&quot;\t&quot;&quot;&quot; ^^ (_ =&gt; '\t') | &quot;&quot;&quot;.&quot;&quot;&quot;.r ^^ (_.head))) ^^ { 
+        case table ~ schema ~ delim =&gt; Scan(table, schema, delim)
+      }
+    def selectClause: Parser[Operator=&gt;Operator] = 
+      &quot;select&quot; ~&gt; (&quot;*&quot; ^^ { _ =&gt; (op:Operator) =&gt; op } | fieldList ^^ { fs =&gt; Project(fs,fs,_:Operator) })
+    def whereClause: Parser[Operator=&gt;Operator] = 
+      opt(&quot;where&quot; ~&gt; predicate ^^ { p =&gt; Filter(p, _:Operator) }) ^^ { _.getOrElse(op =&gt; op)}
+
+    def stm: Parser[Operator] = selectClause ~ fromClause ~ whereClause ^^ { case p ~ s ~ f =&gt; p(f(s)) }
+  }
+  def parseSql(input: String) = Grammar.parseAll(Grammar.stm, input).get // cleaner error reporting?
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>AST</h2>
+<p>The parser takes a string and convers it to an AST.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait QueryAST {
+  def tableFor(s: Table) = s // remove
+
+  type Schema = Vector[String]
+  def Schema(schema: String*): Schema = schema.toVector
+  type Table
+  def Scan(tableName: String): Scan = Scan(tableName, None, None)
+  def Scan(tableName: String, schema: Option[Schema], delim: Option[Char]): Scan // defined in QueryProcessor
+
+  sealed abstract class Operator
+  case class Scan(tableName: Table, schema: Schema, fieldDelimiter: Char, externalSchema: Boolean) extends Operator
+  case class PrintCSV(parent: Operator) extends Operator
+  case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
+  case class Filter(pred: Predicate, parent: Operator) extends Operator
+  case class Join(parent1: Operator, parent2: Operator) extends Operator
+  case class Group(keys: Schema, agg: Schema, parent: Operator) extends Operator
+  case class HashJoin(parent1: Operator, parent2: Operator) extends Operator
+
+  // for filtering
+  sealed abstract class Predicate
+  case class Eq(a: Ref, b: Ref) extends Predicate
+
+  sealed abstract class Ref
+  case class Field(name: String) extends Ref
+  case class Value(x: Any) extends Ref
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_3">&#182;</a>
+                </div>
+                <h2>Iterative Development of a Query Processor</h2>
+<p>We develop our SQL engine in multiple steps. Each steps leads to a
+<br  />working processor, and each successive step either adds a feature or
+<br  />optimization. We define a common interface for each processor.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait QueryProcessor extends QueryAST {
+  def version: String
+  val defaultFieldDelimiter = ','
+
+  def filePath(table: String): String = table
+  def dynamicFilePath(table: String): Table
+
+  def Scan(tableName: String, schema: Option[Schema], delim: Option[Char]): Scan = {
+    val dfile = dynamicFilePath(tableName)
+    val (schema1, externalSchema) = schema.map(s=&gt;(s,true)).getOrElse((loadSchema(filePath(tableName)),false))
+    Scan(dfile, schema1, delim.getOrElse(defaultFieldDelimiter), externalSchema)
+  }
+
+  def loadSchema(filename: String): Schema = {
+    val s = new Scanner(filename)
+    val schema = Schema(s.next('\n').split(defaultFieldDelimiter): _*)
+    s.close
+    schema
+  }
+
+  def execQuery(q: Operator): Unit
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_4">&#182;</a>
+                </div>
+                <h3>a (plain) Query Interpreter</h3>
+<p>We start with a plain query processor: an interpreter.</p>
+<ul>
+<li><a href="query_unstaged.html">query_unstaged.scala</a></li>
+</ul>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait PlainQueryProcessor extends QueryProcessor {
+  type Table = String
+  def dynamicFilePath(table: String) = filePath(table)
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_5">&#182;</a>
+                </div>
+                <h3>a Staged Query Interpreter (= Compiler)</h3>
+<ul>
+<li><p><a href="query_staged0.scala">query_staged0</a></p>
+</li>
+<li><p><a href="query_staged.scala">query_staged</a></p>
+</li>
+<li><p><a href="query_optc.scala">query_optc</a></p>
+</li>
+</ul>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait StagedQueryProcessor extends QueryProcessor with Dsl {
+  type Table = Rep[String] // dynamic filename
+  override def filePath(table: String) = if (table == &quot;?&quot;) throw new Exception(&quot;file path for table ? not available&quot;) else super.filePath(table)
+  def dynamicFileName: Table
+  def dynamicFilePath(table: String) = if (table == &quot;?&quot;) dynamicFileName else unit(filePath(table))
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_6">&#182;</a>
+                </div>
+                <h2>Unit Tests</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>class QueryTest extends TutorialFunSuite {
+  val under = &quot;query_&quot;
+
+  trait TestDriver extends SQLParser with QueryProcessor with ExpectedASTs {
+    def runtest: Unit
+    override def filePath(table: String) = {
+      &quot;src/data/&quot; + table
+    }
+
+    def name: String
+    def query: String
+    def parsedQuery: Operator = if (query.isEmpty) expectedAstForTest(name) else parseSql(query)
+  }
+
+  trait PlainTestDriver extends TestDriver with PlainQueryProcessor {
+    def eval(fn: Table): Unit = execQuery(PrintCSV(parsedQuery))
+  }
+
+  trait StagedTestDriver extends TestDriver with StagedQueryProcessor {
+    var dynamicFileName: Table = _
+    def snippet(fn: Table): Rep[Unit] = {
+      dynamicFileName = fn
+      execQuery(PrintCSV(parsedQuery))
+    }
+  }
+
+  abstract class ScalaPlainQueryDriver(val name: String, val query: String) extends PlainTestDriver with QueryProcessor { q =&gt;
+    override def runtest: Unit = {
+      test(version+&quot; &quot;+name) {
+        assert(expectedAstForTest(name)==parsedQuery)
+        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+      }
+    }
+  }
+
+  abstract class ScalaStagedQueryDriver(val name: String, val query: String) extends DslDriver[String,Unit] with StagedTestDriver with StagedQueryProcessor with ScannerExp { q =&gt;
+    override val codegen = new DslGen with ScalaGenScanner {
+      val IR: q.type = q
+    }
+    override def runtest: Unit = {
+      if (version == &quot;query_staged0&quot; &amp;&amp; query.isEmpty) return ()
+      test(version+&quot; &quot;+name) {
+        assert(expectedAstForTest(name)==parsedQuery)
+        /* FIXME: group by currently not supported in staged Scala version*/
+        if (!parsedQuery.toString.contains(&quot;Group(&quot;)) {
+          check(name, code)
+          precompile
+          checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        }
+      }
+    }
+  }
+
+  abstract class CStagedQueryDriver(val name: String, val query: String) extends DslDriverC[String,Unit] with StagedTestDriver with StagedQueryProcessor with ScannerLowerExp { q =&gt;
+    override val codegen = new DslGenC with CGenScannerLower {
+      val IR: q.type = q
+    }
+    override def runtest: Unit = {
+      test(version+&quot; &quot;+name) {
+        assert(expectedAstForTest(name)==parsedQuery)
+        check(name, code, &quot;c&quot;)
+        //precompile
+        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+      }
+    }
+  }
+
+  def testquery(name: String, query: String = &quot;&quot;) {
+    val drivers: List[TestDriver] =
+      List(
+        new ScalaPlainQueryDriver(name, query) with query_unstaged.QueryInterpreter,
+        new ScalaStagedQueryDriver(name, query) with query_staged0.QueryCompiler,
+        new ScalaStagedQueryDriver(name, query) with query_staged.QueryCompiler,
+        new CStagedQueryDriver(name, query) with query_optc.QueryCompiler {
+          // FIXME: hack so i don't need to replace Value -&gt; #Value in all the files right now
+          override def isNumericCol(s: String) = s == &quot;Value&quot; || super.isNumericCol(s)
+        }
+      )
+    drivers.foreach(_.runtest)
+  }
+
+  // NOTE: we can use &quot;select * from ?&quot; to use dynamic file names (not used here right now)
+
+  trait ExpectedASTs extends QueryAST {
+    val scan_t = Scan(&quot;t.csv&quot;)
+    val scan_t1gram = Scan(&quot;t1gram.csv&quot;,Some(Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)),Some('\t'))
+
+    val expectedAstForTest = Map(
+      &quot;t1&quot; -&gt; scan_t,
+      &quot;t2&quot; -&gt; Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), scan_t),
+      &quot;t3&quot; -&gt; Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;),
+                      Filter(Eq(Field(&quot;Flag&quot;), Value(&quot;yes&quot;)),
+                             scan_t)),
+      &quot;t4&quot; -&gt; Join(scan_t,
+                   Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), scan_t)),
+      &quot;t5&quot; -&gt; Join(scan_t,
+                   Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), scan_t)),
+      &quot;t4h&quot; -&gt; HashJoin(scan_t,
+                   Project(Schema(&quot;Name1&quot;), Schema(&quot;Name&quot;), scan_t)),
+      &quot;t5h&quot; -&gt; HashJoin(scan_t,
+                   Project(Schema(&quot;Name&quot;), Schema(&quot;Name&quot;), scan_t)),
+      &quot;t6&quot;  -&gt; Group(Schema(&quot;Name&quot;),Schema(&quot;Value&quot;), scan_t),
+
+      &quot;t1gram1&quot; -&gt; scan_t1gram,
+      &quot;t1gram2&quot; -&gt; Filter(Eq(Field(&quot;Phrase&quot;), Value(&quot;Auswanderung&quot;)), scan_t1gram)
+    )
+  }
+
+  testquery(&quot;t1&quot;, &quot;select * from t.csv&quot;)
+  testquery(&quot;t2&quot;, &quot;select Name from t.csv&quot;)
+  testquery(&quot;t3&quot;, &quot;select Name from t.csv where Flag='yes'&quot;)
+  testquery(&quot;t4&quot;)
+  testquery(&quot;t5&quot;)
+  testquery(&quot;t4h&quot;)
+  testquery(&quot;t5h&quot;)
+  testquery(&quot;t6&quot;)
+
+  testquery(&quot;t1gram1&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
+  testquery(&quot;t1gram2&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
+}
+</code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/index.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query.scala">View this file on GitHub</a>.
         </p>
 
     </div>
