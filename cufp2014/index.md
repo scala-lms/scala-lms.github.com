@@ -26,6 +26,13 @@ Along the way, we will discuss concepts such as mixed-stage data structures that
 - Presenters: [Tiark Rompf](http://tiarkrompf.github.io) (Purdue/Oracle), [Nada Amin](http://namin.net) (EPFL)
 - Official link: [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html)
 
+## Online Material
+
+- [LMS Getting Started](http://scala-lms.github.io/tutorials/start.html)
+- [Shonan Challenge](http://scala-lms.github.io/tutorials/shonan.html)
+- [Query Compilation](http://scala-lms.github.io/tutorials/query.html)
+- [Code on GitHub](http://github.com/scala-lms/tutorials)
+
 
 ## Tutorial objectives
 This tutorial will equip attendees with the knowledge required to use generative programming techniques in general, and Scala/LMS in particular.
