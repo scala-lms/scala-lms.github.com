@@ -456,8 +456,49 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_1">&#182;</a>
                 </div>
+                <h2>Relational Algebra AST</h2>
+<p>The core of any query processing engine is an AST representation of
+<br  />relational algebra operations.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>trait QueryAST {
+  def tableFor(s: Table) = s // remove
+
+  type Schema = Vector[String]
+  def Schema(schema: String*): Schema = schema.toVector
+  type Table
+  def Scan(tableName: String): Scan = Scan(tableName, None, None)
+  def Scan(tableName: String, schema: Option[Schema], delim: Option[Char]): Scan // defined in QueryProcessor
+
+  sealed abstract class Operator
+  case class Scan(tableName: Table, schema: Schema, fieldDelimiter: Char, externalSchema: Boolean) extends Operator
+  case class PrintCSV(parent: Operator) extends Operator
+  case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
+  case class Filter(pred: Predicate, parent: Operator) extends Operator
+  case class Join(parent1: Operator, parent2: Operator) extends Operator
+  case class Group(keys: Schema, agg: Schema, parent: Operator) extends Operator
+  case class HashJoin(parent1: Operator, parent2: Operator) extends Operator
+
+  // for filtering
+  sealed abstract class Predicate
+  case class Eq(a: Ref, b: Ref) extends Predicate
+
+  sealed abstract class Ref
+  case class Field(name: String) extends Ref
+  case class Value(x: Any) extends Ref
+}
+
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
                 <h2>Parser</h2>
-<p>We start with a parser for a SQL(-like) language.</p>
+<p>We add a parser that takes a SQL(-like) string and converts it to tree of operators.</p>
 
             </div>
             <div class="code">
@@ -502,45 +543,7 @@ import org.scalatest.FunSuite
   def parseSql(input: String) = Grammar.parseAll(Grammar.stm, input).get // cleaner error reporting?
 }
 
-</code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_2">&#182;</a>
-                </div>
-                <h2>Relational Algebra AST</h2>
-<p>The parser takes a SQL string and converts it to tree of relational
-<br  />algebra operators.</p>
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>trait QueryAST {
-  def tableFor(s: Table) = s // remove
-
-  type Schema = Vector[String]
-  def Schema(schema: String*): Schema = schema.toVector
-  type Table
-  def Scan(tableName: String): Scan = Scan(tableName, None, None)
-  def Scan(tableName: String, schema: Option[Schema], delim: Option[Char]): Scan // defined in QueryProcessor
-
-  sealed abstract class Operator
-  case class Scan(tableName: Table, schema: Schema, fieldDelimiter: Char, externalSchema: Boolean) extends Operator
-  case class PrintCSV(parent: Operator) extends Operator
-  case class Project(schema: Schema, schema2: Schema, parent: Operator) extends Operator
-  case class Filter(pred: Predicate, parent: Operator) extends Operator
-  case class Join(parent1: Operator, parent2: Operator) extends Operator
-  case class Group(keys: Schema, agg: Schema, parent: Operator) extends Operator
-  case class HashJoin(parent1: Operator, parent2: Operator) extends Operator
-
-  // for filtering
-  sealed abstract class Predicate
-  case class Eq(a: Ref, b: Ref) extends Predicate
-
-  sealed abstract class Ref
-  case class Field(name: String) extends Ref
-  case class Value(x: Any) extends Ref
-}
 
 </code></pre>
             </div>
@@ -773,6 +776,10 @@ import org.scalatest.FunSuite
   testquery(&quot;t1gram4h&quot;, s&quot;select * from words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
 }
 
+// example runs from sbt console
+/*
+test:run unstaged &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot; src/data/t1gram.csv
+test:run c &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot; src/data/1gram_a.csv
 object Run {
   def time[A](a: =&gt; A) = {
     val now = System.nanoTime
@@ -794,42 +801,50 @@ object Run {
       override def dynamicFilePath(table: String): Table =
         liftTable(if (table == &quot;?&quot;) fn else filePath(table))
     }
-
-    val engine =
+    trait StagedEngine extends Engine with StagedQueryProcessor {
+      override def liftTable(n: String) = unit(n)
+    }
+    def unstaged_engine: Engine =
       new Engine with query_unstaged.QueryInterpreter {
         override def liftTable(n: Table) = n
         override def eval = run
       }
-
-    // weird class error here
-    // in class file scala/lms/tutorial/Run$$anon$4
-    // java.lang.ClassFormatError: Duplicate field name&amp;signature in class file scala/lms/tutorial/Run$$anon$4
-    val staged_engine =
-      new DslDriver[String,Unit] with StagedQueryProcessor with ScannerExp
-      with Engine with query_staged.QueryCompiler { q =&gt;
+    def scala_engine =
+      new DslDriver[String,Unit] with ScannerExp
+      with StagedEngine with query_staged.QueryCompiler { q =&gt;
         override val codegen = new DslGen with ScalaGenScanner {
           val IR: q.type = q
         }
-        override def liftTable(n: String) = unit(n)
         override def snippet(fn: Table): Rep[Unit] = run
         override def prepare: Unit = precompile
         override def eval: Unit = eval(fn)
       }
-
-
+    def c_engine =
+      new DslDriverC[String,Unit] with ScannerLowerExp
+      with StagedEngine with query_optc.QueryCompiler { q =&gt;
+        override val codegen = new DslGenC with CGenScannerLower {
+          val IR: q.type = q
+        }
+        override def snippet(fn: Table): Rep[Unit] = run
+        override def prepare: Unit = {}
+        override def eval: Unit = eval(fn)
+      }
 
   def main(args: Array[String]) {
-    query = args(0)
-    if (args.length &gt; 1)
-      fn = args(1)
-
-    val engines = List(engine, staged_engine)
-    for (eg &lt;- engines) {
-      println(&quot;begin version &quot;+eg.version)
-      eg.prepare
-      time(eg.eval)
-      println(&quot;end version &quot;+eg.version)
+    val version = args(0)
+    val engine = version match {
+      case &quot;c&quot; =&gt; c_engine
+      case &quot;scala&quot; =&gt; scala_engine
+      case &quot;unstaged&quot; =&gt; unstaged_engine
+      case _ =&gt; println(&quot;warning: unexecpted engine, using 'unstaged' by default&quot;)
+        unstaged_engine
     }
+    query = args(1)
+    if (args.length &gt; 2)
+      fn = args(2)
+
+    engine.prepare
+    time(engine.eval)
   }
 }
 </code></pre>
