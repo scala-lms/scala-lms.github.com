@@ -465,22 +465,39 @@ import org.scalatest.FunSuite
   import scala.util.parsing.combinator._
   object Grammar extends JavaTokenParsers with PackratParsers {
     def fieldIdent: Parser[String] = &quot;&quot;&quot;[\w\#]+&quot;&quot;&quot;.r
-    def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r
-    def fieldList: Parser[Schema]  = repsep(fieldIdent,&quot;,&quot;) ^^ { fs =&gt; Schema(fs:_*) }
+    def tableIdent: Parser[String] = &quot;&quot;&quot;[\w_\-/\.]+&quot;&quot;&quot;.r | &quot;?&quot;
+    def fieldList:  Parser[(Schema,Schema)] =
+      repsep(fieldIdent ~ opt(&quot;as&quot; ~&gt; fieldIdent), &quot;,&quot;) ^^ { fs2s =&gt;
+        val (fs,fs1) = fs2s.map { case a~b =&gt; (b.getOrElse(a),a) }.unzip
+        (Schema(fs:_*),Schema(fs1:_*))
+      }
+    def fieldList1:  Parser[Schema] = repsep(fieldIdent,&quot;,&quot;) ^^ (fs =&gt; Schema(fs:_*))
 
     def predicate: Parser[Predicate] = ref ~ &quot;=&quot; ~ ref ^^ { case a ~ _ ~ b =&gt; Eq(a,b) }
-    def ref: Parser[Ref] = fieldIdent ^^ Field | &quot;&quot;&quot;'\w*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |       
+    def ref: Parser[Ref] = fieldIdent ^^ Field | &quot;&quot;&quot;'\w*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |
           &quot;&quot;&quot;[0-9]+&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.toInt))
-    def fromClause: Parser[Operator] = 
-      &quot;from&quot; ~&gt; tableIdent ~ opt(&quot;schema&quot; ~&gt; fieldList) ~ opt(&quot;delim&quot; ~&gt; (&quot;&quot;&quot;\t&quot;&quot;&quot; ^^ (_ =&gt; '\t') | &quot;&quot;&quot;.&quot;&quot;&quot;.r ^^ (_.head))) ^^ { 
+    def tableClause: Parser[Operator] =
+      tableIdent ~ opt(&quot;schema&quot; ~&gt; fieldList1) ~ opt(&quot;delim&quot; ~&gt; (&quot;&quot;&quot;\t&quot;&quot;&quot; ^^ (_ =&gt; '\t') | &quot;&quot;&quot;.&quot;&quot;&quot;.r ^^ (_.head))) ^^ {
         case table ~ schema ~ delim =&gt; Scan(table, schema, delim)
-      }
-    def selectClause: Parser[Operator=&gt;Operator] = 
-      &quot;select&quot; ~&gt; (&quot;*&quot; ^^ { _ =&gt; (op:Operator) =&gt; op } | fieldList ^^ { fs =&gt; Project(fs,fs,_:Operator) })
-    def whereClause: Parser[Operator=&gt;Operator] = 
+      } |
+      (&quot;(&quot; ~&gt; stm &lt;~ &quot;)&quot;)
+    def fromClause: Parser[Operator] =
+      &quot;from&quot; ~&gt; joinClause
+    def joinClause: Parser[Operator] =
+      (&quot;nestedloops&quot; ~&gt; repsep(tableClause, &quot;join&quot;) ^^ { _.reduceLeft((a,b) =&gt; Join(a,b)) }) |
+      (repsep(tableClause, &quot;join&quot;) ^^ { _.reduceLeft((a,b) =&gt; HashJoin(a,b)) })
+
+    def selectClause: Parser[Operator=&gt;Operator] =
+      &quot;select&quot; ~&gt; (&quot;*&quot; ^^ { _ =&gt; (op:Operator) =&gt; op } | fieldList ^^ { case (fs,fs1) =&gt; Project(fs,fs1,_:Operator) })
+    def whereClause: Parser[Operator=&gt;Operator] =
       opt(&quot;where&quot; ~&gt; predicate ^^ { p =&gt; Filter(p, _:Operator) }) ^^ { _.getOrElse(op =&gt; op)}
 
-    def stm: Parser[Operator] = selectClause ~ fromClause ~ whereClause ^^ { case p ~ s ~ f =&gt; p(f(s)) }
+    def groupClause: Parser[Operator=&gt;Operator] =
+      opt(&quot;group&quot; ~&gt; &quot;by&quot; ~&gt; fieldList1 ~ (&quot;sum&quot; ~&gt; fieldList1) ^^ { case p1 ~ p2 =&gt; Group(p1,p2, _:Operator) }) ^^ { _.getOrElse(op =&gt; op)}
+
+    def stm: Parser[Operator] = selectClause ~ fromClause ~ whereClause ~ groupClause ^^ {
+      case p ~ s ~ f ~ g =&gt; g(p(f(s)))
+    }
   }
   def parseSql(input: String) = Grammar.parseAll(Grammar.stm, input).get // cleaner error reporting?
 }
@@ -492,8 +509,9 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
-                <h2>AST</h2>
-<p>The parser takes a string and convers it to an AST.</p>
+                <h2>Relational Algebra AST</h2>
+<p>The parser takes a SQL string and converts it to tree of relational
+<br  />algebra operators.</p>
 
             </div>
             <div class="code">
@@ -568,7 +586,7 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h3>a (plain) Query Interpreter</h3>
+                <h3>A (Plain) Query Interpreter</h3>
 <p>We start with a plain query processor: an interpreter.</p>
 <ul>
 <li><a href="query_unstaged.html">query_unstaged.scala</a></li>
@@ -578,7 +596,6 @@ import org.scalatest.FunSuite
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>trait PlainQueryProcessor extends QueryProcessor {
   type Table = String
-  def dynamicFilePath(table: String) = filePath(table)
 }
 
 </code></pre>
@@ -588,14 +605,19 @@ import org.scalatest.FunSuite
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
-                <h3>a Staged Query Interpreter (= Compiler)</h3>
+                <h3>A Staged Query Interpreter (= Compiler)</h3>
+<p>Staging our query interpreter yields a query compiler.
+<br  />In the first iteration we generate Scala code:</p>
 <ul>
-<li><p><a href="query_staged0.scala">query_staged0</a></p>
+<li><p><a href="query_staged0.html">query_staged0</a></p>
 </li>
-<li><p><a href="query_staged.scala">query_staged</a></p>
+<li><p><a href="query_staged.html">query_staged</a></p>
 </li>
-<li><p><a href="query_optc.scala">query_optc</a></p>
-</li>
+</ul>
+<p>For additional low-level optimizations we switch to
+<br  />generating C code:</p>
+<ul>
+<li><a href="query_optc.html">query_optc</a></li>
 </ul>
 
             </div>
@@ -603,8 +625,6 @@ import org.scalatest.FunSuite
                 <pre><code class='prettyprint lang-scala'>trait StagedQueryProcessor extends QueryProcessor with Dsl {
   type Table = Rep[String] // dynamic filename
   override def filePath(table: String) = if (table == &quot;?&quot;) throw new Exception(&quot;file path for table ? not available&quot;) else super.filePath(table)
-  def dynamicFileName: Table
-  def dynamicFilePath(table: String) = if (table == &quot;?&quot;) dynamicFileName else unit(filePath(table))
 }
 
 </code></pre>
@@ -623,9 +643,7 @@ import org.scalatest.FunSuite
 
   trait TestDriver extends SQLParser with QueryProcessor with ExpectedASTs {
     def runtest: Unit
-    override def filePath(table: String) = {
-      &quot;src/data/&quot; + table
-    }
+    override def filePath(table: String) = dataFilePath(table)
 
     def name: String
     def query: String
@@ -633,11 +651,15 @@ import org.scalatest.FunSuite
   }
 
   trait PlainTestDriver extends TestDriver with PlainQueryProcessor {
-    def eval(fn: Table): Unit = execQuery(PrintCSV(parsedQuery))
+    override def dynamicFilePath(table: String): Table = if (table == &quot;?&quot;) defaultEvalTable else filePath(table)
+    def eval(fn: Table): Unit = {
+      execQuery(PrintCSV(parsedQuery))
+    }
   }
 
   trait StagedTestDriver extends TestDriver with StagedQueryProcessor {
     var dynamicFileName: Table = _
+    override def dynamicFilePath(table: String): Table = if (table == &quot;?&quot;) dynamicFileName else unit(filePath(table))
     def snippet(fn: Table): Rep[Unit] = {
       dynamicFileName = fn
       execQuery(PrintCSV(parsedQuery))
@@ -647,8 +669,10 @@ import org.scalatest.FunSuite
   abstract class ScalaPlainQueryDriver(val name: String, val query: String) extends PlainTestDriver with QueryProcessor { q =&gt;
     override def runtest: Unit = {
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
-        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
+        }
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -657,16 +681,16 @@ import org.scalatest.FunSuite
     override val codegen = new DslGen with ScalaGenScanner {
       val IR: q.type = q
     }
+
     override def runtest: Unit = {
-      if (version == &quot;query_staged0&quot; &amp;&amp; query.isEmpty) return ()
+      if (version == &quot;query_staged0&quot; &amp;&amp; List(&quot;Group&quot;,&quot;HashJoin&quot;).exists(parsedQuery.toString contains _)) return ()
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
-        /* FIXME: group by currently not supported in staged Scala version*/
-        if (!parsedQuery.toString.contains(&quot;Group(&quot;)) {
-          check(name, code)
-          precompile
-          checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
         }
+        check(name, code)
+        precompile
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -677,10 +701,12 @@ import org.scalatest.FunSuite
     }
     override def runtest: Unit = {
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
+        }
         check(name, code, &quot;c&quot;)
         //precompile
-        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -703,7 +729,7 @@ import org.scalatest.FunSuite
 
   trait ExpectedASTs extends QueryAST {
     val scan_t = Scan(&quot;t.csv&quot;)
-    val scan_t1gram = Scan(&quot;t1gram.csv&quot;,Some(Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)),Some('\t'))
+    val scan_t1gram = Scan(&quot;?&quot;,Some(Schema(&quot;Phrase&quot;, &quot;Year&quot;, &quot;MatchCount&quot;, &quot;VolumeCount&quot;)),Some('\t'))
 
     val expectedAstForTest = Map(
       &quot;t1&quot; -&gt; scan_t,
@@ -729,14 +755,73 @@ import org.scalatest.FunSuite
   testquery(&quot;t1&quot;, &quot;select * from t.csv&quot;)
   testquery(&quot;t2&quot;, &quot;select Name from t.csv&quot;)
   testquery(&quot;t3&quot;, &quot;select Name from t.csv where Flag='yes'&quot;)
-  testquery(&quot;t4&quot;)
-  testquery(&quot;t5&quot;)
-  testquery(&quot;t4h&quot;)
-  testquery(&quot;t5h&quot;)
-  testquery(&quot;t6&quot;)
+  testquery(&quot;t4&quot;, &quot;select * from nestedloops t.csv join (select Name as Name1 from t.csv)&quot;)
+  testquery(&quot;t5&quot;, &quot;select * from nestedloops t.csv join (select Name from t.csv)&quot;)
+  testquery(&quot;t4h&quot;,&quot;select * from t.csv join (select Name as Name1 from t.csv)&quot;)
+  testquery(&quot;t5h&quot;,&quot;select * from t.csv join (select Name from t.csv)&quot;)
+  testquery(&quot;t6&quot;, &quot;select * from t.csv group by Name sum Value&quot;) // not 100% right syntax, but hey ...
 
-  testquery(&quot;t1gram1&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
-  testquery(&quot;t1gram2&quot;, &quot;select * from t1gram.csv schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
+  val defaultEvalTable = dataFilePath(&quot;t1gram.csv&quot;)
+  val t1gram = &quot;? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;
+  testquery(&quot;t1gram1&quot;, s&quot;select * from $t1gram&quot;)
+  testquery(&quot;t1gram2&quot;, s&quot;select * from $t1gram where Phrase='Auswanderung'&quot;)
+  testquery(&quot;t1gram2n&quot;, s&quot;select * from nestedloops words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
+  testquery(&quot;t1gram2h&quot;, s&quot;select * from words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
+  testquery(&quot;t1gram3&quot;, s&quot;select * from nestedloops words.csv join (select * from $t1gram)&quot;)
+  testquery(&quot;t1gram3h&quot;, s&quot;select * from words.csv join (select * from $t1gram)&quot;)
+  testquery(&quot;t1gram4&quot;, s&quot;select * from nestedloops words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
+  testquery(&quot;t1gram4h&quot;, s&quot;select * from words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
+}
+
+object Run {
+  def time[A](a: =&gt; A) = {
+    val now = System.nanoTime
+    val result = a
+    val micros = (System.nanoTime - now) / 1000
+    println(&quot;%d microseconds&quot;.format(micros))
+    result
+  }
+  def main(args: Array[String]) {
+    val query = args(0)
+    lazy val fn = args(1)
+
+    trait Engine extends QueryProcessor with SQLParser {
+      def liftTable(n: String): Table
+      def eval: Unit
+      def prepare: Unit = {}
+      def run: Unit = execQuery(PrintCSV(parseSql(query)))
+      override def dynamicFilePath(table: String): Table =
+        liftTable(if (table == &quot;?&quot;) fn else filePath(table))
+    }
+    val engine =
+      new Engine with query_unstaged.QueryInterpreter {
+        override def liftTable(n: Table) = n
+        override def eval = run
+      }
+
+    // weird class error here
+    // in class file scala/lms/tutorial/Run$$anon$4
+    // java.lang.ClassFormatError: Duplicate field name&amp;signature in class file scala/lms/tutorial/Run$$anon$4
+    // val staged_engine =
+    //   new DslDriver[String,Unit] with StagedQueryProcessor with ScannerExp
+    //   with Engine with query_staged.QueryCompiler { q =&gt;
+    //     override val codegen = new DslGen with ScalaGenScanner {
+    //       val IR: q.type = q
+    //     }
+    //     override def liftTable(n: String) = unit(n)
+    //     override def snippet(fn: Table): Rep[Unit] = run
+    //     override def prepare: Unit = precompile
+    //     override def eval: Unit = eval(fn)
+    //   }
+
+    val engines = List(engine)
+    for (eg &lt;- engines) {
+      println(&quot;begin version &quot;+eg.version)
+      eg.prepare
+      time(eg.eval)
+      println(&quot;end version &quot;+eg.version)
+    }
+  }
 }
 </code></pre>
             </div>

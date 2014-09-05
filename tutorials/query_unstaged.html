@@ -437,7 +437,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                
+                <h1>Query Interpreter</h1>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
+
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
@@ -448,8 +451,18 @@ object query_unstaged {
 trait QueryInterpreter extends PlainQueryProcessor {
   override def version = &quot;query_unstaged&quot;
 
-  // low-level processing
-  type Fields = Vector[String]
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <h2>Low-Level Processing Logic</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  type Fields = Vector[String]
 
   case class Record(fields: Fields, schema: Schema) {
     def apply(key: String): String = fields(schema indexOf key)
@@ -467,6 +480,7 @@ trait QueryInterpreter extends PlainQueryProcessor {
       nextRecord // ignore csv header
     }
     while (s.hasNext) yld(nextRecord)
+    s.close
   }
 
   def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
@@ -477,8 +491,18 @@ trait QueryInterpreter extends PlainQueryProcessor {
 
   def fieldsHash(a: Fields) = a.foldLeft(0L) { _ * 41L + _.hashCode }
 
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <h2>Query Interpretation</h2>
 
-  def evalPred(p: Predicate)(rec: Record): Boolean = p match {
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Boolean = p match {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
   }
 
@@ -532,9 +556,9 @@ trait QueryInterpreter extends PlainQueryProcessor {
         buf += rec1
       }
       execOp(right) { rec2 =&gt;
-        hm(rec2(keys)) foreach { rec1 =&gt;
+        hm.get(rec2(keys)) foreach { _.foreach { rec1 =&gt;
           yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
-        }
+        }}
       }
     case PrintCSV(parent) =&gt;
       val schema = resultSchema(parent)

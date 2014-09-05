@@ -446,20 +446,24 @@ import scala.virtualization.lms.common._
 import scala.reflect.SourceContext
 
 // TODO: clean up at least, maybe add to LMS?
-trait HashCodeOps extends Base {
+trait UtilOps extends Base {
   def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext): Rep[Long]
+  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext): Rep[Long]
 }
-trait HashCodeOpsExp extends HashCodeOps with BaseExp {
+trait UtilOpsExp extends UtilOps with BaseExp {
   case class ObjHashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) extends Def[Long]
+  case class StrSubHashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) extends Def[Long]
   def infix_HashCode[T:Manifest](o: Rep[T])(implicit pos: SourceContext) = ObjHashCode(o)
+  def infix_HashCode(o: Rep[String], len: Rep[Int])(implicit pos: SourceContext) = StrSubHashCode(o,len)
 
   override def mirror[A:Manifest](e: Def[A], f: Transformer)(implicit pos: SourceContext): Exp[A] = (e match {
     case e@ObjHashCode(a) =&gt; infix_HashCode(f(a))
+    case e@StrSubHashCode(o,len) =&gt; infix_HashCode(f(o),f(len))
     case _ =&gt; super.mirror(e,f)
   }).asInstanceOf[Exp[A]]
 }
-trait ScalaGenHashCodeOps extends ScalaGenBase {
-  val IR: HashCodeOpsExp
+trait ScalaGenUtilOps extends ScalaGenBase {
+  val IR: UtilOpsExp
   import IR._
 
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
@@ -467,17 +471,18 @@ trait ScalaGenHashCodeOps extends ScalaGenBase {
     case _ =&gt; super.emitNode(sym, rhs)
   }
 }
-trait CGenHashCodeOps extends CGenBase {
-  val IR: HashCodeOpsExp
+trait CGenUtilOps extends CGenBase {
+  val IR: UtilOpsExp
   import IR._
 
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
-    case ObjHashCode(o) =&gt; emitValDef(sym, if (o.tp &lt;:&lt; manifest[String]) src&quot;hash($o)&quot; else src&quot;1/*TODO:improve hash*/&quot;)
+    case StrSubHashCode(o,len) =&gt; emitValDef(sym, src&quot;hash($o,$len)&quot;)
     case _ =&gt; super.emitNode(sym, rhs)
   }
 }
 
-trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with HashCodeOps {
+
+trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {
   implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])
   def infix_&amp;&amp;&amp;(lhs: Rep[Boolean], rhs: =&gt; Rep[Boolean]): Rep[Boolean] =
     __ifThenElse(lhs, rhs, unit(false))
@@ -485,10 +490,14 @@ trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString w
   def comment[A:Manifest](l: String, verbose: Boolean = true)(b: =&gt; Rep[A]): Rep[A]
 }
 
-trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with HashCodeOpsExp {
+trait DslExp extends Dsl with NumericOpsExpOpt with PrimitiveOpsExpOpt with BooleanOpsExp with IfThenElseExpOpt with EqualExpBridgeOpt with RangeOpsExp with OrderingOpsExp with MiscOpsExp with EffectExp with ArrayOpsExpOpt with StringOpsExp with SeqOpsExp with FunctionsRecursiveExp with WhileExp with StaticDataExp with VariablesExpOpt with ObjectOpsExpOpt with UtilOpsExp {
   override def boolean_or(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {
     case Const(false) =&gt; rhs
     case _ =&gt; super.boolean_or(lhs, rhs)
+  }
+  override def boolean_and(lhs: Exp[Boolean], rhs: Exp[Boolean])(implicit pos: SourceContext) : Exp[Boolean] = lhs match {
+    case Const(true) =&gt; rhs
+    case _ =&gt; super.boolean_and(lhs, rhs)
   }
 
   case class GenerateComment(l: String) extends Def[Unit]
@@ -522,7 +531,7 @@ trait DslGen extends ScalaGenNumericOps
     with ScalaGenSeqOps with ScalaGenFunctions with ScalaGenWhile
     with ScalaGenStaticData with ScalaGenVariables
     with ScalaGenObjectOps
-    with ScalaGenHashCodeOps {
+    with ScalaGenUtilOps {
   val IR: DslExp
 
   import IR._
@@ -567,7 +576,7 @@ trait DslGenC extends CGenNumericOps
     with CGenSeqOps with CGenFunctions with CGenWhile
     with CGenStaticData with CGenVariables
     with CGenObjectOps
-    with CGenHashCodeOps {
+    with CGenUtilOps {
   val IR: DslExp
   import IR._
 
@@ -662,12 +671,13 @@ trait DslGenC extends CGenNumericOps
         }
         return 0;
       }
-      unsigned long hash(unsigned char *str) // FIXME: need to take length!
+      long hash(char *str0, int len)
       {
+        unsigned char* str = (unsigned char*)str0;
         unsigned long hash = 5381;
         int c;
 
-        while ((c = *str++))
+        while ((c = *str++) &amp;&amp; len--)
           hash = ((hash &lt;&lt; 5) + hash) + c; /* hash * 33 + c */
 
         return hash;
