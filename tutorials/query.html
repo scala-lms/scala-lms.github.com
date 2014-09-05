@@ -669,8 +669,10 @@ import org.scalatest.FunSuite
   abstract class ScalaPlainQueryDriver(val name: String, val query: String) extends PlainTestDriver with QueryProcessor { q =&gt;
     override def runtest: Unit = {
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
-        checkOut(name, &quot;csv&quot;, eval(&quot;DUMMY&quot;))
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
+        }
+        checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
       }
     }
   }
@@ -679,10 +681,13 @@ import org.scalatest.FunSuite
     override val codegen = new DslGen with ScalaGenScanner {
       val IR: q.type = q
     }
+
     override def runtest: Unit = {
       if (version == &quot;query_staged0&quot; &amp;&amp; List(&quot;Group&quot;,&quot;HashJoin&quot;).exists(parsedQuery.toString contains _)) return ()
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
+        }
         check(name, code)
         precompile
         checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
@@ -696,7 +701,9 @@ import org.scalatest.FunSuite
     }
     override def runtest: Unit = {
       test(version+&quot; &quot;+name) {
-        assert(expectedAstForTest(name)==parsedQuery)
+        for (expectedParsedQuery &lt;- expectedAstForTest.get(name)) {
+          assert(expectedParsedQuery==parsedQuery)
+        }
         check(name, code, &quot;c&quot;)
         //precompile
         checkOut(name, &quot;csv&quot;, eval(defaultEvalTable))
@@ -755,8 +762,13 @@ import org.scalatest.FunSuite
   testquery(&quot;t6&quot;, &quot;select * from t.csv group by Name sum Value&quot;) // not 100% right syntax, but hey ...
 
   val defaultEvalTable = dataFilePath(&quot;t1gram.csv&quot;)
-  testquery(&quot;t1gram1&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;)
-  testquery(&quot;t1gram2&quot;, &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot;)
+  val t1gram = &quot;? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;
+  testquery(&quot;t1gram1&quot;, s&quot;select * from $t1gram&quot;)
+  testquery(&quot;t1gram2&quot;, s&quot;select * from $t1gram where Phrase='Auswanderung'&quot;)
+  testquery(&quot;t1gram3&quot;, s&quot;select * from nestedloops words.csv join (select * from $t1gram)&quot;)
+  testquery(&quot;t1gram3h&quot;, s&quot;select * from words.csv join (select * from $t1gram)&quot;)
+  testquery(&quot;t1gram4&quot;, s&quot;select * from nestedloops words.csv join (select Phrase as Word from $t1gram)&quot;)
+  testquery(&quot;t1gram4h&quot;, s&quot;select * from words.csv join (select Phrase as Word from $t1gram)&quot;)
 }
 
 object Run {
@@ -771,18 +783,42 @@ object Run {
     val query = args(0)
     lazy val fn = args(1)
 
-    trait Engine {
+    trait Engine extends QueryProcessor with SQLParser {
+      def liftTable(n: String): Table
       def eval: Unit
+      def prepare: Unit = {}
+      def run: Unit = execQuery(PrintCSV(parseSql(query)))
+      override def dynamicFilePath(table: String): Table =
+        liftTable(if (table == &quot;?&quot;) fn else filePath(table))
     }
     val engine =
-      new Engine with SQLParser with QueryProcessor with query_unstaged.QueryInterpreter {
-        override def dynamicFilePath(table: String): Table =
-          if (table == &quot;?&quot;) fn else filePath(table)
-        override def eval: Unit =
-          execQuery(PrintCSV(parseSql(query)))
+      new Engine with query_unstaged.QueryInterpreter {
+        override def liftTable(n: Table) = n
+        override def eval = run
       }
 
-    time(engine.eval)
+    // weird class error here
+    // in class file scala/lms/tutorial/Run$$anon$4
+    // java.lang.ClassFormatError: Duplicate field name&amp;signature in class file scala/lms/tutorial/Run$$anon$4
+    // val staged_engine =
+    //   new DslDriver[String,Unit] with StagedQueryProcessor with ScannerExp
+    //   with Engine with query_staged.QueryCompiler { q =&gt;
+    //     override val codegen = new DslGen with ScalaGenScanner {
+    //       val IR: q.type = q
+    //     }
+    //     override def liftTable(n: String) = unit(n)
+    //     override def snippet(fn: Table): Rep[Unit] = run
+    //     override def prepare: Unit = precompile
+    //     override def eval: Unit = eval(fn)
+    //   }
+
+    val engines = List(engine)
+    for (eg &lt;- engines) {
+      println(&quot;begin version &quot;+eg.version)
+      eg.prepare
+      time(eg.eval)
+      println(&quot;end version &quot;+eg.version)
+    }
   }
 }
 </code></pre>

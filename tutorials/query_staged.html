@@ -671,11 +671,13 @@ with ScannerBase {
       def foreach(f: Record =&gt; Rep[Unit]): Rep[Unit] = {
         val bucket = lookup(k)
 
-        val bucketLen = bucketCounts(bucket)
-        val bucketStart = bucket * bucketSize
+        if (bucket != -1) {
+          val bucketLen = bucketCounts(bucket)
+          val bucketStart = bucket * bucketSize
 
-        for (i &lt;- bucketStart until (bucketStart + bucketLen)) {
-          f(Record(data(buckets(i)),schema))
+          for (i &lt;- bucketStart until (bucketStart + bucketLen)) {
+            f(Record(data(buckets(i)),schema))
+          }
         }
       }
     }

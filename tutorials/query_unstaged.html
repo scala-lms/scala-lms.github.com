@@ -556,9 +556,9 @@ trait QueryInterpreter extends PlainQueryProcessor {
         buf += rec1
       }
       execOp(right) { rec2 =&gt;
-        hm(rec2(keys)) foreach { rec1 =&gt;
+        hm.get(rec2(keys)) foreach { _.foreach { rec1 =&gt;
           yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
-        }
+        }}
       }
     case PrintCSV(parent) =&gt;
       val schema = resultSchema(parent)

@@ -518,7 +518,7 @@ with ScannerLowerBase {
       }
       i == len
     }}
-    def hash = data.charAt(0).asInstanceOf[Rep[Long]] // first char ... FIXME
+    def hash = data.HashCode(len)
   }
   case class RInt(value: Rep[Int]) extends RField {
     def print() = printf(&quot;%d&quot;,value)
@@ -747,11 +747,13 @@ with ScannerLowerBase {
       def foreach(f: Record =&gt; Rep[Unit]): Rep[Unit] = {
         val bucket = lookup(k)
 
-        val bucketLen = bucketCounts(bucket)
-        val bucketStart = bucket * bucketSize
+        if (bucket != -1) {
+          val bucketLen = bucketCounts(bucket)
+          val bucketStart = bucket * bucketSize
 
-        for (i &lt;- bucketStart until (bucketStart + bucketLen)) {
-          f(Record(data(buckets(i)),schema))
+          for (i &lt;- bucketStart until (bucketStart + bucketLen)) {
+            f(Record(data(buckets(i)),schema))
+          }
         }
       }
     }
