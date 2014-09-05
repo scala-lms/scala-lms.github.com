@@ -524,7 +524,7 @@ class ShonanTest extends TutorialFunSuite {
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
                 <p>We get a concrete vector as result:</p>
-<pre><code class="prettyprint lang-scala">5,0,1,0,2
+<pre><code>5,0,1,0,2
 </code></pre>
 <h2>STEP 0.5: static vs dynamic conditional</h2>
 <p>Now we add basic code generation facilities and, as a recap of how
@@ -557,7 +557,7 @@ class ShonanTest extends TutorialFunSuite {
                 </div>
                 <p>The condition above is fully static, so it does not show up in
 <br  />the generated code:</p>
-<pre><code class="prettyprint lang-scala">/*****************************************
+<pre><code>/*****************************************
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Array[Int])=&gt;(Array[Int])) {
@@ -599,7 +599,7 @@ End of Generated Code
                     <a class="pilcrow" href="#section_5">&#182;</a>
                 </div>
                 <p>Notice the <code>if/else</code> statement in the generated code.</p>
-<pre><code class="prettyprint lang-scala">/*****************************************
+<pre><code>/*****************************************
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Array[Int])=&gt;(Array[Int])) {
@@ -701,7 +701,7 @@ End of Generated Code
                 <p>Looking at the generated code, we can easily see that we get a while
 <br  />loop for row 0, which is dense, no operations for row 1, and an
 <br  />unrolled loop for row 2, which is sparse:</p>
-<pre><code class="prettyprint lang-scala">/*****************************************
+<pre><code>/*****************************************
 Emitting Generated Code
 *******************************************/
 class Snippet(px6:Array[Int]) extends ((Array[Int])=&gt;(Array[Int])) {
