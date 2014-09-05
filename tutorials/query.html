@@ -776,11 +776,22 @@ import org.scalatest.FunSuite
   testquery(&quot;t1gram4h&quot;, s&quot;select * from words.csv join (select Phrase as Word, Year, MatchCount, VolumeCount from $t1gram)&quot;)
 }
 
-// example runs from sbt console
-/*
-test:run unstaged &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot; src/data/t1gram.csv
-test:run c &quot;select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'&quot; src/data/1gram_a.csv
-object Run {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_7">&#182;</a>
+                </div>
+                <h2>Interactive Mode</h2>
+<p>Examples:</p>
+<pre><code>test:run unstaged "select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'" src/data/t1gram.csv
+test:run c        "select * from ? schema Phrase, Year, MatchCount, VolumeCount delim \\t where Phrase='Auswanderung'" src/data/t1gram.csv
+</code></pre>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>object Run {
   def time[A](a: =&gt; A) = {
     val now = System.nanoTime
     val result = a
@@ -853,7 +864,7 @@ object Run {
         
             <div class="docs">
                 <div class="pilwrap">
-                    <a class="pilcrow" href="#section_7">&#182;</a>
+                    <a class="pilcrow" href="#section_8">&#182;</a>
                 </div>
                 <h2>Suggestions for Exercises</h2>
 <ul>
