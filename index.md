@@ -24,7 +24,7 @@ News:
 We're holding tutorials at major conferences:
 
 - [SPLASH 2014](http://2014.splashcon.org): Portland, October 22. More info: 
-  [2014.splashcon.org](http://2014.splashcon.org/track/splash2014-tutorials) 
+  [2014.splashcon.org](http://2014.splashcon.org/event/splash2014-tutorials-batteries-included-generative-programming-with-scala-and-lms) 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
   [scala-lms.github.io/cufp2014](cufp2014/index.html)
 <!--  [cufp.org/2014](http://cufp.org/2014/t11-tiark-rompf-batteries-included-generative-programming-with-scala-and-lms.html) -->

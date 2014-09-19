@@ -374,6 +374,14 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     query.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live.html">
+                    query_live.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live2.html">
+                    query_live2.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
                     query_optc.html
                 </a>
@@ -400,6 +408,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
                     scannerlib.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan-live.html">
+                    shonan-live.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
@@ -536,9 +548,9 @@ trait TutorialFunSuite extends LibSuite {
     assert (indent==0, &quot;indentation sanity check&quot;)
   }
 
-  def exec(label: String, code: String) = {
+  def exec(label: String, code: String, suffix: String = &quot;scala&quot;) = {
     val fileprefix = prefix+under+label
-    val aname = fileprefix+&quot;.actual.scala&quot;
+    val aname = fileprefix+&quot;.actual.&quot;+suffix
     writeFileIndented(aname, code)
   }
 }
@@ -555,6 +567,20 @@ object utils {
     override def write(b: Array[Byte]) = {}
     override def write(b: Array[Byte], off: Int, len: Int) = {}
   })
+  def withOutputFull(out: PrintStream)(func: =&gt; Unit): Unit = {
+    val oldStdOut = System.out
+    val oldStdErr = System.err
+    try {
+      System.setOut(out)
+      System.setErr(out)
+      scala.Console.withOut(out)(scala.Console.withErr(out)(func))
+    } finally {
+      out.flush()
+      out.close()
+      System.setOut(oldStdOut)
+      System.setErr(oldStdErr)
+    }
+  }
 }
 </code></pre>
             </div>

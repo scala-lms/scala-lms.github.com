@@ -374,6 +374,14 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     query.html
                 </a>
                 
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live.html">
+                    query_live.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live2.html">
+                    query_live2.html
+                </a>
+                
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
                     query_optc.html
                 </a>
@@ -400,6 +408,10 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/scannerlib.html">
                     scannerlib.html
+                </a>
+                
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan-live.html">
+                    shonan-live.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/shonan.html">
@@ -521,7 +533,7 @@ trait QueryInterpreter extends PlainQueryProcessor {
 
   def execOp(o: Operator)(yld: Record =&gt; Unit): Unit = o match {
     case Scan(filename, schema, fieldDelimiter, externalSchema) =&gt;
-      processCSV(tableFor(filename), schema, fieldDelimiter, externalSchema)(yld)
+      processCSV(filename, schema, fieldDelimiter, externalSchema)(yld)
     case Filter(pred, parent) =&gt;
       execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
     case Project(newSchema, parentSchema, parent) =&gt;
