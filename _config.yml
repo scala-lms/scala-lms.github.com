@@ -6,5 +6,5 @@ title: Lightweight Modular Staging
 tagline: Program Generation and Embedded Compilers in Scala
 github_url: https://github.com/TiarkRompf/virtualization-lms-core
 
-production_url : http://scala-lms.github.com
-baseurl: http://scala-lms.github.com/
+production_url : https://scala-lms.github.com
+baseurl: https://scala-lms.github.com/
