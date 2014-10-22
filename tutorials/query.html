@@ -378,8 +378,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     query_live.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live2.html">
-                    query_live2.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live_steps.html">
+                    query_live_steps.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
@@ -599,7 +599,7 @@ import org.scalatest.FunSuite
       ref ~ &quot;=&quot; ~ ref ^^ { case a ~ _ ~ b =&gt; Eq(a,b) }
     def ref: Parser[Ref] = 
       fieldIdent ^^ Field | 
-      &quot;&quot;&quot;'\w*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |
+      &quot;&quot;&quot;'[^']*'&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.drop(1).dropRight(1))) |
       &quot;&quot;&quot;[0-9]+&quot;&quot;&quot;.r ^^ (s =&gt; Value(s.toInt))
   
     def parseAll(input: String): Operator = parseAll(stm,input) match {
@@ -715,27 +715,19 @@ test:run c        "select * from ? schema Phrase, Year, MatchCount, VolumeCount 
   def run: Unit = execQuery(PrintCSV(parseSql(query)))
   override def dynamicFilePath(table: String): Table =
     liftTable(if (table == &quot;?&quot;) filename else filePath(table))
-    def evalString = {
-      val source = new java.io.ByteArrayOutputStream()
-      utils.withOutputFull(new java.io.PrintStream(source)) {
-        eval
-      }
-      source.toString
+  def evalString = {
+    val source = new java.io.ByteArrayOutputStream()
+    utils.withOutputFull(new java.io.PrintStream(source)) {
+      eval
     }
+    source.toString
+  }
 }
 trait StagedEngine extends Engine with StagedQueryProcessor {
   override def liftTable(n: String) = unit(n)
 }
 
 object Run {
-  def time[A](a: =&gt; A) = {
-    val now = System.nanoTime
-    val result = a
-    val micros = (System.nanoTime - now) / 1000
-    println(&quot;%d microseconds&quot;.format(micros))
-    result
-  }
-
   var qu: String = _
   var fn: String = _
 
@@ -793,7 +785,7 @@ object Run {
 
     try {
       engine.prepare
-      time(engine.eval)
+      utils.time(engine.eval)
     } catch {
       case ex: Exception =&gt;
         println(&quot;ERROR: &quot; + ex)

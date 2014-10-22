@@ -378,8 +378,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     query_live.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live2.html">
-                    query_live2.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live_steps.html">
+                    query_live_steps.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
@@ -498,7 +498,7 @@ with ScannerBase {
 
   def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
 
-  def printFields(fields: Fields) = printf(fields.map{_ =&gt; &quot;%s&quot;}.mkString(&quot;\&quot;&quot;, defaultFieldDelimiter.toString, &quot;\\n\&quot;&quot;), fields: _*)
+  def printFields(fields: Fields) = printf(fields.map{_ =&gt; &quot;%s&quot;}.mkString(&quot;&quot;, defaultFieldDelimiter.toString, &quot;\n&quot;), fields: _*)
 
   def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(unit(true)) { (a,b) =&gt; a &amp;&amp; b._1 == b._2 }
 

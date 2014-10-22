@@ -378,8 +378,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     query_live.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live2.html">
-                    query_live2.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_live_steps.html">
+                    query_live_steps.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query_optc.html">
@@ -496,7 +496,7 @@ trait CGenUtilOps extends CGenBase {
 
 trait Dsl extends NumericOps with PrimitiveOps with BooleanOps with LiftString with LiftNumeric with LiftBoolean with IfThenElse with Equal with RangeOps with OrderingOps with MiscOps with ArrayOps with StringOps with SeqOps with Functions with While with StaticData with Variables with LiftVariables with ObjectOps with UtilOps {
   implicit def repStrToSeqOps(a: Rep[String]) = new SeqOpsCls(a.asInstanceOf[Rep[Seq[Char]]])
-  def infix_&amp;&amp;&amp;(lhs: Rep[Boolean], rhs: =&gt; Rep[Boolean]): Rep[Boolean] =
+  override def infix_&amp;&amp;(lhs: Rep[Boolean], rhs: =&gt; Rep[Boolean])(implicit pos: scala.reflect.SourceContext): Rep[Boolean] =
     __ifThenElse(lhs, rhs, unit(false))
   def generate_comment(l: String): Rep[Unit]
   def comment[A:Manifest](l: String, verbose: Boolean = true)(b: =&gt; Rep[A]): Rep[A]
@@ -557,6 +557,8 @@ trait DslGen extends ScalaGenNumericOps
   override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
     case IfThenElse(c,Block(Const(true)),Block(Const(false))) =&gt;
       emitValDef(sym, quote(c))
+    case PrintF(f:String,xs) =&gt; 
+      emitValDef(sym, src&quot;printf(${Const(f)::xs})&quot;)
     case GenerateComment(s) =&gt;
       stream.println(&quot;// &quot;+s)
     case Comment(s, verbose, b) =&gt;
@@ -601,7 +603,7 @@ trait DslGenC extends CGenNumericOps
     case &quot;Char&quot; =&gt; &quot;char&quot;
     case _ =&gt; super.remap(m)
   }
-  def format(s: Exp[Any]): String = {
+  override def format(s: Exp[Any]): String = {
     remap(s.tp) match {
       case &quot;uint16_t&quot; =&gt; &quot;%c&quot;
       case &quot;bool&quot; | &quot;int8_t&quot; | &quot;int16_t&quot; | &quot;int32_t&quot; =&gt; &quot;%d&quot;
@@ -616,7 +618,7 @@ trait DslGenC extends CGenNumericOps
         throw new GenerationFailedException(&quot;CGenMiscOps: cannot print type &quot; + remap(s.tp))
     }
   }
-  def quoteRawString(s: Exp[Any]): String = {
+  override def quoteRawString(s: Exp[Any]): String = {
     remap(s.tp) match {
       case &quot;string&quot; =&gt; quote(s) + &quot;.c_str()&quot;
       case _ =&gt; quote(s)
