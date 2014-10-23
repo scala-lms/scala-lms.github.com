@@ -453,12 +453,19 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <p>Specializing string matchers and parsers is a popular benchmark in the partial
-<br  />evaluation and supercompilation literature
-<br  /><a href="DBLP:journals/ipl/ConselD89,DBLP:journals/toplas/AgerDR06,DBLP:journals/toplas/SperberT00,DBLP:journals/toplas/Turchin86,DBLP:journals/jfp/SorensenGJ96">(*)</a>.
-<br  />We consider ``multi-threaded'' regular expression matchers, that spawn a new
+<br  />evaluation and supercompilation literature.</p>
+<!--
+- http://dblp.uni-trier.de/db/ journals/ipl/ConselD89
+- http://dblp.uni-trier.de/db/ journals/toplas/AgerDR06
+- http://dblp.uni-trier.de/db/ journals/toplas/SperberT00
+- http://dblp.uni-trier.de/db/ journals/toplas/Turchin86,
+- http://dblp.uni-trier.de/db/ journals/jfp/SorensenGJ96
+-->
+<p>We consider ``multi-threaded'' regular expression matchers, that spawn a new
 <br  />conceptual thread to process alternatives in parallel. Of course these matchers
 <br  />do not actually spawn OS-level threads, but rather need to be advanced manually
 <br  />by client code. Thus, they are similar to coroutines.</p>
+<h2>Regexp Matchers as Nondeterministic Finite Automata (NFA)</h2>
 <p>Here is a simple example for the fixed regular expression <code>.*AAB</code>:</p>
 <pre><code>def findAAB(): NIO = {
   guard(Set('A')) {
@@ -487,6 +494,7 @@ def stop(): NIO = Nil
 <br  />use <code>Char</code>s for simplicity, but of course we could  use generic types as well.
 <br  />Note that the API does not mention where input is obtained from (files,
 <br  />streams, etc).</p>
+<h2>From NFA to DFA using Staging</h2>
 <p>We will translate NFAs to DFAs using staging. This is the unstaged DFA API:</p>
 <pre><code>abstract class DfaState {
   def hasFlag(x: Flag): Boolean
@@ -518,10 +526,10 @@ def dfa_trans(f: Rep[Char] =&gt; DIO): DIO
 }
 iterate(findAAB())
 </code></pre>
-<p>The LMS framework memoizes  functions (see <a href="#sec:220functions">here</a>) which
+<p>The LMS framework memoizes  functions (see <a href="http://infoscience.epfl.ch/record/178274/files/lms-cacm2012.pdf">here (PDF)</a>) which
 <br  />ensures  termination if the NFA is indeed finite.</p>
 <p>We use a separate function to explore the NFA space (see
-<br  />Figure~\ref{fig:NFAexplore}), advancing the automaton by a symbolic character
+<br  />below), advancing the automaton by a symbolic character
 <br  /><code>cin</code> to invoke its continuations <code>k</code> with a new automaton, i.e. the possible
 <br  />set of states after consuming <code>cin</code>. The given implementation assumes
 <br  />character sets contain either zero or one characters, the empty set <code>Set()</code>
@@ -549,12 +557,13 @@ iterate(findAAB())
     maybeFlag(exploreNFA(rest, cin)(acc =&gt; k(acc ++ s())))
 }
 </code></pre>
-<p>The generated code is shown in Figure~\ref{fig:regexGen}. Each function
+<p>The generated code is shown further down below. Each function
 <br  />corresponds to one DFA state. Note how  negative information has been used to
 <br  />prune the transition space: Given input such as <code>...AAB</code> the  automaton jumps
 <br  />back to the initial state, i.e. it recognizes that the last character B
 <br  />cannot also be A and starts looking for two As after the B.</p>
-<p>The generated code can be used as follows:</p>
+<h2>Generated State Machine Code</h2>
+<p>To use the generated code, we use the following small driver loop:</p>
 <pre><code>var state = stagedFindAAB()
 var input = ...
 while (input.nonEmpty) {
