@@ -17,12 +17,11 @@ LMS is used by several other projects, including:
 
 ## News Flash
 
-News:
-
-- [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation.
-
 We're holding tutorials at major conferences:
 
+- [CGO 2015](http://cgo.org/cgo2015/): San Francisco, February 7. More info: 
+<!--  [cgo.org/cgo2015/](http://cgo.org/cgo2015/event/hpdsls-scala-lms-and-delite-for-high-%C2%ADperformance-dsls-and-program-generators/) -->
+  [scala-lms.github.io/cgo2015](cgo2015/index.html)
 - [SPLASH 2014](http://2014.splashcon.org): Portland, October 22. More info: 
   [2014.splashcon.org](http://2014.splashcon.org/event/splash2014-tutorials-batteries-included-generative-programming-with-scala-and-lms) 
 - [CUFP 2014](http://cufp.org/2014/): Gothenburg, September 5. More info: 
@@ -35,6 +34,7 @@ We're holding tutorials at major conferences:
 
 Slides and additional materials are available from the links above.
 
+- [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation. Stay tuned for the 2015 edition!
 
 
 ## Abstraction Without Regret
