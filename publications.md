@@ -14,7 +14,7 @@ category: publications
 * __Lightweight Modular Staging and Embedded Compilers: Abstraction Without Regret for High-Level High-Performance Programming.__
   Tiark Rompf.
   PhD Thesis, LAMP, EPFL, 2012
-  ([PDF](http://lampwww.epfl.ch/~rompf/thesis_120716.pdf))
+  ([PDF](http://infoscience.epfl.ch/record/180642/files/EPFL_TH5456.pdf))
 
 
 ## Journals
