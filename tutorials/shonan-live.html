@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>scannerlib.scala</title>
+    <title>shonan-live.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        scannerlib.scala // Jump To &hellip;
+        shonan-live.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -441,7 +441,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">scannerlib.scala</li>
+      <li class="active">shonan-live.scala</li>
     </ol>
 
 
@@ -458,33 +458,118 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import java.io.FileReader
-import java.io.BufferedReader
+import scala.virtualization.lms.common._
+import scala.reflect.SourceContext
 
-class Scanner(filename: String) {
-  val br = new BufferedReader(new FileReader(filename))
-  private[this] var pending: String = br.readLine()
-  def next(delim: Char): String = {
-    if (delim == '\n' ) {
-      val field = pending
-      pending = br.readLine()
-      field
-    } else {
-      val i = pending.indexOf(delim)
-      val field = pending.substring(0,i)
-      pending = pending.substring(i+1)
-      field
+// sbt ~test-only *ShonanLive*
+
+class ShonanLiveTest extends TutorialFunSuite {
+  val under = &quot;0-live-&quot;
+
+/*  playground for live demo */
+
+  test(&quot;shonan-hmm-live&quot;) {
+    val A = scala.Array
+
+    val a =
+      A(A(1, 1, 1, 1, 1), // dense
+        A(0, 0, 0, 0, 0), // null
+        A(0, 0, 1, 0, 0), // sparse
+        A(0, 0, 0, 0, 0),
+        A(0, 0, 1, 0, 1))
+
+    def matrix_vector_prod(a: Array[Array[Int]], v: Array[Int]) = {
+      val n = a.length
+      val v1 = new Array[Int](n)
+
+      for (i &lt;- (0 until n): Range) {
+        for (j &lt;- (0 until n)) {
+          v1(i) = v1(i) + a(i).apply(j) * v(j)
+        }
+      }
+      v1
     }
+
+    // let's run it on some static input:
+    val v = A(1,1,1,1,1)
+    val v1 = matrix_vector_prod(a, v)
+    
+    val result = v1.mkString(&quot;,&quot;)
+    check(&quot;shonan-hmm-live&quot;, result)
   }
-  def hasNext = pending ne null
-  def close = br.close
+
+
+
+
+  /*
+    val snippet = new LMS_Driver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+        println(&quot;hello&quot;)
+        v
+      }
+    }
+    exec(&quot;shonan-hmm-live&quot;, snippet.code)
+
+
+
+/*
+  DEMO:
+  1) add compile snippet
+  2) add conditional
+  3) stage mv prod
+      - staticData(a)
+      - NewArray[Int](n)     
+  4) Range vs Rep[Range]
+  5) unrollIf
+
+abstract class LMS_Driver[A:Manifest,B:Manifest] extends DslDriver[A,B]
+
+
 }
+
+
+/*    
+    val snippet = new LMS_Driver[Array[Int],Array[Int]] {
+      def snippet(v: Rep[Array[Int]]) = {
+
+        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
+          val n = a0.length
+          val v1 = NewArray[Int](n)
+
+          val a = staticData(a0)
+
+          def unrollIf(c: Boolean)(r: Range) = new { 
+            def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+              if (c) {
+                for (j &lt;- r) {
+                  f(j)
+                }
+              } else {
+                for (j &lt;- (r.start until r.end):Rep[Range]) {
+                  f(j)
+                }
+              }
+            }
+
+          }
+
+
+          for (i &lt;- (0 until n):Range) {
+            val sparse = a0(i).count(_ != 0) &lt; 3
+            for (j &lt;- unrollIf(sparse)(0 until n)) {
+              v1(i) = v1(i) + a(i).apply(j) * v(j)
+            }
+          }
+          v1
+        }
+
+        matrix_vector_prod(a,v)
 </code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/scannerlib.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/shonan-live.scala">View this file on GitHub</a>.
         </p>
 
     </div>

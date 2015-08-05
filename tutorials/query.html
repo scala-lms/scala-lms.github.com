@@ -370,8 +370,8 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/parasall.html">
-                    parasall.html
+                <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/linq.html">
+                    linq.html
                 </a>
                 
                 <a class="source" href="http://scala-lms.github.io/summer-of-lms-2014/tutorials/query.html">
@@ -966,15 +966,18 @@ object Run {
 <p>(Hint: the C version already does this, but is also more involved
 <br  />because of the custom type representations.)</p>
 </li>
-<li><p>Implement more predicates (e.g. <code>LessThan</code>) and predicate
+<li><p>(easy) Implement more predicates (e.g. <code>LessThan</code>) and predicate
 <br  />combinators (e.g. <code>And</code>, <code>Or</code>) in order to run more interesting
 <br  />queries.</p>
 </li>
 <li><p>(medium) Implement a real column-oriented database, where each column has its
 <br  />own file so that it can be read independently.</p>
 </li>
-<li><p>Implement an optimizer on the relational algebra before generating code.
+<li><p>(hard) Implement an optimizer on the relational algebra before generating code.
 <br  />(Hint: smart constructors might help.)</p>
+<p>The query optimizer should rearrange query operator trees for a better join ordering, i.e. decide whether to execute joins on relations S0 x S1 x S2 as  (S0 x (S1 x S2)) vs ((S0 x S1) x S2).</p>
+<p>Use a dynamic programming algorithm, that for n joins on tables S0 x S1 x &hellip;x Sn tries to find an optimal solution for S1 x .. x Sn first, and then the optimal combination with S0.</p>
+<p>To find an optimal combination, try all alternatives and estimate the cost of each. Cost can be measured roughly as number of records processed. As a simple approximation, you can use the size of each input table and assume that all filter predicates match uniformly with probability 0.5.</p>
 </li>
 </ul>
 

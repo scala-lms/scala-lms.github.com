@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>scannerlib.scala</title>
+    <title>query_live_steps.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        scannerlib.scala // Jump To &hellip;
+        query_live_steps.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -441,7 +441,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">scannerlib.scala</li>
+      <li class="active">query_live_steps.scala</li>
     </ol>
 
 
@@ -458,33 +458,452 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import java.io.FileReader
-import java.io.BufferedReader
+import scala.virtualization.lms.common._
 
-class Scanner(filename: String) {
-  val br = new BufferedReader(new FileReader(filename))
-  private[this] var pending: String = br.readLine()
-  def next(delim: Char): String = {
-    if (delim == '\n' ) {
-      val field = pending
-      pending = br.readLine()
-      field
-    } else {
-      val i = pending.indexOf(delim)
-      val field = pending.substring(0,i)
-      pending = pending.substring(i+1)
-      field
+
+class QueryLiveStepsTest extends TutorialFunSuite {
+  val under = &quot;query_live_&quot;
+
+  test(&quot;demo0&quot;) {
+
+    def run = {
+      println(&quot;When I grow up I'm gonna be a SQL engine!&quot;)
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(run), suffix=&quot;csv&quot;)
+  }
+
+
+
+
+  test(&quot;demo1&quot;) {
+
+    def run = {
+      println(&quot;room,title&quot;)
+      val in = new Scanner(&quot;src/data/talks.csv&quot;)
+      in.next('\n')
+      while (in.hasNext) {
+        val tid   = in.next(',')
+        val time  = in.next(',')
+        val title = in.next(',')
+        val room  = in.next('\n')
+        if (time == &quot;09:00 AM&quot;)
+          printf(&quot;%s,%s\n&quot;,room,title)
+      }
+      in.close
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(run), suffix=&quot;csv&quot;)
+  }
+
+
+
+
+  test(&quot;demo2&quot;) {
+
+    type Schema = Vector[String]
+    case class Record(fields: Vector[String], schema: Vector[String]) {
+      def apply(name: String) = fields(schema indexOf name)
+    }
+
+    def run = {
+      println(&quot;room,title&quot;)
+      val in = new Scanner(&quot;src/data/talks.csv&quot;)
+
+      val schema = in.next('\n').split(&quot;,&quot;).toVector
+
+      while (in.hasNext) {
+        val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+        val rec = Record(fields, schema)
+
+        if (rec(&quot;time&quot;) == &quot;09:00 AM&quot;)
+          printf(&quot;%s,%s\n&quot;,rec(&quot;room&quot;),rec(&quot;title&quot;))
+      }
+      in.close
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(run), suffix=&quot;csv&quot;)
+  }
+
+
+  test(&quot;demo3&quot;) {
+
+    type Schema = Vector[String]
+    case class Record(fields: Vector[String], schema: Vector[String]) {
+      def apply(name: String) = fields(schema indexOf name)
+    }
+
+    def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+      val in = new Scanner(&quot;src/data/talks.csv&quot;)
+      val schema = in.next('\n').split(&quot;,&quot;).toVector
+      while (in.hasNext) {
+        val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+        yld(Record(fields, schema))
+      }
+    }
+
+    def run = {
+      println(&quot;room,title&quot;)
+
+      processCSV(&quot;src/data/talks.csv&quot;) { rec =&gt;
+        if (rec(&quot;time&quot;) == &quot;09:00 AM&quot;)
+          printf(&quot;%s,%s\n&quot;,rec(&quot;room&quot;),rec(&quot;title&quot;))
+      }
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(run), suffix=&quot;csv&quot;)
+  }
+
+
+
+  test(&quot;demo4&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+
+      case class Record(fields: Vector[String], schema: Vector[String]) {
+        def apply(name: String) = fields(schema indexOf name)
+      }
+
+      def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+        val in = new Scanner(file)
+        val schema = in.next('\n').split(&quot;,&quot;).toVector
+        while (in.hasNext) {
+          val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+          yld(Record(fields, schema))
+        }
+      }
+
+      def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+        case Scan(file, _, _, _)      =&gt; processCSV(file)(yld)
+        case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+      }
+
+
+      def printFields(fields: Vector[String]) = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;,&quot;)+&quot;\n&quot;, fields: _*)
+
+      def run = {
+        val ops = parseSql(&quot;select * from src/data/talks.csv&quot;)
+        
+        println(ops)
+        println(&quot;---&quot;)
+        execOp(PrintCSV(ops)) { _ =&gt; }
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+  test(&quot;demo5&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+
+      case class Record(fields: Vector[String], schema: Vector[String]) {
+        def apply(name: String): String          = fields(schema indexOf name)
+        def apply(names: Schema): Vector[String] = names map (this apply _)
+      }
+
+      def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+        val in = new Scanner(file)
+        val schema = in.next('\n').split(&quot;,&quot;).toVector
+        while (in.hasNext) {
+          val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+          yld(Record(fields, schema))
+        }
+      }
+
+      def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+        case Scan(file, _, _, _)      =&gt; processCSV(file)(yld)
+        case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+        case Project(outSchema, inSchema, parent) =&gt;
+          execOp(parent) { rec =&gt; yld(Record(rec(inSchema), outSchema))}
+      }
+
+
+      def printFields(fields: Vector[String]): Unit = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;&quot;,&quot;,&quot;,&quot;\n&quot;), fields: _*)
+
+      def run = {
+        val ops = parseSql(&quot;select time,room,title from src/data/talks.csv&quot;)
+        
+        println(ops)
+        println(&quot;---&quot;)
+        execOp(PrintCSV(ops)) { _ =&gt; }
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+
+  test(&quot;demo6&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+
+      case class Record(fields: Vector[String], schema: Vector[String]) {
+        def apply(name: String): String          = fields(schema indexOf name)
+        def apply(names: Schema): Vector[String] = names map (this apply _)
+      }
+
+      def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+        val in = new Scanner(file)
+        val schema = in.next('\n').split(&quot;,&quot;).toVector
+        while (in.hasNext) {
+          val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+          yld(Record(fields, schema))
+        }
+      }
+
+      def evalRef(p: Ref)(rec: Record) = p match {
+        case Value(a) =&gt; a
+        case Field(name) =&gt; rec(name)
+      }
+
+      def evalPred(p: Predicate)(rec: Record) = p match {
+        case Eq(a,b) =&gt; evalRef(a)(rec) == evalRef(b)(rec)
+      }
+
+      def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+        case Scan(file, _, _, _)      =&gt; processCSV(file)(yld)
+        case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+        case Project(outSchema, inSchema, parent) =&gt;
+          execOp(parent) { rec =&gt; yld(Record(rec(inSchema), outSchema))}
+        case Filter(pred, parent) =&gt;
+          execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
+      }
+
+
+      def printFields(fields: Vector[String]) = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;&quot;,&quot;,&quot;,&quot;\n&quot;), fields: _*)
+
+      def run = {
+        val ops = parseSql(&quot;select time,room,title from src/data/talks.csv where time = '09:00 AM'&quot;)
+        
+        println(ops)
+        println(&quot;---&quot;)
+        execOp(PrintCSV(ops)) { _ =&gt; }
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+
+  test(&quot;demo7&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+
+      case class Record(fields: Vector[String], schema: Vector[String]) {
+        def apply(name: String): String          = fields(schema indexOf name)
+        def apply(names: Schema): Vector[String] = names map (this apply _)
+      }
+
+      def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+        val in = new Scanner(file)
+        val schema = in.next('\n').split(&quot;,&quot;).toVector
+        while (in.hasNext) {
+          val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+          yld(Record(fields, schema))
+        }
+      }
+
+      def evalRef(p: Ref)(rec: Record) = p match {
+        case Value(a) =&gt; a
+        case Field(name) =&gt; rec(name)
+      }
+
+      def evalPred(p: Predicate)(rec: Record) = p match {
+        case Eq(a,b) =&gt; evalRef(a)(rec) == evalRef(b)(rec)
+      }
+
+      def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+        case Scan(file, _, _, _)      =&gt; processCSV(file)(yld)
+        case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+        case Project(outSchema, inSchema, parent) =&gt;
+          execOp(parent) { rec =&gt; yld(Record(rec(inSchema), outSchema))}
+        case Filter(pred, parent) =&gt;
+          execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
+      }
+
+
+      def printFields(fields: Vector[String]) = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;&quot;,&quot;,&quot;,&quot;\n&quot;), fields: _*)
+
+      def run = {
+        val ops = parseSql(&quot;select time,room,title from src/data/talks.csv where time = '09:00 AM'&quot;)
+        
+        println(ops)
+        println(&quot;---&quot;)
+        execOp(PrintCSV(ops)) { _ =&gt; }
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+  // staging!
+
+  test(&quot;demo8&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+
+      case class Record(fields: Vector[String], schema: Vector[String]) {
+        def apply(name: String): String          = fields(schema indexOf name)
+        def apply(names: Schema): Vector[String] = names map (this apply _)
+      }
+
+      def processCSV(file: String)(yld: Record =&gt; Unit): Unit = {
+        val in = new Scanner(file)
+        val schema = in.next('\n').split(&quot;,&quot;).toVector
+        while (in.hasNext) {
+          val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+          yld(Record(fields, schema))
+        }
+      }
+
+      def evalRef(p: Ref)(rec: Record) = p match {
+        case Value(a) =&gt; a
+        case Field(name) =&gt; rec(name)
+      }
+
+      def evalPred(p: Predicate)(rec: Record) = p match {
+        case Eq(a,b) =&gt; evalRef(a)(rec) == evalRef(b)(rec)
+      }
+
+      def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+        case Scan(file, _, _, _)      =&gt; processCSV(file)(yld)
+        case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+        case Project(outSchema, inSchema, parent) =&gt;
+          execOp(parent) { rec =&gt; yld(Record(rec(inSchema), outSchema))}
+        case Filter(pred, parent) =&gt;
+          execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
+      }
+
+
+      def printFields(fields: Vector[String]) = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;&quot;,&quot;,&quot;,&quot;\n&quot;), fields: _*)
+
+      def run = {
+
+        val snippet = new LMS_Driver[Int,Unit] {
+          def snippet(x: Rep[Int]): Rep[Unit] = {
+            if (x &lt; 4)
+              println(&quot;hello&quot;)
+            else
+              printf(&quot;world&quot;)
+          }
+        }
+
+        println(snippet.code)
+        println(&quot;--- now running: ---&quot;)
+
+        println(snippet.eval(4))
+
+/*
+        val ops = parseSql(&quot;select time,room,title from src/data/talks.csv where time = '09:00 AM'&quot;)
+        
+        println(ops)
+        println(&quot;---&quot;)
+        execOp(PrintCSV(ops)) { _ =&gt; }
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+  test(&quot;demo9&quot;) {
+
+    object Engine extends SimpleQueryProcessor with SQLParser {
+      def run = {
+        val snippet = new LMS_Driver[Int,Unit] {
+
+          case class Record(fields: Vector[Rep[String]], schema: Vector[String]) {
+            def apply(name: String): Rep[String]          = fields(schema indexOf name)
+            def apply(names: Schema): Vector[Rep[String]] = names map (this apply _)
+          }
+
+          def processCSV(file: String, schema: Vector[String])(yld: Record =&gt; Unit): Unit = {
+            val in = newScanner(file)
+            in.next('\n')
+            while (in.hasNext) {
+              val fields = schema map (n =&gt; in.next(if (n == schema.last) '\n' else ','))
+              yld(Record(fields, schema))
+            }
+          }
+
+          def evalRef(p: Ref)(rec: Record): Rep[String] = p match {
+            case Value(a: String) =&gt; a
+            case Field(name) =&gt; rec(name)
+          }
+
+          def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
+            case Eq(a,b) =&gt; evalRef(a)(rec) == evalRef(b)(rec)
+          }
+
+          def execOp(op: Operator)(yld: Record =&gt; Unit): Unit = op match {
+            case Scan(file, schema, _, _) =&gt; processCSV(file,schema)(yld)
+            case PrintCSV(parent)         =&gt; execOp(parent) { rec =&gt; printFields(rec.fields) }
+            case Project(outSchema, inSchema, parent) =&gt;
+              execOp(parent) { rec =&gt; yld(Record(rec(inSchema), outSchema))}
+            case Filter(pred, parent) =&gt;
+              execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
+          }
+
+          def printFields(fields: Vector[Rep[String]]) = printf(fields.map(_ =&gt; &quot;%s&quot;).mkString(&quot;&quot;,&quot;,&quot;,&quot;\n&quot;), fields: _*)
+
+          def snippet(x: Rep[Int]): Rep[Unit] = {
+            val ops = parseSql(&quot;select time,room,title from src/data/talks.csv where time = '09:00 AM'&quot;)
+            execOp(PrintCSV(ops)) { _ =&gt; }
+          }
+        }
+
+        println(snippet.code)
+        println(&quot;--- now running: ---&quot;)
+        snippet.precompile
+        utils.time {
+          snippet.eval(4)
+        }
+
+      }
+
+    }
+
+    exec(&quot;data&quot;, utils.captureOut(Engine.run), suffix=&quot;csv&quot;)
+  }
+
+
+  trait SimpleQueryProcessor extends PlainQueryProcessor with SQLParser {
+    def dynamicFilePath(table: String): Table = table
+    def execQuery(q: Operator): Unit = ???
+    def version: String = &quot;simple&quot;
+  }
+
+
+  abstract class LMS_Driver[A:Manifest,B:Manifest] extends DslDriver[A,B] with ScannerExp { q =&gt;
+    override val codegen = new DslGen with ScalaGenScanner {
+      val IR: q.type = q
     }
   }
-  def hasNext = pending ne null
-  def close = br.close
+
+  /*abstract class LMS_Driver[A:Manifest,B:Manifest] extends DslDriver[A,B] with ScannerExp
+    with StagedEngine with MainEngine with query_staged.QueryCompiler { q =&gt;
+      override val codegen = new DslGen with ScalaGenScanner {
+        val IR: q.type = q
+      }
+
+
 }
 </code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/scannerlib.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_live_steps.scala">View this file on GitHub</a>.
         </p>
 
     </div>

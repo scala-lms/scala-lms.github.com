@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>scannerlib.scala</title>
+    <title>query_live.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        scannerlib.scala // Jump To &hellip;
+        query_live.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -441,7 +441,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">scannerlib.scala</li>
+      <li class="active">query_live.scala</li>
     </ol>
 
 
@@ -458,33 +458,77 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import java.io.FileReader
-import java.io.BufferedReader
+import scala.virtualization.lms.common._
 
-class Scanner(filename: String) {
-  val br = new BufferedReader(new FileReader(filename))
-  private[this] var pending: String = br.readLine()
-  def next(delim: Char): String = {
-    if (delim == '\n' ) {
-      val field = pending
-      pending = br.readLine()
-      field
-    } else {
-      val i = pending.indexOf(delim)
-      val field = pending.substring(0,i)
-      pending = pending.substring(i+1)
-      field
-    }
+object query_live {
+trait QueryInterpreter extends PlainQueryProcessor {
+  override def version = &quot;query_live&quot;
+
+  def execQuery(q: Operator): Unit = {
+    println(&quot;hello&quot;)
   }
-  def hasNext = pending ne null
-  def close = br.close
+}
+}
+
+class QueryLiveTest extends TutorialFunSuite {
+  val under = &quot;query_live_&quot;
+
+  def engine =
+    new Engine with query_live.QueryInterpreter {
+      override def liftTable(n: Table) = n
+      override def eval = run
+
+    //trait QueryCompiler extends Dsl with StagedQueryProcessor with ScannerBase {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_1">&#182;</a>
+                </div>
+                <pre><code>new DslDriver[String,Unit] with ScannerExp with StagedEngine with query_live.QueryCompiler { q =&gt;
+  override val codegen = new DslGen with ScalaGenScanner {
+    val IR: q.type = q
+  }
+  override def prepare: Unit = precompile
+</code></pre>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>    //trait QueryCompiler extends Dsl with StagedQueryProcessor with ScannerLowerBase {
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_2">&#182;</a>
+                </div>
+                <pre><code>new DslDriverC[String,Unit] with ScannerLowerExp with StagedEngine with query_live.QueryCompiler { q =&gt;
+  override val codegen = new DslGenC with CGenScannerLower {
+    val IR: q.type = q
+  }
+  override def snippet(fn: Table): Rep[Unit] = run
+  override def eval = eval(filename)
+</code></pre>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>      override def query = s&quot;select * from $t1gram&quot;
+      override def filename = dataFilePath(&quot;t1gram.csv&quot;)
+      val t1gram = &quot;? schema Phrase, Year, MatchCount, VolumeCount delim \\t&quot;
+
+    }
+  test(&quot;demo&quot;) {
+    //exec(&quot;code&quot;, engine.code, suffix=&quot;scala&quot;)
+    exec(&quot;data&quot;, engine.evalString, suffix=&quot;csv&quot;)
+  }
 }
 </code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/scannerlib.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_live.scala">View this file on GitHub</a>.
         </p>
 
     </div>
