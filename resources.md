@@ -27,7 +27,7 @@ Tutorial write-ups:
 
 Comprehensive, but many many pages: 
 
-* Tiark's [thesis](http://lampwww.epfl.ch/~rompf/thesis_120716.pdf)
+* Tiark's [thesis](http://infoscience.epfl.ch/record/180642/files/EPFL_TH5456.pdf)
 
 Training courses, full-day tutorials:
 
