@@ -929,7 +929,68 @@ abstract class EvalDslDriver extends EvalDsl with EvalDslImpl with CompileScala 
       top_eval[NoRep](A(A(Y(true), List(A(sumf(true), List(A(Y(true), List(fib(true))))))), List(I(7))))}
   }
 }
+
 </code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_18">&#182;</a>
+                </div>
+                <h2>Generated Code</h2>
+<p>This is code generated while specializing the <code>fib</code> lambda.</p>
+<pre><code class="prettyprint lang-scala">import scala.lms.tutorial.eval._
+/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Value)=&gt;(Value)) {
+  def apply(x0:Value): Value = {
+    val x14 = {x15: (Value) =&gt;
+      x15: Value
+    }
+    val x1 = {x2: (Value) =&gt;
+      val x8 = {x9: (Value) =&gt;
+        val x12 = {x13: (Value) =&gt;
+          val x16 = base_apply_norep(P("+"), List(x9, x13), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x14)
+          x16: Value
+        }
+        val x10 = {x11: (Value) =&gt;
+          val x18 = base_apply_norep(x0, List(x11), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x12)
+          x18: Value
+        }
+        val x20 = base_apply_norep(P("-"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x10)
+        x20: Value
+      }
+      val x6 = {x7: (Value) =&gt;
+        val x22 = base_apply_norep(x0, List(x7), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x8)
+        x22: Value
+      }
+      val x3 = {x4: (Value) =&gt;
+        val x5 = B(false) != x4
+        val x26 = if (x5) {
+          x2
+        } else {
+          val x24 = base_apply_norep(P("-"), List(x2, I(1)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x6)
+          x24
+        }
+        x26: Value
+      }
+      val x28 = base_apply_norep(P("&lt;"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x3)
+      x28: Value
+    }
+    val x30 = evalfun(x1)
+    x30
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+// compilation: ok
+</code></pre>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'></code></pre>
             </div>
         
 
