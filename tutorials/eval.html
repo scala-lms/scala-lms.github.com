@@ -8,7 +8,7 @@
     <meta name="author" content="">
     <link rel="icon" href="../../favicon.ico">
 
-    <title>query_optc.scala</title>
+    <title>eval.scala</title>
 
     <!-- Google Analytics -->
     <script>
@@ -325,7 +325,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        query_optc.scala // Jump To &hellip;
+        eval.scala // Jump To &hellip;
         <div id="jump_wrapper">
             <div id="jump_toc"></div>
             <div id="jump_page">
@@ -445,7 +445,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
       <li><a href="index.html">Tutorials</a></li>
-      <li class="active">query_optc.scala</li>
+      <li class="active">eval.scala</li>
     </ol>
 
 
@@ -457,20 +457,25 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_0">&#182;</a>
                 </div>
-                <h1>Query Compiler III (C Code)</h1>
-<p>Outline:</p>
-<div id="tableofcontents"></div>
+                <h1>An auto-specializing interpreter</h1>
+<p>We show an end-to-end LMS example, exploiting once more that a &ldquo;staged
+<br  />interpreter is a compiler&rdquo; but with a twist: parametric staging!</p>
+<ul>
+<li><p>Georg Ofenbeck et al. at GPCE 2013
+<br  /><em>Spiral in Scala: Towards the Systematic Construction of Generators for Performance Libraries</em>
+<br  />The technique of abstracting over staging decision is inspired by this work.</p>
+</li>
+<li><p>Kenichi Asai at GPCE 2014
+<br  /><em>Compiling a Reflective Language using MetaOCaml</em>
+<br  />Specializing lambdas in our interpreter is loosely inspired by this
+<br  />paper, which features a much more powerful and flexible Scheme-like
+<br  />object language.</p>
+</li>
+</ul>
 
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
-
-import scala.lms.common._
-
-object query_optc {
-trait QueryCompiler extends Dsl with StagedQueryProcessor
-with ScannerLowerBase {
-  override def version = &quot;query_optc&quot;
 
 </code></pre>
             </div>
@@ -479,38 +484,12 @@ with ScannerLowerBase {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_1">&#182;</a>
                 </div>
-                <h2>Input File Tokenizer</h2>
+                <h2>Our Base Evaluator</h2>
+<p>We use an object <code>eval</code> to which we can easily refer in the generated code.</p>
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  class Scanner(name: Rep[String]) {
-    val fd = open(name)
-    val fl = filelen(fd)
-    val data = mmap[Char](fd,fl)
-    var pos = 0
-
-    def next(d: Rep[Char]) = {
-      val start = pos: Rep[Int] // force read
-      while (data(pos) != d) pos += 1
-      val len = pos - start
-      pos += 1
-      RString(stringFromCharArray(data,start,len), len)
-    }
-
-    def nextInt(d: Rep[Char]) = {
-      val start = pos: Rep[Int] // force read
-      var num = 0
-      while (data(pos) != d) {
-        num = num * 10 + (data(pos) - '0').toInt
-        pos += 1
-      }
-      pos += 1
-      RInt(num)
-    }
-
-    def hasNext = pos &lt; fl
-    def done = close(fd)
-  }
+                <pre><code class='prettyprint lang-scala'>object eval {
 
 </code></pre>
             </div>
@@ -519,74 +498,14 @@ with ScannerLowerBase {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_2">&#182;</a>
                 </div>
-                <h2>Low-Level Processing Logic</h2>
+                <p>We use plain Scala ASTs for our <code>Term</code>s and <code>Value</code>s. We change the
+<br  /><code>toString</code> representation of the ASTs so that each is self-evaluating in
+<br  />Scala, so that they can be printed as such in the generated code.</p>
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  abstract class RField {
-    def print()
-    def compare(o: RField): Rep[Boolean]
-    def hash: Rep[Long]
-  }
-  case class RString(data: Rep[String], len: Rep[Int]) extends RField {
-    def print() = prints(data)
-    def compare(o: RField) = o match { case RString(data2, len2) =&gt; if (len != len2) false else {
-      // TODO: we may or may not want to inline this (code bloat and icache considerations).
-      var i = 0
-      while (i &lt; len &amp;&amp; data.charAt(i) == data2.charAt(i)) {
-        i += 1
-      }
-      i == len
-    }}
-    def hash = data.HashCode(len)
-  }
-  case class RInt(value: Rep[Int]) extends RField {
-    def print() = printf(&quot;%d&quot;,value)
-    def compare(o: RField) = o match { case RInt(v2) =&gt; value == v2 }
-    def hash = value.asInstanceOf[Rep[Long]]
-  }
-
-  type Fields = Vector[RField]
-
-  def isNumericCol(s: String) = s.startsWith(&quot;#&quot;)
-
-  case class Record(fields: Fields, schema: Schema) {
-    def apply(key: String): RField = fields(schema indexOf key)
-    def apply(keys: Schema): Fields = keys.map(this apply _)
-  }
-
-  def processCSV(filename: Rep[String], schema: Schema, fieldDelimiter: Char, externalSchema: Boolean)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = {
-    val s = new Scanner(filename)
-    val last = schema.last
-    def nextField(name: String) = {
-      val d = if (name==last) '\n' else fieldDelimiter
-      if (isNumericCol(name)) s.nextInt(d) else s.next(d)
-    }
-    def nextRecord = Record(schema.map(nextField), schema)
-    if (!externalSchema) {
-      // the right thing would be to dynamically re-check the schema,
-      // but it clutters the generated code
-      // schema.foreach(f =&gt; if (s.next != f) println(&quot;ERROR: schema mismatch&quot;))
-      nextRecord // ignore csv header
-    }
-    while (s.hasNext) yld(nextRecord)
-    s.done
-  }
-
-  def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))
-
-  def printFields(fields: Fields) = {
-    if (fields.nonEmpty) {
-      fields.head.print
-      fields.tail.foreach { x  =&gt; printf(defaultFieldDelimiter.toString); x.print }
-    }
-    println(&quot;&quot;)
-  }
-
-  def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(unit(true)) { (a,b) =&gt; b._1 compare b._2 }
-
-  def fieldsHash(a: Fields) = a.foldLeft(unit(0L)) { _ * 41L + _.hash }
-
+                <pre><code class='prettyprint lang-scala'>  sealed trait Term
+  type Env = Map[String, Value]
 </code></pre>
             </div>
         
@@ -594,71 +513,12 @@ with ScannerLowerBase {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_3">&#182;</a>
                 </div>
-                <h2>Query Interpretation = Compilation</h2>
+                <p>We see our first <code>R[_]</code> to abstract over whether we have a <code>Rep</code> (staged) value or a <code>NoRep</code> (unstaged) one.</p>
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
-    case Eq(a1, a2) =&gt; evalRef(a1)(rec) compare evalRef(a2)(rec)
-  }
-
-  def evalRef(r: Ref)(rec: Record): RField = r match {
-    case Field(name) =&gt; rec(name)
-    case Value(x:Int) =&gt; RInt(x)
-    case Value(x) =&gt; RString(x.toString,x.toString.length)
-  }
-
-  def resultSchema(o: Operator): Schema = o match {
-    case Scan(_, schema, _, _)   =&gt; schema
-    case Filter(pred, parent)    =&gt; resultSchema(parent)
-    case Project(schema, _, _)   =&gt; schema
-    case Join(left, right)       =&gt; resultSchema(left) ++ resultSchema(right)
-    case Group(keys, agg, parent)=&gt; keys ++ agg
-    case HashJoin(left, right)   =&gt; resultSchema(left) ++ resultSchema(right)
-    case PrintCSV(parent)        =&gt; Schema()
-  }
-
-  def execOp(o: Operator)(yld: Record =&gt; Rep[Unit]): Rep[Unit] = o match {
-    case Scan(filename, schema, fieldDelimiter, externalSchema) =&gt;
-      processCSV(filename, schema, fieldDelimiter, externalSchema)(yld)
-    case Filter(pred, parent) =&gt;
-      execOp(parent) { rec =&gt; if (evalPred(pred)(rec)) yld(rec) }
-    case Project(newSchema, parentSchema, parent) =&gt;
-      execOp(parent) { rec =&gt; yld(Record(rec(parentSchema), newSchema)) }
-    case Join(left, right) =&gt;
-      execOp(left) { rec1 =&gt;
-        execOp(right) { rec2 =&gt;
-          val keys = rec1.schema intersect rec2.schema
-          if (fieldsEqual(rec1(keys), rec2(keys)))
-            yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
-        }
-      }
-    case Group(keys, agg, parent) =&gt;
-      val hm = new HashMapAgg(keys, agg)
-      execOp(parent) { rec =&gt;
-        hm(rec(keys)) += rec(agg)
-      }
-      hm foreach { (k,a) =&gt;
-        yld(Record(k ++ a, keys ++ agg))
-      }
-    case HashJoin(left, right) =&gt;
-      val keys = resultSchema(left) intersect resultSchema(right)
-      val hm = new HashMapBuffer(keys, resultSchema(left))
-      execOp(left) { rec1 =&gt;
-        hm(rec1(keys)) += rec1.fields
-      }
-      execOp(right) { rec2 =&gt;
-        hm(rec2(keys)) foreach { rec1 =&gt;
-          yld(Record(rec1.fields ++ rec2.fields, rec1.schema ++ rec2.schema))
-        }
-      }
-    case PrintCSV(parent) =&gt;
-      val schema = resultSchema(parent)
-      printSchema(schema)
-      execOp(parent) { rec =&gt; printFields(rec.fields) }
-  }
-  def execQuery(q: Operator): Unit = execOp(q) { _ =&gt; }
-
+                <pre><code class='prettyprint lang-scala'>  type Cont[R[_]] = R[Value] =&gt; R[Value]
+  sealed trait Value
 </code></pre>
             </div>
         
@@ -666,152 +526,415 @@ with ScannerLowerBase {
                 <div class="pilwrap">
                     <a class="pilcrow" href="#section_4">&#182;</a>
                 </div>
-                <h2>Data Structure Implementations</h2>
+                <p>Our object language just has enough features to execute fibonacci.
+<br  />Hence, the terms include just the following:</p>
 
             </div>
             <div class="code">
-                <pre><code class='prettyprint lang-scala'>  // defaults for hash sizes etc
+                <pre><code class='prettyprint lang-scala'>  // number
+  case class I(n: Int) extends Value with Term
+  // boolean
+  case class B(b: Boolean) extends Value with Term
+  // variable
+  case class V(s: String) extends Term {
+    override def toString = &quot;V(\&quot;&quot;+s+&quot;\&quot;)&quot;
+  }
+  // primitive
+  case class P(p: String) extends Value with Term {
+    override def toString = &quot;P(\&quot;&quot;+p+&quot;\&quot;)&quot;
+  }
+  // lambda
+  case class L(compile: Boolean, param: String, body: Term) extends Term {
+    override def toString = &quot;L(&quot;+compile+&quot;, \&quot;&quot;+param+&quot;\&quot;, &quot;+body+&quot;)&quot;
+  }
+  // application
+  case class A(fun: Term, args: List[Term]) extends Term
+  // if-expression
+  case class If(c: Term, thenp: Term, elsep: Term) extends Term
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_5">&#182;</a>
+                </div>
+                <p>Now, on to non-trivial values.</p>
+<p>A <code>Closure</code> represents the value of uncompiled lambda. We leave the quoting of closures to the
+<br  />code generation because we need to quote the environment.</p>
 
-  object hashDefaults {
-    val hashSize   = (1 &lt;&lt; 8)
-    val keysSize   = hashSize
-    val bucketSize = (1 &lt;&lt; 8)
-    val dataSize   = keysSize * bucketSize
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  case class Clo(param: String, body: Term, env: Map[String, Value]) extends Value
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_6">&#182;</a>
+                </div>
+                <p>An <code>Evalfun</code> represents the value of a compiled lambda, that is a function <code>Value =&gt; Value</code>.
+<br  />However, in order for these to self-quote nicely, we unfortunately need a level of
+<br  />indirection from a key (a <code>String</code>) to be mapped to the actual compiled function
+<br  />below.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  case class Evalfun(key: String) extends Value {
+    override def toString = &quot;Evalfun(\&quot;&quot;+key+&quot;\&quot;)&quot;
+  }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_7">&#182;</a>
+                </div>
+                <p>Finally, we sometimes need a <code>Rep[Value]</code> for the parameter of a lambda to be compiled.
+<br  />A <code>Code</code> enables such a representation.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  case class Code[R[_]](c: R[Value]) extends Value
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_8">&#182;</a>
+                </div>
+                <p>Our map from the key of each <code>Evalfun</code> to the actual compiled function.
+<br  />This is a bit of a leak, and so we need to reset the map between runs.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  var funs = Map[String, Value =&gt; Value]()
+  def addFun(f: Value =&gt; Value): String = {
+    val key = &quot;f&quot;+funs.size
+    funs += (key -&gt; f)
+    key
+  }
+  def reset() {
+    funs = funs.empty
+  }
+  def evalfun(f: Value =&gt; Value) = Evalfun(addFun(f))
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_9">&#182;</a>
+                </div>
+                <p>Applying a primitive is straightforward.</p>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def apply_primitive(p: String, args: List[Value]): Value = (p, args) match {
+    case (&quot;&lt;&quot;, List(I(a), I(b))) =&gt; B(a &lt; b)
+    case (&quot;+&quot;, List(I(a), I(b))) =&gt; I(a+b)
+    case (&quot;-&quot;, List(I(a), I(b))) =&gt; I(a-b)
   }
 
-  // common base class to factor out commonalities of group and join hash tables
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_10">&#182;</a>
+                </div>
+                <p>The <code>Ops</code> typeclass encapsulates all we need to know in order to parametrically stage the code. We define <code>Ops[Rep]</code> later outside the object.</p>
 
-  class HashMapBase(keySchema: Schema, schema: Schema) {
-    import hashDefaults._
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  trait Ops[R[_]] {
+    def lift(v: Value): R[Value]
+    def base_apply(fun: R[Value], args: List[R[Value]], env: Env, cont: Cont[R]): R[Value]
+    def isTrue(v: R[Value]): R[Boolean]
+    def ifThenElse[A:Manifest](cond: R[Boolean], thenp: =&gt; R[A], elsep: =&gt; R[A]): R[A]
+    def makeFun(f: R[Value] =&gt; R[Value]): R[Value]
+    def inRep: Boolean
+  }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_11">&#182;</a>
+                </div>
+                <p>The type <code>NoRep</code> enables us to run the evaluator &ldquo;now&rdquo;.</p>
 
-    val keys = new ArrayBuffer(keysSize, keySchema)
-    val keyCount = var_new(0)
-
-    val hashMask = hashSize - 1
-    val htable = NewArray[Int](hashSize)
-    for (i &lt;- 0 until hashSize) { htable(i) = -1 }
-
-    def lookup(k: Fields) = lookupInternal(k,None)
-    def lookupOrUpdate(k: Fields)(init: Rep[Int]=&gt;Rep[Unit]) = lookupInternal(k,Some(init))
-    def lookupInternal(k: Fields, init: Option[Rep[Int]=&gt;Rep[Unit]]): Rep[Int] =
-    comment[Int](&quot;hash_lookup&quot;) {
-      val h = fieldsHash(k).toInt
-      var pos = h &amp; hashMask
-      while (htable(pos) != -1 &amp;&amp; !fieldsEqual(keys(htable(pos)),k)) {
-        pos = (pos + 1) &amp; hashMask
-      }
-      if (init.isDefined) {
-        if (htable(pos) == -1) {
-          val keyPos = keyCount: Rep[Int] // force read
-          keys(keyPos) = k
-          keyCount += 1
-          htable(pos) = keyPos
-          init.get(keyPos)
-          keyPos
-        } else {
-          htable(pos)
-        }
-      } else {
-        htable(pos)
-      }
-    }
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  type NoRep[A] = A
+  implicit object OpsNoRep extends Ops[NoRep] {
+    def lift(v: Value) = v
+    def base_apply(fun: Value, args: List[Value], env: Env, cont: Cont[NoRep]) =
+      base_apply_norep(fun, args, env, cont)
+    def isTrue(v: Value) = B(false)!=v
+    def ifThenElse[A:Manifest](cond: Boolean, thenp: =&gt; A, elsep: =&gt; A): A = if (cond) thenp else elsep
+    def makeFun(f: Value =&gt; Value) = evalfun(f)
+    def inRep = false
   }
 
-  // hash table for groupBy, storing sums
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_12">&#182;</a>
+                </div>
+                <p>The unstaged base application will also be called from the generated code.</p>
 
-  class HashMapAgg(keySchema: Schema, schema: Schema) extends HashMapBase(keySchema: Schema, schema: Schema) {
-    import hashDefaults._
-
-    val values = new ArrayBuffer(keysSize, schema) // assuming all summation fields are numeric
-
-    def apply(k: Fields) = new {
-      def +=(v: Fields) = {
-        val keyPos = lookupOrUpdate(k) { keyPos =&gt;
-          values(keyPos) = schema.map(_ =&gt; RInt(0))
-        }
-        values(keyPos) = (values(keyPos) zip v) map { case (RInt(x), RInt(y)) =&gt; RInt(x + y) }
-      }
-    }
-
-    def foreach(f: (Fields,Fields) =&gt; Rep[Unit]): Rep[Unit] = {
-      for (i &lt;- 0 until keyCount) {
-        f(keys(i),values(i))
-      }
-    }
-
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def base_apply_norep(fun: Value, args: List[Value], env: Env, cont: Cont[NoRep]) = fun match {
+    case Clo(param, body, cenv) =&gt;
+      base_eval[NoRep](body, cenv + (param -&gt; args(0)), cont)
+    case Evalfun(key) =&gt;
+      val f = funs(key)
+      cont(f(args(0)))
+    case P(p) =&gt;
+      cont(apply_primitive(p, args))
   }
 
-  // hash table for joins, storing lists of records
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_13">&#182;</a>
+                </div>
+                <p>Now, on to our evaluation functions.</p>
+<p>Evaluate a list of terms.</p>
 
-  class HashMapBuffer(keySchema: Schema, schema: Schema) extends HashMapBase(keySchema: Schema, schema: Schema) {
-    import hashDefaults._
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def base_evlist[R[_]:Ops](exps: List[Term], env: Env, cont: List[R[Value]] =&gt; R[Value]): R[Value] = exps match {
+    case Nil =&gt; cont(Nil)
+    case e::es =&gt; base_eval[R](e, env, { v =&gt;
+      base_evlist[R](es, env, { vs =&gt;
+        cont(v::vs)
+      })
+    })
+  }
 
-    val data = new ArrayBuffer(dataSize, schema)
-    val dataCount = var_new(0)
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_14">&#182;</a>
+                </div>
+                <p>Evaluate a top-level term.</p>
 
-    val buckets = NewArray[Int](dataSize)
-    val bucketCounts = NewArray[Int](keysSize)
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def top_eval[R[_]:Ops](exp: Term): R[Value] = {
+    reset()
+    base_eval[R](exp, Map(), x =&gt; x)
+  }
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_15">&#182;</a>
+                </div>
+                <p>Finally, the evaluator.</p>
+<p>A key take-away is that by just staging the continuation
+<br  />from a <code>Value =&gt; Value</code> to a <code>Rep[Value] =&gt; Rep[Value]</code>,
+<br  />we can generate code for a known term instead of evaluating it directly.</p>
+<p>However, the cost of combining the staged and unstaged <code>base_eval</code> is
+<br  />that the function is no longer tail-recursive.</p>
 
-    def apply(k: Fields) = new {
-      def +=(v: Fields) = {
-        val dataPos = dataCount: Rep[Int] // force read
-        data(dataPos) = v
-        dataCount += 1
-
-        val bucket = lookupOrUpdate(k)(bucket =&gt; bucketCounts(bucket) = 0)
-        val bucketPos = bucketCounts(bucket)
-        buckets(bucket * bucketSize + bucketPos) = dataPos
-        bucketCounts(bucket) = bucketPos + 1
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>  def base_eval[R[_]:Ops](exp: Term, env: Env, cont: Cont[R]): R[Value] = {
+    val o = implicitly[Ops[R]]; import o._
+    exp match {
+      case e@I(n) =&gt; cont(lift(e))
+      case e@B(b) =&gt; cont(lift(e))
+      case e@P(p) =&gt; cont(lift(e))
+      case V(s) =&gt; env.get(s) match {
+        case Some(Code(v)) =&gt; cont(v.asInstanceOf[R[Value]])
+        case Some(v) =&gt; cont(lift(v))
       }
-
-      def foreach(f: Record =&gt; Rep[Unit]): Rep[Unit] = {
-        val bucket = lookup(k)
-
-        if (bucket != -1) {
-          val bucketLen = bucketCounts(bucket)
-          val bucketStart = bucket * bucketSize
-
-          for (i &lt;- bucketStart until (bucketStart + bucketLen)) {
-            f(Record(data(buckets(i)),schema))
+      case L(compile, param, body) =&gt;
+        if (!compile) {
+          cont(lift(Clo(param, body, env)))
+        } else if (!inRep) {
+          trait Program extends EvalDsl {
+            def snippet(arg: Rep[Value]): Rep[Value] =
+              base_eval[Rep](body, env+(param -&gt; Code(arg)), x =&gt; x)(OpsRep)
           }
+          val r = new EvalDslDriver with Program
+          println(r.code)
+          r.precompile
+          val f = arg =&gt; r.eval(arg)
+          cont(lift(evalfun(f)))
+        } else {
+          val f = makeFun(arg =&gt; base_eval[R](body, env+(param -&gt; Code(arg)), x =&gt; x))
+          cont(f)
         }
-      }
+      case A(fun, args) =&gt; base_eval[R](fun, env, { v =&gt;
+        base_evlist[R](args, env, { vs =&gt;
+          base_apply(v, vs, env, cont)
+        })
+      })
+      case If(cond, thenp, elsep) =&gt; base_eval[R](cond, env, { vc =&gt;
+        ifThenElse(isTrue(vc),
+          base_eval[R](thenp, env, cont),
+          base_eval[R](elsep, env, cont))
+      })
     }
   }
+}
 
-  // column-oriented array buffer, with a row-oriented interface,
-  // specialized to data representation
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_16">&#182;</a>
+                </div>
+                <h2>The LMS bits</h2>
 
-  abstract class ColBuffer
-  case class IntColBuffer(data: Rep[Array[Int]]) extends ColBuffer
-  case class StringColBuffer(data: Rep[Array[String]], len: Rep[Array[Int]]) extends ColBuffer
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>import eval._
+import scala.lms.common._
 
-  class ArrayBuffer(dataSize: Int, schema: Schema) {
-    val buf = schema.map {
-      case hd if isNumericCol(hd) =&gt; IntColBuffer(NewArray[Int](dataSize))
-      case _ =&gt; StringColBuffer(NewArray[String](dataSize), NewArray[Int](dataSize))
-    }
-    var len = 0
-    def +=(x: Fields) = {
-      this(len) = x
-      len += 1
-    }
-    def update(i: Rep[Int], x: Fields) = (buf,x).zipped.foreach {
-      case (IntColBuffer(b), RInt(x)) =&gt; b(i) = x
-      case (StringColBuffer(b,l), RString(x,y)) =&gt; b(i) = x; l(i) = y
-    }
-    def apply(i: Rep[Int]) = buf.map {
-      case IntColBuffer(b) =&gt; RInt(b(i))
-      case StringColBuffer(b,l) =&gt; RString(b(i),l(i))
-    }
+trait EvalDsl extends Functions with IfThenElse with Equal with UncheckedOps {
+  def base_apply_rep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]): Rep[Value]
+  implicit object OpsRep extends scala.Serializable with Ops[Rep] {
+    def lift(v: Value) = unit(v)
+    def base_apply(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]) =
+      base_apply_rep(f, args, env, cont)
+    def isTrue(v: Rep[Value]): Rep[Boolean] = unit(B(false))!=v
+    def ifThenElse[A:Manifest](cond: Rep[Boolean], thenp: =&gt; Rep[A], elsep: =&gt; Rep[A]): Rep[A] = if (cond) thenp else elsep
+    def makeFun(f: Rep[Value] =&gt; Rep[Value]) = unchecked(&quot;evalfun(&quot;, fun(f), &quot;)&quot;)
+    def inRep = true
   }
-}}
+
+  def snippet(x: Rep[Value]): Rep[Value]
+}
+
+trait EvalDslExp extends EvalDsl with EffectExp with FunctionsRecursiveExp with IfThenElseExp with EqualExp with UncheckedOpsExp {
+  case class BaseApplyRep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Rep[Cont[NoRep]]) extends Def[Value]
+  def base_apply_rep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]): Rep[Value] =
+    reflectEffect(BaseApplyRep(f, args, env, fun(cont)))
+}
+
+trait EvalDslGen extends ScalaGenFunctions with ScalaGenIfThenElse with ScalaGenEqual with ScalaGenUncheckedOps {
+  val IR: EvalDslExp
+  import IR._
+
+  def env_quote(env: Env) =
+    &quot;Map(&quot;+(for ((k,v) &lt;- env) yield (&quot;(\&quot;&quot;+k+&quot;\&quot; -&gt; &quot;+quote(Const(v))+&quot;)&quot;)).mkString(&quot;, &quot;)+&quot;)&quot;
+
+  override def quote(x: Exp[Any]) : String = x match {
+    case Const(Code(c)) =&gt; quote(c.asInstanceOf[Rep[Value]])
+    case Const(Clo(param, body, env)) =&gt;  &quot;Clo(\&quot;&quot;+param+&quot;\&quot;, &quot;+body+&quot;, &quot;+env_quote(env)+&quot;)&quot;
+    case _ =&gt; super.quote(x)
+  }
+  override def emitNode(sym: Sym[Any], rhs: Def[Any]) = rhs match {
+    case BaseApplyRep(f, args, env, cont) =&gt;
+      emitValDef(sym, &quot;base_apply_norep(&quot;+quote(f)+&quot;, List(&quot;+args.map(quote).mkString(&quot;, &quot;)+&quot;), &quot;+env_quote(env)+&quot;, &quot;+quote(cont)+&quot;)&quot;)
+    case _ =&gt; super.emitNode(sym, rhs)
+  }
+}
+
+trait EvalDslImpl extends EvalDslExp { q =&gt;
+  val codegen = new EvalDslGen {
+    val IR: q.type = q
+
+    override def remap[A](m: Manifest[A]): String = {
+      if (m.toString.endsWith(&quot;$Value&quot;)) &quot;Value&quot;
+      else super.remap(m)
+    }
+
+    override def emitSource[A : Manifest](args: List[Sym[_]], body: Block[A], className: String, stream: java.io.PrintWriter): List[(Sym[Any], Any)] = {
+      stream.println(&quot;import scala.lms.tutorial.eval._&quot;)
+      super.emitSource(args, body, className, stream)
+    }
+
+  }
+}
+
+abstract class EvalDslDriver extends EvalDsl with EvalDslImpl with CompileScala {
+  lazy val f = compile(snippet)
+  def precompile: Unit = { print(&quot;// &quot;); f }
+  def precompileSilently: Unit = utils.devnull(f)
+  def eval(x: Value): Value = f(x)
+  lazy val code: String = {
+    val source = new java.io.StringWriter()
+    codegen.emitSource(snippet, &quot;Snippet&quot;, new java.io.PrintWriter(source))
+    source.toString
+  }
+}
+
+</code></pre>
+            </div>
+        
+            <div class="docs">
+                <div class="pilwrap">
+                    <a class="pilcrow" href="#section_17">&#182;</a>
+                </div>
+                <h2>The Tests</h2>
+
+            </div>
+            <div class="code">
+                <pre><code class='prettyprint lang-scala'>class TestEvaluator extends TutorialFunSuite {
+  val under = &quot;eval_&quot;
+
+  def ex_id(c: Boolean) = A(L(c, &quot;x&quot;, V(&quot;x&quot;)), List(I(1)))
+  test (&quot;id evaluated&quot;) {
+    assertResult(I(1)){top_eval[NoRep](ex_id(false))}
+  }
+
+  test (&quot;id compiled&quot;) {
+    checkOut(&quot;id&quot;, &quot;scala&quot;,
+      assertResult(I(1)){top_eval[NoRep](ex_id(true))})
+  }
+
+  def Y(c: Boolean) = L(c, &quot;fun&quot;, A(L(c, &quot;F&quot;, A(V(&quot;F&quot;), List(V(&quot;F&quot;)))), List(L(c, &quot;F&quot;, A(V(&quot;fun&quot;), List(L(c, &quot;x&quot;, A(A(V(&quot;F&quot;), List(V(&quot;F&quot;))), List(V(&quot;x&quot;))))))))))
+  def fib(c: Boolean) = L(c, &quot;fib&quot;, L(c, &quot;n&quot;, If(A(P(&quot;&lt;&quot;), List(V(&quot;n&quot;), I(2))), V(&quot;n&quot;), A(P(&quot;+&quot;), List(A(V(&quot;fib&quot;), List(A(P(&quot;-&quot;), List(V(&quot;n&quot;), I(1))))), A(V(&quot;fib&quot;), List(A(P(&quot;-&quot;), List(V(&quot;n&quot;), I(2))))))))))
+  def sumf(c: Boolean) = L(c, &quot;f&quot;, L(c, &quot;sumf&quot;, L(c, &quot;n&quot;, If(A(P(&quot;&lt;&quot;), List(V(&quot;n&quot;), I(0))), I(0), A(P(&quot;+&quot;), List(A(V(&quot;f&quot;), List(V(&quot;n&quot;))), A(V(&quot;sumf&quot;), List(A(P(&quot;-&quot;), List(V(&quot;n&quot;), I(1)))))))))))
+
+  test (&quot;fib 7 evaluated&quot;) {
+    assertResult(I(13)){
+      top_eval[NoRep](A(A(Y(false), List(fib(false))), List(I(7))))}
+  }
+
+  test (&quot;fib 7 compiled fib&quot;) {
+    checkOut(&quot;yfibc&quot;, &quot;scala&quot;,
+      assertResult(I(13)){
+        top_eval[NoRep](A(A(Y(false), List(fib(true))), List(I(7))))})
+  }
+
+  test (&quot;fib 7 compiled all&quot;) {
+    checkOut(&quot;ycfibc&quot;, &quot;scala&quot;,
+      assertResult(I(13)){
+        top_eval[NoRep](A(A(Y(true), List(fib(true))), List(I(7))))})
+  }
+
+  test (&quot;sum of fibs evaluated&quot;) {
+    assertResult(I(33)){
+      top_eval[NoRep](A(A(Y(false), List(A(sumf(false), List(A(Y(false), List(fib(false))))))), List(I(7))))}
+  }
+
+  test (&quot;sum of fibs compiled&quot;) {
+    assertResult(I(33)){
+      top_eval[NoRep](A(A(Y(true), List(A(sumf(true), List(A(Y(true), List(fib(true))))))), List(I(7))))}
+  }
+}
 </code></pre>
             </div>
         
 
         <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_optc.scala">View this file on GitHub</a>.
+        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/eval.scala">View this file on GitHub</a>.
         </p>
 
     </div>
