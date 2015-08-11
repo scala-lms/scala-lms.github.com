@@ -461,7 +461,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import scala.virtualization.lms.common._
+import scala.lms.common._
 
 object query_optc {
 trait QueryCompiler extends Dsl with StagedQueryProcessor
@@ -505,7 +505,7 @@ with ScannerLowerBase {
     }
 
     def hasNext = pos &lt; fl
-    def close = fclose(fd)
+    def done = close(fd)
   }
 
 </code></pre>
@@ -566,7 +566,7 @@ with ScannerLowerBase {
       nextRecord // ignore csv header
     }
     while (s.hasNext) yld(nextRecord)
-    s.close
+    s.done
   }
 
   def printSchema(schema: Schema) = println(schema.mkString(defaultFieldDelimiter.toString))

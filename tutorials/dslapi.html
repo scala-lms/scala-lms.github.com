@@ -458,7 +458,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
-import scala.virtualization.lms.common._
+import scala.lms.common._
 import scala.reflect.SourceContext
 
 // TODO: clean up at least, maybe add to LMS?
@@ -618,7 +618,7 @@ trait DslGenC extends CGenNumericOps
       case &quot;char&quot; =&gt; &quot;%c&quot;
       case &quot;void&quot; =&gt; &quot;%c&quot;
       case _ =&gt;
-        import scala.virtualization.lms.internal.GenerationFailedException
+        import scala.lms.internal.GenerationFailedException
         throw new GenerationFailedException(&quot;CGenMiscOps: cannot print type &quot; + remap(s.tp))
     }
   }
@@ -675,6 +675,7 @@ trait DslGenC extends CGenNumericOps
       #include &lt;sys/stat.h&gt;
       #include &lt;stdio.h&gt;
       #include &lt;stdint.h&gt;
+      #include &lt;unistd.h&gt;
       #ifndef MAP_FILE
       #define MAP_FILE MAP_SHARED
       #endif
