@@ -40,6 +40,11 @@ category: publications
 
 ## Conferences
 
+* __Functional Pearl: A SQL to C Compiler in 500 Lines of Code.__
+  Tiark Rompf, Nada Amin.
+  ICFP '15.
+  ([PDF](http://www.cs.purdue.edu/homes/rompf/papers/rompf-icfp15.pdf))
+
 * __On Staged Parser Combinators for Efficient Data Processing.__
   Manohar Jonnalagedda, Thierry Coppey, Sandro Stucki, Tiark Rompf, Martin Odersky. 
   OOPSLA '14.
