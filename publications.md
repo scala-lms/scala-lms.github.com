@@ -45,6 +45,11 @@ category: publications
   ICFP '15.
   ([PDF](http://www.cs.purdue.edu/homes/rompf/papers/rompf-icfp15.pdf))
 
+* __Go Meta! A Case for Generative Programming and DSLs in Performance Critical Systems.__
+  Tiark Rompf, Kevin J Brown, HyoukJoong Lee, Arvind K Sujeeth, Manohar Jonnalagedda, Nada Amin, Georg Ofenbeck, Alen Stojanov, Yannis Klonatos, Mohammad Dashti, Christoph Koch, Markus Püschel, Kunle Olukotun.
+  SNAPL '15
+  ([PDF](http://drops.dagstuhl.de/opus/volltexte/2015/5029/pdf/19.pdf))
+
 * __On Staged Parser Combinators for Efficient Data Processing.__
   Manohar Jonnalagedda, Thierry Coppey, Sandro Stucki, Tiark Rompf, Martin Odersky. 
   OOPSLA '14.
