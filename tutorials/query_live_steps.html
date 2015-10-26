@@ -374,10 +374,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="https://scala-lms.github.io/tutorials/linq.html">
-                    linq.html
-                </a>
-                
                 <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
                     query.html
                 </a>
@@ -894,7 +890,7 @@ class QueryLiveStepsTest extends TutorialFunSuite {
     }
   }
 
-  /*abstract class LMS_Driver[A:Manifest,B:Manifest] extends DslDriver[A,B] with ScannerExp
+  /*abstract class LMS_Driver[A:Typ,B:Typ] extends DslDriver[A,B] with ScannerExp
     with StagedEngine with MainEngine with query_staged.QueryCompiler { q =&gt;
       override val codegen = new DslGen with ScalaGenScanner {
         val IR: q.type = q

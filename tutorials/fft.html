@@ -374,10 +374,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="https://scala-lms.github.io/tutorials/linq.html">
-                    linq.html
-                </a>
-                
                 <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
                     query.html
                 </a>
@@ -699,7 +695,7 @@ trait ScalaGenFlat extends ScalaGenBase {
    import IR._
    type Block[+T] = Exp[T]
    def getBlockResultFull[T](x: Block[T]): Exp[T] = x
-   def reifyBlock[T:Manifest](x: =&gt;Exp[T]): Block[T] = x
+   def reifyBlock[T:Typ](x: =&gt;Exp[T]): Block[T] = x
    def traverseBlock[A](block: Block[A]): Unit = {
      buildScheduleForResult(block) foreach traverseStm
    }

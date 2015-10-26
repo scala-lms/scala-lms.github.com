@@ -374,10 +374,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="https://scala-lms.github.io/tutorials/linq.html">
-                    linq.html
-                </a>
-                
                 <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
                     query.html
                 </a>
@@ -703,7 +699,7 @@ with ScannerBase {
     }
   }
 
-  class ArrayBuffer[T:Manifest](dataSize: Int, schema: Schema) {
+  class ArrayBuffer[T:Typ](dataSize: Int, schema: Schema) {
     val buf = schema.map(f =&gt; NewArray[T](dataSize))
     var len = 0
     def +=(x: Seq[Rep[T]]) = {

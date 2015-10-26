@@ -374,10 +374,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="https://scala-lms.github.io/tutorials/linq.html">
-                    linq.html
-                </a>
-                
                 <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
                     query.html
                 </a>
@@ -648,10 +644,12 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             </div>
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  trait Ops[R[_]] {
+    type T[A]
+    def valueT: T[Value]
     def lift(v: Value): R[Value]
     def base_apply(fun: R[Value], args: List[R[Value]], env: Env, cont: Cont[R]): R[Value]
     def isTrue(v: R[Value]): R[Boolean]
-    def ifThenElse[A:Manifest](cond: R[Boolean], thenp: =&gt; R[A], elsep: =&gt; R[A]): R[A]
+    def ifThenElse[A:T](cond: R[Boolean], thenp: =&gt; R[A], elsep: =&gt; R[A]): R[A]
     def makeFun(f: R[Value] =&gt; R[Value]): R[Value]
     def inRep: Boolean
   }
@@ -668,11 +666,13 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
             <div class="code">
                 <pre><code class='prettyprint lang-scala'>  type NoRep[A] = A
   implicit object OpsNoRep extends Ops[NoRep] {
+    type T[A] = Unit
+    def valueT = ()
     def lift(v: Value) = v
     def base_apply(fun: Value, args: List[Value], env: Env, cont: Cont[NoRep]) =
       base_apply_norep(fun, args, env, cont)
     def isTrue(v: Value) = B(false)!=v
-    def ifThenElse[A:Manifest](cond: Boolean, thenp: =&gt; A, elsep: =&gt; A): A = if (cond) thenp else elsep
+    def ifThenElse[A:T](cond: Boolean, thenp: =&gt; A, elsep: =&gt; A): A = if (cond) thenp else elsep
     def makeFun(f: Value =&gt; Value) = evalfun(f)
     def inRep = false
   }
@@ -785,7 +785,7 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
       case If(cond, thenp, elsep) =&gt; base_eval[R](cond, env, { vc =&gt;
         ifThenElse(isTrue(vc),
           base_eval[R](thenp, env, cont),
-          base_eval[R](elsep, env, cont))
+          base_eval[R](elsep, env, cont))(valueT)
       })
     }
   }
@@ -805,14 +805,17 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                 <pre><code class='prettyprint lang-scala'>import eval._
 import scala.lms.common._
 
-trait EvalDsl extends Functions with IfThenElse with Equal with UncheckedOps {
+trait EvalDsl extends Dsl with UncheckedOps {
+  implicit def valTyp: Typ[Value]
   def base_apply_rep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]): Rep[Value]
   implicit object OpsRep extends scala.Serializable with Ops[Rep] {
+    type T[A] = Typ[A]
+    def valueT = typ[Value]
     def lift(v: Value) = unit(v)
     def base_apply(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]) =
       base_apply_rep(f, args, env, cont)
-    def isTrue(v: Rep[Value]): Rep[Boolean] = unit(B(false))!=v
-    def ifThenElse[A:Manifest](cond: Rep[Boolean], thenp: =&gt; Rep[A], elsep: =&gt; Rep[A]): Rep[A] = if (cond) thenp else elsep
+    def isTrue(v: Rep[Value]): Rep[Boolean] = unit[Value](B(false))!=v
+    def ifThenElse[A:T](cond: Rep[Boolean], thenp: =&gt; Rep[A], elsep: =&gt; Rep[A]): Rep[A] = if (cond) thenp else elsep
     def makeFun(f: Rep[Value] =&gt; Rep[Value]) = unchecked(&quot;evalfun(&quot;, fun(f), &quot;)&quot;)
     def inRep = true
   }
@@ -820,7 +823,8 @@ trait EvalDsl extends Functions with IfThenElse with Equal with UncheckedOps {
   def snippet(x: Rep[Value]): Rep[Value]
 }
 
-trait EvalDslExp extends EvalDsl with EffectExp with FunctionsRecursiveExp with IfThenElseExp with EqualExp with UncheckedOpsExp {
+trait EvalDslExp extends EvalDsl with DslExp with UncheckedOpsExp {
+  implicit def valTyp: Typ[Value] = manifestTyp
   case class BaseApplyRep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Rep[Cont[NoRep]]) extends Def[Value]
   def base_apply_rep(f: Rep[Value], args: List[Rep[Value]], env: Env, cont: Cont[Rep]): Rep[Value] =
     reflectEffect(BaseApplyRep(f, args, env, fun(cont)))
@@ -849,12 +853,12 @@ trait EvalDslImpl extends EvalDslExp { q =&gt;
   val codegen = new EvalDslGen {
     val IR: q.type = q
 
-    override def remap[A](m: Manifest[A]): String = {
+    override def remap[A](m: Typ[A]): String = {
       if (m.toString.endsWith(&quot;$Value&quot;)) &quot;Value&quot;
       else super.remap(m)
     }
 
-    override def emitSource[A : Manifest](args: List[Sym[_]], body: Block[A], className: String, stream: java.io.PrintWriter): List[(Sym[Any], Any)] = {
+    override def emitSource[A : Typ](args: List[Sym[_]], body: Block[A], className: String, stream: java.io.PrintWriter): List[(Sym[Any], Any)] = {
       stream.println(&quot;import scala.lms.tutorial.eval._&quot;)
       super.emitSource(args, body, className, stream)
     }
@@ -864,7 +868,7 @@ trait EvalDslImpl extends EvalDslExp { q =&gt;
 
 abstract class EvalDslDriver extends EvalDsl with EvalDslImpl with CompileScala {
   lazy val f = compile(snippet)
-  def precompile: Unit = { print(&quot;// &quot;); f }
+  def precompile: Unit = { Console.print(&quot;// &quot;); f }
   def precompileSilently: Unit = utils.devnull(f)
   def eval(x: Value): Value = f(x)
   lazy val code: String = {
@@ -945,41 +949,41 @@ Emitting Generated Code
 *******************************************/
 class Snippet extends ((Value)=&gt;(Value)) {
   def apply(x0:Value): Value = {
-    val x14 = {x15: (Value) =&gt;
-      x15: Value
+    val x15 = {x16: (Value) =&gt;
+      x16: Value
     }
     val x1 = {x2: (Value) =&gt;
-      val x8 = {x9: (Value) =&gt;
-        val x12 = {x13: (Value) =&gt;
-          val x16 = base_apply_norep(P("+"), List(x9, x13), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x14)
-          x16: Value
+      val x9 = {x10: (Value) =&gt;
+        val x13 = {x14: (Value) =&gt;
+          val x17 = base_apply_norep(P("+"), List(x10, x14), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x15)
+          x17: Value
         }
-        val x10 = {x11: (Value) =&gt;
-          val x18 = base_apply_norep(x0, List(x11), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x12)
-          x18: Value
+        val x11 = {x12: (Value) =&gt;
+          val x19 = base_apply_norep(x0, List(x12), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x13)
+          x19: Value
         }
-        val x20 = base_apply_norep(P("-"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x10)
-        x20: Value
+        val x21 = base_apply_norep(P("-"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x11)
+        x21: Value
       }
-      val x6 = {x7: (Value) =&gt;
-        val x22 = base_apply_norep(x0, List(x7), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x8)
-        x22: Value
+      val x7 = {x8: (Value) =&gt;
+        val x23 = base_apply_norep(x0, List(x8), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x9)
+        x23: Value
       }
       val x3 = {x4: (Value) =&gt;
-        val x5 = B(false) != x4
-        val x26 = if (x5) {
-          x2
+        val x6 = B(false) == x4
+        val x27 = if (x6) {
+          val x25 = base_apply_norep(P("-"), List(x2, I(1)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x7)
+          x25
         } else {
-          val x24 = base_apply_norep(P("-"), List(x2, I(1)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x6)
-          x24
+          x2
         }
-        x26: Value
+        x27: Value
       }
-      val x28 = base_apply_norep(P("&lt;"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x3)
-      x28: Value
+      val x29 = base_apply_norep(P("&lt;"), List(x2, I(2)), Map(("fib" -&gt; x0), ("n" -&gt; x2)), x3)
+      x29: Value
     }
-    val x30 = evalfun(x1)
-    x30
+    val x31 = evalfun(x1)
+    x31
   }
 }
 /*****************************************

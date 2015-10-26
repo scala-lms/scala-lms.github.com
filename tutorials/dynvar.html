@@ -374,10 +374,6 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
                     index.html
                 </a>
                 
-                <a class="source" href="https://scala-lms.github.io/tutorials/linq.html">
-                    linq.html
-                </a>
-                
                 <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
                     query.html
                 </a>
@@ -484,7 +480,7 @@ trait TrackConditionals extends Dsl {
     finally
       cs0 = save
   }
-  abstract override def __ifThenElse[T:Manifest](cond: Rep[Boolean], thenp: =&gt; Rep[T], elsep: =&gt; Rep[T])(implicit pos: SourceContext) = {
+  abstract override def __ifThenElse[T:Typ](cond: Rep[Boolean], thenp: =&gt; Rep[T], elsep: =&gt; Rep[T])(implicit pos: SourceContext) = {
     if (cs1.contains(cond)) thenp
     else if (cs0.contains(cond)) elsep
     else super.__ifThenElse(cond, push1(cond, thenp), push0(cond, elsep))
