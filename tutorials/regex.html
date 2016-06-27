@@ -657,19 +657,19 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
 
   testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
   testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
-  testmatch(&quot;hell&quot;, &quot;hello&quot;, true);
-  testmatch(&quot;hell&quot;, &quot;hell&quot;, true);
-  testmatch(&quot;hel*&quot;, &quot;he&quot;, true);
-  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false);
-  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true);
-  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true);
-  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false);
-  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
-  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
-  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
+  testmatch(&quot;hell&quot;, &quot;hello&quot;, true)
+  testmatch(&quot;hell&quot;, &quot;hell&quot;, true)
+  testmatch(&quot;hel*&quot;, &quot;he&quot;, true)
+  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false)
+  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true)
+  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true)
+  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false)
+  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true)
+  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true)
+  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true)
+  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true)
+  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false)
+  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false)
 
 </code></pre>
             </div>
