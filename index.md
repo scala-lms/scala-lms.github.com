@@ -15,10 +15,15 @@ LMS is used by several other projects, including:
 - [LegoBase](http://data.epfl.ch/legobase): 
   query compilation in database systems.
 
-## News Flash
+## Recent Events
 
-We're holding tutorials at major conferences:
+We've been holding tutorials at major conferences and summer schools:
 
+- [DSLDISS 2015](http://vjovanov.github.io/dsldi-summer-school/): Lausanne, July 14. More info: 
+  [vjovanov.github.io/dsldi-summer-school](http://vjovanov.github.io/dsldi-summer-school/program.html)
+- [CGO 2015](http://cgo.org/cgo2015/): San Francisco, February 7. More info: 
+<!--  [cgo.org/cgo2015/](http://cgo.org/cgo2015/event/hpdsls-scala-lms-and-delite-for-high-%C2%ADperformance-dsls-and-program-generators/) -->
+  [scala-lms.github.io/cgo2015](cgo2015/index.html)
 - [CGO 2015](http://cgo.org/cgo2015/): San Francisco, February 7. More info: 
 <!--  [cgo.org/cgo2015/](http://cgo.org/cgo2015/event/hpdsls-scala-lms-and-delite-for-high-%C2%ADperformance-dsls-and-program-generators/) -->
   [scala-lms.github.io/cgo2015](cgo2015/index.html)
@@ -34,8 +39,13 @@ We're holding tutorials at major conferences:
 
 Slides and additional materials are available from the links above.
 
-- [The Summer of LMS 2014](summer-of-lms-2014.html): stability, polishing, documentation. Stay tuned for the 2015 edition!
+The Summer of LMS: We have conducted focused hackathons with specific themes:
 
+- [2014](summer-of-lms-2014.html): stability, polishing, documentation.
+- 2015: reimplement Scala-Virtualized compiler fork using macros
+- 2016: focus on C generation, including specs for static verification
+
+<!-- TODO: links and outcomes -->
 
 ## Abstraction Without Regret
 
@@ -108,5 +118,5 @@ Be sure to check out the [docs](tutorials/index.html)!
 ## Community
 
 LMS is developed and used by researchers and practitioners from EPFL, Stanford, ETH, Purdue, 
-University of Rennes, Oracle Labs, Huawei Labs, and other institutions.
+University of Rennes, Barcelona Supercomputing Center, Oracle Labs, Huawei Labs, and other institutions.
 
