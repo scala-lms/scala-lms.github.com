@@ -29,6 +29,8 @@ Related projects:
 
 * [Delite](http://stanford-ppl.github.com/Delite/)
 * [OptiML](http://stanford-ppl.github.com/Delite/optiml/index.html)
+* [Spiral in Scala](http://www.spiral.net/software/spiral-scala.html)
+* [LMS Verify](https://github.com/namin/lms-verify)
 * [Scala Virtualized](https://github.com/tiarkrompf/scala-virtualized/wiki)
 * [JS-Scala](https://github.com/js-scala/js-scala)
 
