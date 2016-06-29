@@ -23,6 +23,7 @@ Tutorial write-ups:
 
 * [Tutorials](http://scala-lms.github.io/tutorials) hosted here
 * [LMS Tutorial](https://github.com/julienrf/lms-tutorial/wiki) by Julien Richard Foy
+* [Blog Posts (on Efficient Query Processing)](http://manojo.github.io/) by Manohar Jonnalagedda
 * [OptiML getting started guide](http://stanford-ppl.github.com/Delite/optiml/getting_started.html) by Arvind Sujeeth (about Delite and OptiML)
 
 Comprehensive, but many many pages: 
@@ -51,7 +52,6 @@ Related projects:
 
 * [Delite](http://stanford-ppl.github.com/Delite/)
 * [OptiML](http://stanford-ppl.github.com/Delite/optiml/index.html)
+* [LMS Verify](https://github.com/namin/lms-verify)
 * [Scala Virtualized](https://github.com/tiarkrompf/scala-virtualized/wiki)
 * [JS-Scala](https://github.com/js-scala/js-scala)
-
-<!-- http://www.infoq.com/interviews/amin-scala -->
