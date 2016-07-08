@@ -23,7 +23,7 @@ Tutorial write-ups:
 
 * [Tutorials](http://scala-lms.github.io/tutorials) hosted here
 * [LMS Tutorial](https://github.com/julienrf/lms-tutorial/wiki) by Julien Richard Foy
-* [Blog Posts (on Efficient Query Processing)](http://manojo.github.io#posts) by Manohar Jonnalagedda
+* [Blog Posts (on Specialising Parsers for Queries)](http://manojo.github.io#posts) by Manohar Jonnalagedda
 * [OptiML getting started guide](http://stanford-ppl.github.com/Delite/optiml/getting_started.html) by Arvind Sujeeth (about Delite and OptiML)
 
 Comprehensive, but many many pages: 
