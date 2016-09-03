@@ -6,7 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="description" content="">
     <meta name="author" content="">
-    <link rel="icon" href="../../favicon.ico">
+    <link rel="icon" href="../images/favicon.ico">
 
     <title>query_staged0.scala</title>
 
@@ -25,196 +25,186 @@
     <!-- Bootstrap core CSS -->
     <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
-    <script src="../bootstrap/assets/js/ie-emulation-modes-warning.js"></script>
-
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../bootstrap/assets/js/ie10-viewport-bug-workaround.js"></script>
-
     <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
-      <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-      <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
-    <![endif]-->
-
-    <!-- Custom styles for this template -->
-    <!-- <link href="../bootstrap/carousel.css" rel="stylesheet"> -->
+	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
 
     <!-- font awesome -->
     <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
 
     <style type="text/css">
-@import url(../stylesheets/pygment_trac.css);
-/* head fancy: Lobster, Pacifico */
-/* head serif: Arvo, Bitter, Podkova, Roboto Slab */
-/* dense bold: Squada One, Oswald; */
-@import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
-@import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
-@import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
-@import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
-body {
-  /*line-height: 1.7;*/
-  /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
-  font-family: 'Helvetica Neue';
-  /*font-size: 15pt;*/
-  color: rgb(41,41,41);
-}
+      @import url(../stylesheets/pygment_trac.css);
+      /* head fancy: Lobster, Pacifico */
+      /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
+      /* dense bold: Squada One, Oswald; */
+      @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+      @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+      @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+      @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+      body {
+      /*line-height: 1.7;*/
+      /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+      font-family: 'Helvetica Neue';
+      /*font-size: 15pt;*/
+      color: rgb(41,41,41);
+      }
 
-h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
-  font-family: 'Roboto Slab';
-  font-weight: 700;
-}
-
-
-.container h1,h2 {
-  border-bottom: 1px solid #e5e5e5;
-/*  margin-bottom: 1em;
-  margin-top: 2em;*/
-}
+      h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+      font-family: 'Roboto Slab';
+      font-weight: 700;
+      }
 
 
+      .container h1,h2 {
+      border-bottom: 1px solid #e5e5e5;
+      /*  margin-bottom: 1em;
+      margin-top: 2em;*/
+      }
 
 
-.jumbotron {
-  background: transparent;
-}
 
-/* Space out content a bit */
-/*body {
-  padding-top: 20px;
-  padding-bottom: 20px;
-}*/
 
-/* Everything but the jumbotron gets side spacing for mobile first views */
-.header,
-.marketing,
-.footer {
-  padding-right: 15px;
-  padding-left: 15px;
-}
+      .jumbotron {
+      background: transparent;
+      }
 
-/* Custom page header */
-.header {
-  border-bottom: 1px solid #e5e5e5;
-}
-/* Make the masthead heading the same height as the navigation */
-.header h3 {
-  padding-bottom: 19px;
-  margin-top: 0;
-  margin-bottom: 0;
-  line-height: 40px;
-}
+      /* Space out content a bit */
+      /*body {
+      padding-top: 20px;
+      padding-bottom: 20px;
+      }*/
 
-/* Custom page footer */
-.footer {
-  padding-top: 19px;
-  color: #777;
-  border-top: 1px solid #e5e5e5;
-}
+      /* Everything but the jumbotron gets side spacing for mobile first views */
+      .header,
+      .marketing,
+      .footer {
+      padding-right: 15px;
+      padding-left: 15px;
+      }
 
-/* Customize container */
-@media (min-width: 768px) {
-  .jumbotron .container {
-    max-width: 730px;
-  }
-  .container {
-    max-width: 730px;
-  }
-}
-.container-narrow > hr {
-  margin: 30px 0;
-}
+      /* Custom page header */
+      .header {
+      border-bottom: 1px solid #e5e5e5;
+      }
+      /* Make the masthead heading the same height as the navigation */
+      .header h3 {
+      padding-bottom: 19px;
+      margin-top: 0;
+      margin-bottom: 0;
+      line-height: 40px;
+      }
 
-/* Main marketing message and sign up button */
-.jumbotron {
-  text-align: center;
-  border-bottom: 1px solid #e5e5e5;
-}
-.jumbotron .btn {
-  padding: 14px 24px;
-  font-size: 21px;
-}
+      /* Custom page footer */
+      .footer {
+      padding-top: 19px;
+      color: #777;
+      border-top: 1px solid #e5e5e5;
+      }
 
-/* Supporting marketing content */
-.marketing {
-  margin: 40px 0;
-}
-.marketing p + h4 {
-  margin-top: 28px;
-}
+      /* Customize container */
+      @media (min-width: 768px) {
+      .jumbotron .container {
+      max-width: 730px;
+      }
+      .container {
+      max-width: 730px;
+      }
+      }
+      .container-narrow > hr {
+	margin: 30px 0;
+	}
 
-/* Responsive: Portrait tablets and up */
-@media screen and (min-width: 768px) {
-  /* Remove the padding we set earlier */
-  .header,
-  .marketing,
-  .footer {
-    padding-right: 0;
-    padding-left: 0;
-  }
-  /* Space out the masthead */
-  .header {
-    margin-bottom: 30px;
-  }
-  /* Remove the bottom border on the jumbotron for visual effect */
-  .jumbotron {
-    border-bottom: 1px solid #e5e5e5;
-  }
-}
+	/* Main marketing message and sign up button */
+	.jumbotron {
+	text-align: center;
+	border-bottom: 1px solid #e5e5e5;
+	}
+	.jumbotron .btn {
+	padding: 14px 24px;
+	font-size: 21px;
+	}
+
+	/* Supporting marketing content */
+	.marketing {
+	margin: 40px 0;
+	}
+	.marketing p + h4 {
+	margin-top: 28px;
+	}
+
+	/* Responsive: Portrait tablets and up */
+	@media screen and (min-width: 768px) {
+	/* Remove the padding we set earlier */
+	.header,
+	.marketing,
+	.footer {
+	padding-right: 0;
+	padding-left: 0;
+	}
+	/* Space out the masthead */
+	.header {
+	margin-bottom: 30px;
+	}
+	/* Remove the bottom border on the jumbotron for visual effect */
+	.jumbotron {
+	border-bottom: 1px solid #e5e5e5;
+	}
+	}
 
 
         #jump_to, #jump_page, #jump_toc {
-            background: white;
-            -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
-            -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
-            font: 10px Arial;
-            text-transform: uppercase;
-            cursor: pointer;
-            text-align: right;
+        background: white;
+        -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+        -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+        font: 10px Arial;
+        text-transform: uppercase;
+        cursor: pointer;
+        text-align: right;
         }
         #jump_to, #jump_wrapper {
-            position: fixed;
-            right: 0; top: 0;
-            padding: 5px 10px;
+        position: fixed;
+        right: 0; top: 0;
+        padding: 5px 10px;
         }
         #jump_wrapper {
-            padding: 0;
-            display: none;
+        padding: 0;
+        display: none;
         }
         #jump_to:hover #jump_wrapper {
-            display: block;
+        display: block;
         }
         #jump_page {
-            padding: 5px 0 3px;
-            margin: 0 0 25px 25px;
+        padding: 5px 0 3px;
+        margin: 0 0 25px 25px;
         }
         #jump_page .source {
-            display: block;
-            padding: 5px 10px;
-            text-decoration: none;
-            border-top: 1px solid #eee;
+        display: block;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-top: 1px solid #eee;
         }
         #jump_page .source:hover {
-            background: #f5f5ff;
+        background: #f5f5ff;
         }
         #jump_page .source:first-child {
         }
 
 
         #jump_toc {
-            padding: 5px 0 3px;
-            margin: 0 0 25px 25px;
+        padding: 5px 0 3px;
+        margin: 0 0 25px 25px;
         }
         #jump_toc li {
-            display: block;
-            padding: 5px 10px;
-            text-decoration: none;
-            border-top: 1px solid #eee;
+        display: block;
+        padding: 5px 10px;
+        text-decoration: none;
+        border-top: 1px solid #eee;
         }
         #jump_toc li:hover {
-            background: #f5f5ff;
+        background: #f5f5ff;
         }
         #jump_toc li:first-child {
         }
@@ -222,220 +212,231 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
 
 
         table td {
-            border: 0;
-            outline: 0;
+        border: 0;
+        outline: 0;
         }
         td.docs, th.docs {
-            min-width: 575px;
-            /*max-width: 450px;
-            min-width: 450px;
-            min-height: 5px;*/
-            padding: 10px 25px 1px 50px;
-            /*overflow-x: hidden;*
-            vertical-align: top;
-            text-align: left;*/
+        min-width: 575px;
+        /*max-width: 450px;
+        min-width: 450px;
+        min-height: 5px;*/
+        padding: 10px 25px 1px 50px;
+        /*overflow-x: hidden;*
+        vertical-align: top;
+        text-align: left;*/
         }
         .docs pre {
-            margin: 15px 0 15px;
-            padding-left: 15px;
+        margin: 15px 0 15px;
+        padding-left: 15px;
         }
         .docs p tt, .docs p code, .doc code {
-            background: #f8f8ff;
-            border: 1px solid #dedede;
-            font-size: 12px;
-            padding: 0 0.2em;
+        background: #f8f8ff;
+        border: 1px solid #dedede;
+        font-size: 12px;
+        padding: 0 0.2em;
         }
         .pilwrap {
-            position: relative;
+        position: relative;
         }
         .pilcrow {
-            font: 12px Arial;
-            text-decoration: none;
-            color: #454545;
-            position: absolute;
-            top: 3px; left: -20px;
-            padding: 1px 2px;
-            opacity: 0;
-            -webkit-transition: opacity 0.2s linear;
+        font: 12px Arial;
+        text-decoration: none;
+        color: #454545;
+        position: absolute;
+        top: 3px; left: -20px;
+        padding: 1px 2px;
+        opacity: 0;
+        -webkit-transition: opacity 0.2s linear;
         }
         td.docs:hover .pilcrow {
-            opacity: 1;
+        opacity: 1;
         }
         pre {
-            border: none;
-            /*width: 100%;*/
-            vertical-align: top;
-            background: #f5f5ff;
-            /*border-left: 1px solid #e5e5ee;*/
+        border: none;
+        /*width: 100%;*/
+        vertical-align: top;
+        background: #f5f5ff;
+        /*border-left: 1px solid #e5e5ee;*/
         }
         pre, tt, code {
-            font-size: 12px; line-height: 18px;
-            font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+        font-size: 12px; line-height: 18px;
+        font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
         }
-
-        /*---------------------- Prettify Syntax Highlighting -----------------------------*/
-        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
 
         table.doc { margin-bottom: 20px; }
         td.doc { border-bottom: 1px dashed #708090; }
         td.param { font-weight: bold; }
         td.return { font-weight: bold; text-decoration: underline; }
-    </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/prettify/r224/prettify.js" type="text/javascript"></script>
-    <script src="https://google-code-prettify.googlecode.com/svn/trunk/src/lang-scala.js" type="text/javascript"></script>
+</style>
+<script type="text/x-mathjax-config">
+  MathJax.Hub.Config({
+    extensions: ["tex2jax.js"],
+    jax: ["input/TeX", "output/HTML-CSS"],
+  tex2jax: {
+      skipTags: ["script","noscript","style","textarea"],
+      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+      processEscapes: true
+    },
+    "HTML-CSS": { availableFonts: ["TeX"] }
+  });
+</script>
+<script type="text/javascript" async
+  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+</script>
 </head>
 
-<body onload="prettyPrint()">
-        <div class="navbar navbar-default navbar-static-top" role="navigation">
-          <div class="container">
-            <div class="navbar-header">
-              <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-                <span class="sr-only">Toggle navigation</span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-                <span class="icon-bar"></span>
-              </button>
-              <a class="navbar-brand" href="index.html">LMS</a>
-            </div>
-            <div class="navbar-collapse collapse">
-              <ul class="nav navbar-nav">
-                <li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-                <li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
-                <li><a href="../resources.html">Resources</a></li>
-                <li><a href="../publications.html">Publications</a></li>
-                <li><a href="../community.html">Community</a></li>
-                <!--<li><a href="community.html">Community</a></li>-->
-                <!--<li class="dropdown">
-                  <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-                  <ul class="dropdown-menu" role="menu">
-                    <li><a href="#">Action</a></li>
-                    <li><a href="#">Another action</a></li>
-                    <li><a href="#">Something else here</a></li>
-                    <li class="divider"></li>
-                    <li class="dropdown-header">Nav header</li>
-                    <li><a href="#">Separated link</a></li>
-                    <li><a href="#">One more separated link</a></li>
-                  </ul>
-                </li>-->
-              </ul>
-            </div>
-          </div>
-        </div>
-
+<body>
+  <div class="navbar navbar-default navbar-static-top" role="navigation">
     <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="index.html">LMS</a>
+      </div>
+      <div class="navbar-collapse collapse">
+        <ul class="nav navbar-nav">
+          <li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+          <li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+          <li><a href="../resources.html">Resources</a></li>
+          <li><a href="../publications.html">Publications</a></li>
+          <li><a href="../community.html">Community</a></li>
+          <!--<li><a href="community.html">Community</a></li>-->
+          <!--<li class="dropdown">
+              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+              <ul class="dropdown-menu" role="menu">
+                <li><a href="#">Action</a></li>
+                <li><a href="#">Another action</a></li>
+                <li><a href="#">Something else here</a></li>
+                <li class="divider"></li>
+                <li class="dropdown-header">Nav header</li>
+                <li><a href="#">Separated link</a></li>
+                <li><a href="#">One more separated link</a></li>
+              </ul>
+          </li>-->
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <div class="container">
     <div id="background"></div>
     <div id="jump_to">
-        query_staged0.scala // Jump To &hellip;
-        <div id="jump_wrapper">
-            <div id="jump_toc"></div>
-            <div id="jump_page">
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
-                    01_overview.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
-                    02_basics.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
-                    03_compiler.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
-                    04_atwork.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
-                    ack.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
-                    automata.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
-                    dslapi.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
-                    dynvar.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
-                    eval.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
-                    fft.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/index.html">
-                    index.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
-                    query.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
-                    query_live.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
-                    query_live_steps.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
-                    query_optc.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
-                    query_staged.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
-                    query_staged0.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
-                    query_unstaged.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
-                    regex.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
-                    scanner.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
-                    scannerlib.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
-                    shonan-live.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
-                    shonan.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/start.html">
-                    start.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
-                    stencil.html
-                </a>
-                
-                <a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
-                    utils.html
-                </a>
-                
-            </div>
+      query_staged0.scala // Jump To &hellip;
+      <div id="jump_wrapper">
+        <div id="jump_toc"></div>
+        <div id="jump_page">
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+            index.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
+            eval.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
+            query_staged0.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+            utils.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+            shonan-live.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+            dynvar.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
+            dslapi.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
+            02_basics.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+            start.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+            fft.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
+            query_unstaged.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
+            01_overview.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+            scannerlib.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
+            03_compiler.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+            regex.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
+            query_optc.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+            query.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
+            ack.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
+            stencil.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
+            04_atwork.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+            scanner.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+            shonan.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
+            query_live.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
+            automata.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
+            query_live_steps.html
+          </a>
+          
+          <a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
+            query_staged.html
+          </a>
+          
         </div>
+      </div>
     </div>
 
     <ol class="breadcrumb">
@@ -448,18 +449,18 @@ h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
     <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
     <!-- tbd whether it should be here ?? -->
 
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_0">&#182;</a>
-                </div>
-                <h1>Query Compiler I (Scala)</h1>
+    
+    <div class="docs">
+      <div class="pilwrap">
+        <a class="pilcrow" href="#section_0">&#182;</a>
+      </div>
+      <h1>Query Compiler I (Scala)</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+    </div>
+    <div class="code">
+      <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
 import scala.lms.common._
 
@@ -469,17 +470,17 @@ with ScannerBase {
   override def version = &quot;query_staged0&quot;
 
 </code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_1">&#182;</a>
-                </div>
-                <h2>Low-Level Processing Logic</h2>
+    </div>
+    
+    <div class="docs">
+      <div class="pilwrap">
+        <a class="pilcrow" href="#section_1">&#182;</a>
+      </div>
+      <h2>Low-Level Processing Logic</h2>
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  type Fields = Vector[Rep[String]]
+    </div>
+    <div class="code">
+      <pre><code class='prettyprint lang-scala'>  type Fields = Vector[Rep[String]]
 
   case class Record(fields: Fields, schema: Schema) {
     def apply(key: String): Rep[String] = fields(schema indexOf key)
@@ -507,17 +508,17 @@ with ScannerBase {
   def fieldsEqual(a: Fields, b: Fields) = (a zip b).foldLeft(unit(true)) { (a,b) =&gt; a &amp;&amp; b._1 == b._2 }
 
 </code></pre>
-            </div>
-        
-            <div class="docs">
-                <div class="pilwrap">
-                    <a class="pilcrow" href="#section_2">&#182;</a>
-                </div>
-                <h2>Query Interpretation = Compilation</h2>
+    </div>
+    
+    <div class="docs">
+      <div class="pilwrap">
+        <a class="pilcrow" href="#section_2">&#182;</a>
+      </div>
+      <h2>Query Interpretation = Compilation</h2>
 
-            </div>
-            <div class="code">
-                <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
+    </div>
+    <div class="code">
+      <pre><code class='prettyprint lang-scala'>  def evalPred(p: Predicate)(rec: Record): Rep[Boolean] = p match {
     case Eq(a1, a2) =&gt; evalRef(a1)(rec) == evalRef(a2)(rec)
   }
 
@@ -561,12 +562,12 @@ with ScannerBase {
   def execQuery(q: Operator): Unit = execOp(q) { _ =&gt; }
 }}
 </code></pre>
-            </div>
-        
+    </div>
+    
 
-        <p>
-        Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_staged0.scala">View this file on GitHub</a>.
-        </p>
+    <p>
+      Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/query_staged0.scala">View this file on GitHub</a>.
+    </p>
 
     <ol class="breadcrumb">
       <li><a href="../">LMS</a></li>
@@ -574,44 +575,48 @@ with ScannerBase {
       <li class="active">query_staged0.scala</li>
     </ol>
 
-    </div>
+  </div>
 
-    <!-- FOOTER -->
-    <div class="footer">
+  <!-- FOOTER -->
+  <div class="footer">
     <div class="container">
       <p class="pull-right"><a href="#">Back to top</a></p>
       <p>&copy; 2011-2016 EPFL and collaborators</p>
     </div>
-    </div>
+  </div>
 
-    <!-- Bootstrap core JavaScript
-    ================================================== -->
-    <!-- Placed at the end of the document so the pages load faster -->
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-    <script src="../bootstrap/js/bootstrap.min.js"></script>
-    <script src="../bootstrap/assets/js/docs.min.js"></script>
-    <script src="../javascripts/toc.min.js"></script>
-    <script type="text/javascript">
+  <!-- Bootstrap core JavaScript
+       ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+  <script src="../bootstrap/js/bootstrap.min.js"></script>
+  <script src="../bootstrap/assets/js/docs.min.js"></script>
+  <script src="../javascripts/toc.min.js"></script>
+  <script type="text/javascript">
 
     $(document).ready(function() {
-        $(".container").tableofcontents({
-            id: "#tableofcontents"
-        });
-        $(".container").tableofcontents({
-            id: "#jump_toc"
-        });
+    $("pre").removeClass().addClass('prettyprint');
+    });
+    $(document).ready(function() {
+    $(".container").tableofcontents({
+    id: "#tableofcontents"
+    });
+    $(".container").tableofcontents({
+    id: "#jump_toc"
+    });
     });
 
-/*
-        $('#my-affix').affix({
-            offset: {
-              top: 100
-            , bottom: function () {
-                return (this.bottom = $('.footer').outerHeight(true))
-              }
-            }
-        })
-*/
-    </script>
-  </body>
+    /*
+    $('#my-affix').affix({
+    offset: {
+    top: 100
+    , bottom: function () {
+    return (this.bottom = $('.footer').outerHeight(true))
+    }
+    }
+    })
+    */
+  </script>
+<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+</body>
 </html>
