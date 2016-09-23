@@ -1,465 +1,467 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="description" content="">
-    <meta name="author" content="">
-    <link rel="icon" href="../images/favicon.ico">
+    <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../images/favicon.ico">
 
-    <title>regex.scala</title>
+	<title>regex.scala</title>
 
-    <!-- Google Analytics -->
-    <script>
-      (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
-      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
-      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
-      })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+	<!-- Google Analytics -->
+	<script>
+	 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 
-      ga('create', 'UA-39122235-2', 'scala-lms.github.io');
-      ga('send', 'pageview');
+	 ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+	 ga('send', 'pageview');
 
-    </script>
+	</script>
 
-    <!-- Bootstrap core CSS -->
-    <link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+	<!-- Bootstrap core CSS -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-	<script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
-	<script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
 	<![endif]-->
 
-    <!-- font awesome -->
-    <link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+	<!-- font awesome -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
 
 
-    <style type="text/css">
-      @import url(../stylesheets/pygment_trac.css);
-      /* head fancy: Lobster, Pacifico */
-      /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
-      /* dense bold: Squada One, Oswald; */
-      @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
-      @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
-      @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
-      @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
-      body {
-      /*line-height: 1.7;*/
-      /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
-      font-family: 'Helvetica Neue';
-      /*font-size: 15pt;*/
-      color: rgb(41,41,41);
-      }
+	<style type="text/css">
+	 @import url(../stylesheets/pygment_trac.css);
+	 /* head fancy: Lobster, Pacifico */
+	 /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
+	 /* dense bold: Squada One, Oswald; */
+	 @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+	 body {
+	     /*line-height: 1.7;*/
+	     /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+	     font-family: 'Helvetica Neue';
+	     /*font-size: 15pt;*/
+	     color: rgb(41,41,41);
+	 }
 
-      h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
-      font-family: 'Roboto Slab';
-      font-weight: 700;
-      }
-
-
-      .container h1,h2 {
-      border-bottom: 1px solid #e5e5e5;
-      /*  margin-bottom: 1em;
-      margin-top: 2em;*/
-      }
+	 h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+	     font-family: 'Roboto Slab';
+	     font-weight: 700;
+	 }
 
 
+	 .container h1,h2 {
+	     border-bottom: 1px solid #e5e5e5;
+	     /*  margin-bottom: 1em;
+		margin-top: 2em;*/
+	 }
+
+	 .jumbotron {
+	     background: transparent;
+	 }
+
+	 /* Space out content a bit */
+	 /*body {
+	    padding-top: 20px;
+	    padding-bottom: 20px;
+	    }*/
+
+	 /* Everything but the jumbotron gets side spacing for mobile first views */
+	 .header,
+	 .marketing,
+	 .footer {
+	     padding-right: 15px;
+	     padding-left: 15px;
+	 }
+
+	 /* Custom page header */
+	 .header {
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 /* Make the masthead heading the same height as the navigation */
+	 .header h3 {
+	     padding-bottom: 19px;
+	     margin-top: 0;
+	     margin-bottom: 0;
+	     line-height: 40px;
+	 }
+
+	 /* Custom page footer */
+	 .footer {
+	     padding-top: 19px;
+	     color: #777;
+	     border-top: 1px solid #e5e5e5;
+	 }
+
+	 /* Customize container */
+	 @media (min-width: 768px) {
+	     .jumbotron .container {
+		 max-width: 730px;
+	     }
+	     .container {
+		 max-width: 730px;
+	     }
+	 }
+	 .container-narrow > hr {
+	     margin: 30px 0;
+	 }
+
+	 /* Main marketing message and sign up button */
+	 .jumbotron {
+	     text-align: center;
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 .jumbotron .btn {
+	     padding: 14px 24px;
+	     font-size: 21px;
+	 }
+
+	 /* Supporting marketing content */
+	 .marketing {
+	     margin: 40px 0;
+	 }
+	 .marketing p + h4 {
+	     margin-top: 28px;
+	 }
+
+	 /* Responsive: Portrait tablets and up */
+	 @media screen and (min-width: 768px) {
+	     /* Remove the padding we set earlier */
+	     .header,
+	     .marketing,
+	     .footer {
+		 padding-right: 0;
+		 padding-left: 0;
+	     }
+	     /* Space out the masthead */
+	     .header {
+		 margin-bottom: 30px;
+	     }
+	     /* Remove the bottom border on the jumbotron for visual effect */
+	     .jumbotron {
+		 border-bottom: 1px solid #e5e5e5;
+	     }
+	 }
 
 
-      .jumbotron {
-      background: transparent;
-      }
-
-      /* Space out content a bit */
-      /*body {
-      padding-top: 20px;
-      padding-bottom: 20px;
-      }*/
-
-      /* Everything but the jumbotron gets side spacing for mobile first views */
-      .header,
-      .marketing,
-      .footer {
-      padding-right: 15px;
-      padding-left: 15px;
-      }
-
-      /* Custom page header */
-      .header {
-      border-bottom: 1px solid #e5e5e5;
-      }
-      /* Make the masthead heading the same height as the navigation */
-      .header h3 {
-      padding-bottom: 19px;
-      margin-top: 0;
-      margin-bottom: 0;
-      line-height: 40px;
-      }
-
-      /* Custom page footer */
-      .footer {
-      padding-top: 19px;
-      color: #777;
-      border-top: 1px solid #e5e5e5;
-      }
-
-      /* Customize container */
-      @media (min-width: 768px) {
-      .jumbotron .container {
-      max-width: 730px;
-      }
-      .container {
-      max-width: 730px;
-      }
-      }
-      .container-narrow > hr {
-	margin: 30px 0;
-	}
-
-	/* Main marketing message and sign up button */
-	.jumbotron {
-	text-align: center;
-	border-bottom: 1px solid #e5e5e5;
-	}
-	.jumbotron .btn {
-	padding: 14px 24px;
-	font-size: 21px;
-	}
-
-	/* Supporting marketing content */
-	.marketing {
-	margin: 40px 0;
-	}
-	.marketing p + h4 {
-	margin-top: 28px;
-	}
-
-	/* Responsive: Portrait tablets and up */
-	@media screen and (min-width: 768px) {
-	/* Remove the padding we set earlier */
-	.header,
-	.marketing,
-	.footer {
-	padding-right: 0;
-	padding-left: 0;
-	}
-	/* Space out the masthead */
-	.header {
-	margin-bottom: 30px;
-	}
-	/* Remove the bottom border on the jumbotron for visual effect */
-	.jumbotron {
-	border-bottom: 1px solid #e5e5e5;
-	}
-	}
+         #jump_to, #jump_page, #jump_toc {
+             background: white;
+             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+             font: 10px Arial;
+             text-transform: uppercase;
+             cursor: pointer;
+             text-align: right;
+         }
+         #jump_to, #jump_wrapper {
+             position: fixed;
+             right: 0; top: 0;
+             padding: 5px 10px;
+         }
+         #jump_wrapper {
+             padding: 0;
+             display: none;
+         }
+         #jump_to:hover #jump_wrapper {
+             display: block;
+         }
+         #jump_page {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_page .source {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_page .source:hover {
+             background: #f5f5ff;
+         }
+         #jump_page .source:first-child {
+         }
 
 
-        #jump_to, #jump_page, #jump_toc {
-        background: white;
-        -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
-        -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
-        font: 10px Arial;
-        text-transform: uppercase;
-        cursor: pointer;
-        text-align: right;
-        }
-        #jump_to, #jump_wrapper {
-        position: fixed;
-        right: 0; top: 0;
-        padding: 5px 10px;
-        }
-        #jump_wrapper {
-        padding: 0;
-        display: none;
-        }
-        #jump_to:hover #jump_wrapper {
-        display: block;
-        }
-        #jump_page {
-        padding: 5px 0 3px;
-        margin: 0 0 25px 25px;
-        }
-        #jump_page .source {
-        display: block;
-        padding: 5px 10px;
-        text-decoration: none;
-        border-top: 1px solid #eee;
-        }
-        #jump_page .source:hover {
-        background: #f5f5ff;
-        }
-        #jump_page .source:first-child {
-        }
-
-
-        #jump_toc {
-        padding: 5px 0 3px;
-        margin: 0 0 25px 25px;
-        }
-        #jump_toc li {
-        display: block;
-        padding: 5px 10px;
-        text-decoration: none;
-        border-top: 1px solid #eee;
-        }
-        #jump_toc li:hover {
-        background: #f5f5ff;
-        }
-        #jump_toc li:first-child {
-        }
+         #jump_toc {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_toc li {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_toc li:hover {
+             background: #f5f5ff;
+         }
+         #jump_toc li:first-child {
+         }
 
 
 
-        table td {
-        border: 0;
-        outline: 0;
-        }
-        td.docs, th.docs {
-        min-width: 575px;
-        /*max-width: 450px;
-        min-width: 450px;
-        min-height: 5px;*/
-        padding: 10px 25px 1px 50px;
-        /*overflow-x: hidden;*
-        vertical-align: top;
-        text-align: left;*/
-        }
-        .docs pre {
-        margin: 15px 0 15px;
-        padding-left: 15px;
-        }
-        .docs p tt, .docs p code, .doc code {
-        background: #f8f8ff;
-        border: 1px solid #dedede;
-        font-size: 12px;
-        padding: 0 0.2em;
-        }
-        .pilwrap {
-        position: relative;
-        }
-        .pilcrow {
-        font: 12px Arial;
-        text-decoration: none;
-        color: #454545;
-        position: absolute;
-        top: 3px; left: -20px;
-        padding: 1px 2px;
-        opacity: 0;
-        -webkit-transition: opacity 0.2s linear;
-        }
-        td.docs:hover .pilcrow {
-        opacity: 1;
-        }
-        pre {
-        border: none;
-        /*width: 100%;*/
-        vertical-align: top;
-        background: #f5f5ff;
-        /*border-left: 1px solid #e5e5ee;*/
-        }
-        pre, tt, code {
-        font-size: 12px; line-height: 18px;
-        font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
-        }
+         table td {
+             border: 0;
+             outline: 0;
+         }
+         td.docs, th.docs {
+             min-width: 575px;
+             /*max-width: 450px;
+		min-width: 450px;
+		min-height: 5px;*/
+             padding: 10px 25px 1px 50px;
+             /*overflow-x: hidden;*
+		vertical-align: top;
+		text-align: left;*/
+         }
+         .docs pre {
+             margin: 15px 0 15px;
+             padding-left: 15px;
+         }
+         .docs p tt, .docs p code, .doc code {
+             background: #f8f8ff;
+             border: 1px solid #dedede;
+             font-size: 12px;
+             padding: 0 0.2em;
+         }
+         .pilwrap {
+             position: relative;
+         }
+         .pilcrow {
+             font: 12px Arial;
+             text-decoration: none;
+             color: #454545;
+             position: absolute;
+             top: 3px; left: -20px;
+             padding: 1px 2px;
+             opacity: 0;
+             -webkit-transition: opacity 0.2s linear;
+         }
+         td.docs:hover .pilcrow {
+             opacity: 1;
+         }
+         pre {
+             border: none;
+             /*width: 100%;*/
+             vertical-align: top;
+             background: #f5f5ff;
+             /*border-left: 1px solid #e5e5ee;*/
+         }
 
-	/*---------------------- Prettify Syntax Highlighting -----------------------------*/
-        .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+         pre.prettyprint.prettyprinted {
+             border: none;
+	 }
 
-        table.doc { margin-bottom: 20px; }
-        td.doc { border-bottom: 1px dashed #708090; }
-        td.param { font-weight: bold; }
-        td.return { font-weight: bold; text-decoration: underline; }
+         pre, tt, code {
+             font-size: 12px; line-height: 18px;
+             font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+         }
 
+	 /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+         .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
 
-</style>
-<script type="text/x-mathjax-config">
-  MathJax.Hub.Config({
-    extensions: ["tex2jax.js"],
-    jax: ["input/TeX", "output/HTML-CSS"],
-  tex2jax: {
-      skipTags: ["script","noscript","style","textarea"],
-      inlineMath: [ ['$','$'], ["\\(","\\)"] ],
-      displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
-      processEscapes: true
-    },
-    "HTML-CSS": { availableFonts: ["TeX"] }
-  });
-</script>
-<script type="text/javascript" async
-  src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
-</script>
-</head>
-
-<body>
-  <div class="navbar navbar-default navbar-static-top" role="navigation">
-    <div class="container">
-      <div class="navbar-header">
-        <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
-          <span class="sr-only">Toggle navigation</span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-          <span class="icon-bar"></span>
-        </button>
-        <a class="navbar-brand" href="index.html">LMS</a>
-      </div>
-      <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav">
-          <li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
-          <li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
-          <li><a href="../resources.html">Resources</a></li>
-          <li><a href="../publications.html">Publications</a></li>
-          <li><a href="../community.html">Community</a></li>
-          <!--<li><a href="community.html">Community</a></li>-->
-          <!--<li class="dropdown">
-              <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
-              <ul class="dropdown-menu" role="menu">
-                <li><a href="#">Action</a></li>
-                <li><a href="#">Another action</a></li>
-                <li><a href="#">Something else here</a></li>
-                <li class="divider"></li>
-                <li class="dropdown-header">Nav header</li>
-                <li><a href="#">Separated link</a></li>
-                <li><a href="#">One more separated link</a></li>
-              </ul>
-          </li>-->
-        </ul>
-      </div>
-    </div>
-  </div>
-
-  <div class="container">
-    <div id="background"></div>
-    <div id="jump_to">
-      regex.scala // Jump To &hellip;
-      <div id="jump_wrapper">
-        <div id="jump_toc"></div>
-        <div id="jump_page">
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/index.html">
-            index.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
-            eval.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
-            query_staged0.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
-            utils.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
-            shonan-live.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
-            dynvar.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
-            dslapi.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
-            02_basics.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/start.html">
-            start.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
-            fft.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
-            query_unstaged.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
-            01_overview.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
-            scannerlib.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
-            03_compiler.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
-            regex.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
-            query_optc.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query.html">
-            query.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
-            ack.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
-            stencil.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
-            04_atwork.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
-            scanner.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
-            shonan.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
-            query_live.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
-            automata.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
-            query_live_steps.html
-          </a>
-          
-          <a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
-            query_staged.html
-          </a>
-          
-        </div>
-      </div>
-    </div>
-
-    <ol class="breadcrumb">
-      <li><a href="../">LMS</a></li>
-      <li><a href="index.html">Tutorials</a></li>
-      <li class="active">regex.scala</li>
-    </ol>
+         table.doc { margin-bottom: 20px; }
+         td.doc { border-bottom: 1px dashed #708090; }
+         td.param { font-weight: bold; }
+         td.return { font-weight: bold; text-decoration: underline; }
 
 
-    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
-    <!-- tbd whether it should be here ?? -->
+	</style>
+	<script type="text/x-mathjax-config">
+	 MathJax.Hub.Config({
+	     extensions: ["tex2jax.js"],
+	     jax: ["input/TeX", "output/HTML-CSS"],
+	     tex2jax: {
+		 skipTags: ["script","noscript","style","textarea"],
+		 inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		 displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		 processEscapes: true
+	     },
+	     "HTML-CSS": { availableFonts: ["TeX"] }
+	 });
+	</script>
+	<script type="text/javascript" async
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+    </head>
 
-    
-    <div class="docs">
-      <div class="pilwrap">
-        <a class="pilcrow" href="#section_0">&#182;</a>
-      </div>
-      <h1>From Interpreter to Compiler</h1>
+    <body>
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+		<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		    </button>
+		    <a class="navbar-brand" href="index.html">LMS</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		    <ul class="nav navbar-nav">
+			<li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+			<li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+			<li><a href="../resources.html">Resources</a></li>
+			<li><a href="../publications.html">Publications</a></li>
+			<li><a href="../community.html">Community</a></li>
+			<!--<li><a href="community.html">Community</a></li>-->
+			<!--<li class="dropdown">
+			     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+			     <ul class="dropdown-menu" role="menu">
+			     <li><a href="#">Action</a></li>
+			     <li><a href="#">Another action</a></li>
+			     <li><a href="#">Something else here</a></li>
+			     <li class="divider"></li>
+			     <li class="dropdown-header">Nav header</li>
+			     <li><a href="#">Separated link</a></li>
+			     <li><a href="#">One more separated link</a></li>
+			     </ul>
+			     </li>-->
+		    </ul>
+		</div>
+	    </div>
+	</div>
+
+	<div class="container">
+	    <div id="background"></div>
+	    <div id="jump_to">
+		regex.scala // Jump To &hellip;
+		<div id="jump_wrapper">
+		    <div id="jump_toc"></div>
+		    <div id="jump_page">
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
+			    eval.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
+			    query_staged0.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+			    shonan-live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
+			    dslapi.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
+			    02_basics.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
+			    query_unstaged.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
+			    01_overview.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
+			    03_compiler.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
+			    query_optc.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
+			    ack.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
+			    stencil.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
+			    04_atwork.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
+			    query_live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
+			    automata.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
+			    query_live_steps.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
+			    query_staged.html
+			</a>
+			
+		    </div>
+		</div>
+	    </div>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">regex.scala</li>
+	    </ol>
+
+
+	    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+	    <!-- tbd whether it should be here ?? -->
+
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_0">&#182;</a>
+		</div>
+		<h1>From Interpreter to Compiler</h1>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <p>A staged interpreter is a compiler. This is useful, because an
@@ -484,27 +486,27 @@
 <br  />example, we used the same process to stage a bytecode interpreter into
 <br  />a bytecode compiler.</p>
 
-    </div>
-    <div class="code">
-      <pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
 
 import org.scalatest.FunSuite
 
 
 </code></pre>
-    </div>
-    
-    <div class="docs">
-      <div class="pilwrap">
-        <a class="pilcrow" href="#section_1">&#182;</a>
-      </div>
-      <h2>Regular Expression Matcher</h2>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_1">&#182;</a>
+		</div>
+		<h2>Regular Expression Matcher</h2>
 <p>We start with a small regular expression matcher, ported to Scala from
 <br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">a C version, written by Rob Pike and Brian Kernighan</a>.</p>
 
-    </div>
-    <div class="code">
-      <pre><code class='prettyprint lang-scala'>trait RegexpMatcher {
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait RegexpMatcher {
 
   /* search for regexp anywhere in text */
   def matchsearch(regexp: String, text: String): Boolean = {
@@ -578,19 +580,19 @@ class RegexpMatcherTest extends FunSuite with RegexpMatcher {
 }
 
 </code></pre>
-    </div>
-    
-    <div class="docs">
-      <div class="pilwrap">
-        <a class="pilcrow" href="#section_2">&#182;</a>
-      </div>
-      <h2>Staged Interpreter</h2>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_2">&#182;</a>
+		</div>
+		<h2>Staged Interpreter</h2>
 <p>The staged interpreter simply consist in wrapping the variable
 <br  />parameters in <code>Rep[_]</code> types. Otherwise, the code is the same.</p>
 
-    </div>
-    <div class="code">
-      <pre><code class='prettyprint lang-scala'>trait StagedRegexpMatcher extends Dsl {
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait StagedRegexpMatcher extends Dsl {
 
   /* search for regexp anywhere in text */
   def matchsearch(regexp: String, text: Rep[String]): Rep[Boolean] = {
@@ -678,13 +680,13 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
   testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false)
 
 </code></pre>
-    </div>
-    
-    <div class="docs">
-      <div class="pilwrap">
-        <a class="pilcrow" href="#section_3">&#182;</a>
-      </div>
-      <h2>Generated Code</h2>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_3">&#182;</a>
+		</div>
+		<h2>Generated Code</h2>
 <p>As an example, here is the code generated for <code>^ab</code>.</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
 Emitting Generated Code
@@ -724,65 +726,65 @@ End of Generated Code
 <h2>What's next?</h2>
 <p>Go back to the <a href="index.html">tutorial index</a> or continue with the <a href="ack.html">Ackermann's Function</a>.</p>
 
-    </div>
-    <div class="code">
-      <pre><code class='prettyprint lang-scala'>}
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>}
 </code></pre>
-    </div>
-    
+	    </div>
+	    
 
-    <p>
-      Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/regex.scala">View this file on GitHub</a>.
-    </p>
+	    <p>
+		Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/regex.scala">View this file on GitHub</a>.
+	    </p>
 
-    <ol class="breadcrumb">
-      <li><a href="../">LMS</a></li>
-      <li><a href="index.html">Tutorials</a></li>
-      <li class="active">regex.scala</li>
-    </ol>
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">regex.scala</li>
+	    </ol>
 
-  </div>
+	</div>
 
-  <!-- FOOTER -->
-  <div class="footer">
-    <div class="container">
-      <p class="pull-right"><a href="#">Back to top</a></p>
-      <p>&copy; 2011-2016 EPFL and collaborators</p>
-    </div>
-  </div>
+	<!-- FOOTER -->
+	<div class="footer">
+	    <div class="container">
+		<p class="pull-right"><a href="#">Back to top</a></p>
+		<p>&copy; 2011-2016 EPFL and collaborators</p>
+	    </div>
+	</div>
 
-  <!-- Bootstrap core JavaScript
-       ================================================== -->
-  <!-- Placed at the end of the document so the pages load faster -->
-  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
-  <script src="../bootstrap/js/bootstrap.min.js"></script>
-  <script src="../bootstrap/assets/js/docs.min.js"></script>
-  <script src="../javascripts/toc.min.js"></script>
-  <script type="text/javascript">
+	<!-- Bootstrap core JavaScript
+	     ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="../bootstrap/assets/js/docs.min.js"></script>
+	<script src="../javascripts/toc.min.js"></script>
+	<script type="text/javascript">
 
-    $(document).ready(function() {
-    $("pre").removeClass().addClass('prettyprint');
-    });
-    $(document).ready(function() {
-    $(".container").tableofcontents({
-    id: "#tableofcontents"
-    });
-    $(".container").tableofcontents({
-    id: "#jump_toc"
-    });
-    });
+	 $(document).ready(function() {
+	     $("pre").removeClass().addClass('prettyprint');
+	 });
+	 $(document).ready(function() {
+	     $(".container").tableofcontents({
+		 id: "#tableofcontents"
+	     });
+	     $(".container").tableofcontents({
+		 id: "#jump_toc"
+	     });
+	 });
 
-    /*
-    $('#my-affix').affix({
-    offset: {
-    top: 100
-    , bottom: function () {
-    return (this.bottom = $('.footer').outerHeight(true))
-    }
-    }
-    })
-    */
-  </script>
-<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
-</body>
+	 /*
+	    $('#my-affix').affix({
+	    offset: {
+	    top: 100
+	    , bottom: function () {
+	    return (this.bottom = $('.footer').outerHeight(true))
+	    }
+	    }
+	    })
+	  */
+	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    </body>
 </html>
