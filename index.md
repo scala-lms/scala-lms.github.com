@@ -19,11 +19,10 @@ LMS is used by several other projects, including:
 
 We've been holding tutorials at major conferences and summer schools:
 
+- [PLDI 2017](http://pldi17.sigplan.org): Barcelona, June 23. More info: 
+  [scala-lms.github.io/pldi2017](pldi2017/index.html) 
 - [DSLDISS 2015](http://vjovanov.github.io/dsldi-summer-school/): Lausanne, July 14. More info: 
   [vjovanov.github.io/dsldi-summer-school](http://vjovanov.github.io/dsldi-summer-school/program.html)
-- [CGO 2015](http://cgo.org/cgo2015/): San Francisco, February 7. More info: 
-<!--  [cgo.org/cgo2015/](http://cgo.org/cgo2015/event/hpdsls-scala-lms-and-delite-for-high-%C2%ADperformance-dsls-and-program-generators/) -->
-  [scala-lms.github.io/cgo2015](cgo2015/index.html)
 - [CGO 2015](http://cgo.org/cgo2015/): San Francisco, February 7. More info: 
 <!--  [cgo.org/cgo2015/](http://cgo.org/cgo2015/event/hpdsls-scala-lms-and-delite-for-high-%C2%ADperformance-dsls-and-program-generators/) -->
   [scala-lms.github.io/cgo2015](cgo2015/index.html)
