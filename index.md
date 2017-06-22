@@ -8,7 +8,7 @@ code generators and embedded compilers in Scala.
 
 LMS is used by several other projects, including:
 
-- [Delite](http://ppl.stanford.edu/main/projects.html): 
+- [Delite](https://ppl.stanford.edu/projects): 
   domain-specific languages for heterogeneous parallel computing.
 - [Spiral](http://www.spiral.net/software/spiral-scala.html): 
   library generators for high-performance numerical kernels.
