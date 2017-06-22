@@ -14,7 +14,7 @@ The aim of this tutorial is to equip attendees with the knowledge and tools to d
 
 - June 23, 9:00-17:00. Co-located with [PLDI 2017](http://pldi2017.sigplan.org) in Barcelona.
 - Organizers: [Tiark Rompf](http://tiarkrompf.github.io) (Purdue), [Kunle Olukotun](http://ogun.stanford.edu/~kunle) (Stanford), [Markus Püschel](http://www.inf.ethz.ch/personal/markusp/) (ETH)
-- Presenters: Kevin Brown, Georg Ofenbeck, Tiark Rompf, Alen Stojanov
+- Presenters: Kevin Brown, [Georg Ofenbeck](https://georgofenbeck.github.io/) (ETH), Tiark Rompf, [Alen Stojanov](https://astojanov.github.io/) (ETH)
 
 
 ## Agenda
@@ -31,7 +31,7 @@ This tutorial will cover the following topics:
   - High performance program generators
   - Stage polymorphism for generic programming in space and time
 - 11:20 - 12:10: Alen Stojanov, ETH
-  - Advanced SIMD vectorization
+  - Vectorization with LMS: SIMD Intrinsics ([introductory slides](https://www.slideshare.net/astojanov/vectorization-with-lms-simd-intrinsics), [code](https://github.com/astojanov/lms-tutorial-pldi))
 
 - 13:40 - 14:30: Kevin Brown, Stanford / Mines.io
   - Machine learning with Delite and OptiML
