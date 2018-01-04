@@ -40,6 +40,26 @@ category: publications
 
 ## Conferences
 
+* __Collapsing Towers of Interpreters.__
+  Nada Amin, Tiark Rompf.
+  POPL '18.
+  ([PDF](http://lampwww.epfl.ch/~amin/pub/collapsing-towers.pdf))
+
+* __LMS-Verify: Abstraction without Regret for Verified Systems Programming.__
+  Nada Amin, Tiark Rompf.
+  POPL '17.
+  ([PDF](http://lampwww.epfl.ch/~amin/pub/lms-verify.pdf))
+
+*  __Reflections on LMS: Exploring Front-End Alternatives.__
+   Tiark Rompf.
+   Scala Symposium '16.
+   ([PDF](http://www.cs.purdue.edu/homes/rompf/papers/rompf-scala16.pdf))
+
+*  __The Essence of Multi-Stage Evaluation in LMS.__
+   Tiark Rompf.
+   WadlerFest '16
+   ([PDF](http://www.cs.purdue.edu/homes/rompf/papers/rompf-wf16.pdf))
+
 * __Functional Pearl: A SQL to C Compiler in 500 Lines of Code.__
   Tiark Rompf, Nada Amin.
   ICFP '15.
