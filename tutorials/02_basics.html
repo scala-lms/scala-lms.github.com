@@ -338,108 +338,64 @@
 		    <div id="jump_toc"></div>
 		    <div id="jump_page">
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
-			    index.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
-			    eval.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
-			    query_staged0.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
-			    utils.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
-			    shonan-live.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
-			    dynvar.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
-			    dslapi.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
-			    02_basics.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
-			    start.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
-			    fft.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
-			    query_unstaged.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
-			    01_overview.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
-			    scannerlib.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
-			    03_compiler.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
-			    regex.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
-			    query_optc.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
-			    query.html
-			</a>
-			
 			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
 			    ack.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
-			    stencil.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
-			    04_atwork.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
-			    scanner.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
-			    shonan.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
-			    query_live.html
 			</a>
 			
 			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
 			    automata.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
-			    query_live_steps.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
+			    dslapi.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
-			    query_staged.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
+			    eval.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
+			    stencil.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
 			</a>
 			
 		    </div>
@@ -501,7 +457,7 @@
 <p><a name="sec:220quasi"></a></p>
 <h2>Program Generation with Quasi-Quotes</h2>
 <p>Strings model concrete syntax, but we can also use abstract syntax. This idea
-<br  />is inspired by Lisp's ''''code as data'' model.  We start with a slightly more
+<br  />is inspired by Lisp's &ldquo;code as data&rdquo; model.  We start with a slightly more
 <br  />convenient string notation, denoted by <code>s"..."</code> quotes:</p>
 <pre><code>def power(b: String, n: Int): String =
   if (n == 0) s"1.0" else s"($b * ${ power(b, n - 1) })"
@@ -552,7 +508,7 @@ $[[$ val y = 7; $\$${ x = y }$]]$
 <br  />compute <code>Double</code> values in the next stage.</p>
 <p>Note that the use of parametric types alone does not prevent scope extrusion,
 <br  />which can also be seen as a type error in the sense of a well-typed multi-
-<br  />stage program ''going wrong''
+<br  />stage program &ldquo;going wrong&rdquo;
 <br  /><a href="DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03">(*)</a>.  Thus we do not obtain
 <br  />a guarantee that <em>all</em>  generated programs type check, but the slightly
 <br  />weaker assurance  that all generated programs that are well-formed are also
@@ -617,15 +573,15 @@ power($[[$computeB() + $\$$x$]]$, 4)
 <h2>Let Insertion as a Remedy</h2>
 <p>One way of fixing the order of staged expressions is to insert let-bindings in
 <br  />strategic places. This is frequently done by separate front ends. Staging
-<br  />effectively becomes an ''assembly language'' for code generation.  The front
+<br  />effectively becomes an &ldquo;assembly language&rdquo; for code generation.  The front
 <br  />end can assemble pieces of generated code using explicit side effects, or the
 <br  />code generators are written in monadic style or continuation passing style
 <br  />(CPS), in which case the monadic bind operation will insert let-bindings to
 <br  />maintain the desired evaluation order <a href="DBLP:conf/pepm/SwadiTKP06">(*)</a>.
 <br  />Effectful code generators are much more likely to cause scope extrusion.
 <br  />Explicit monadic style or CPS complicate code generators a lot. This dilemma
-<br  />is described as an ''agonizing trade-off'', due to which one ''cannot achieve
-<br  />clarity, safety, and efficiency at the same time''
+<br  />is described as an &ldquo;agonizing trade-off&rdquo;, due to which one &ldquo;cannot achieve
+<br  />clarity, safety, and efficiency at the same time&rdquo;
 <br  /><a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>. Only very recently have type-systems been
 <br  />devised to handle both staging and effects
 <br  /><a href="DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>.
@@ -776,7 +732,7 @@ x8
 <br  />generation. Now we turn to other approaches of delineating embedded object
 <br  />programs. Our aim is embedding domain specific  compilers. We want object
 <br  />languages tailored to specific applications, with custom compiler components.
-<br  />The ''one size fits all'' approach of having the same meta and object language
+<br  />The &ldquo;one size fits all&rdquo; approach of having the same meta and object language
 <br  />is not ideal for this purpose. In our case, we would have to inspect Scala
 <br  />ASTs and reject or possibly interpret constructs that have no correspondence
 <br  />in the object language (type, class or method definitions, etc).</p>
@@ -834,7 +790,7 @@ def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
 <br  />about the <em>representation</em> of a <code>T</code> value in the next stage and less
 <br  />about composing code fragments.</p>
 <p>Where quasiquoting allowed the full language to be staged, we now have to
-<br  />explicitly ''white-list'' all operations we want to make available. Clearly
+<br  />explicitly &ldquo;white-list&rdquo; all operations we want to make available. Clearly
 <br  />there is a tradeoff, as explicit white-listing of operations can be tedious.
 <br  />However we can remedy the white-listing effort to a large extent by providing
 <br  />libraries of reusable components that contain sets of lifted operations from
@@ -896,7 +852,7 @@ def power(b: Rep[Double], n: Int): Rep[Double] = ...
 <br  />producing on object program in administrative normal form (ANF). This removes
 <br  />the need for explicit val bindings in object code. Instead, programmers can
 <br  />just use val bindings in the meta program. This is an example of deep
-<br  />linguistic reuse, as the ''feature'' of val bindings is translated away.</p>
+<br  />linguistic reuse, as the &ldquo;feature&rdquo; of val bindings is translated away.</p>
 <p>As for scope correctness, we have not encountered any binders in object code
 <br  />so far. <a href="#sec:220functions">Below</a> we will introduce staged
 <br  />functions  using higher order abstract syntax (HOAS)
@@ -943,7 +899,7 @@ lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
 <br  />inline the definition of <code>fac</code> but result in an actual function call in  the
 <br  />generated code.</p>
 <p>However the HOAS representation has the disadvantage of being opaque: there is
-<br  />no immediate way to ''look into'' a Scala function object. If we want to treat
+<br  />no immediate way to &ldquo;look into&rdquo; a Scala function object. If we want to treat
 <br  />functions in the same way as other program constructs, we need a way to
 <br  />transform the HOAS encoding into our string representation. We can implement
 <br  /><code>lambda(f)</code> to call</p>
@@ -980,7 +936,7 @@ $\hookrightarrow$ false
 <br  />same syntactic location in the source program and whether all data referenced
 <br  />by their free variables is equal. Fortunately, the implementation of first-
 <br  />class functions as closure objects offers (at least in principle) access to a
-<br  />''defunctionalized''  data type representation on which equality can easily be
+<br  />&ldquo;defunctionalized&rdquo;  data type representation on which equality can easily be
 <br  />checked. A bit of care must be taken though, because the structure can be
 <br  />cyclic. On the JVM there is a particularly neat trick.  We can serialize the
 <br  />function objects into a byte array and compare the serialized representations:</p>
@@ -1025,7 +981,7 @@ if (c)    // c: Rep[Boolean]
   def compile[A,B](f: Rep[A] =&gt; Rep[B]): A=&gt;B
 }
 </code></pre>
-<p>The contract of <code>compile</code> is to ''unstage'' a function from staged to staged
+<p>The contract of <code>compile</code> is to &ldquo;unstage&rdquo; a function from staged to staged
 <br  />values into a function operating on  present-stage values that can be used
 <br  />just like any other function object in the running program. Of course this
 <br  />only works for functions that do not reference externally bound <code>Rep[T]</code>

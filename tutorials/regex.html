@@ -338,108 +338,64 @@
 		    <div id="jump_toc"></div>
 		    <div id="jump_page">
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
-			    index.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
-			    eval.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
-			    query_staged0.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
-			    utils.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
-			    shonan-live.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
-			    dynvar.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
-			    dslapi.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
-			    02_basics.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
-			    start.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
-			    fft.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
-			    query_unstaged.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
-			    01_overview.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
-			    scannerlib.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
-			    03_compiler.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
-			    regex.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
-			    query_optc.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
-			    query.html
-			</a>
-			
 			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
 			    ack.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
-			    stencil.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
-			    04_atwork.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
-			    scanner.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
-			    shonan.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
-			    query_live.html
 			</a>
 			
 			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
 			    automata.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
-			    query_live_steps.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
+			    dslapi.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
-			    query_staged.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
+			    eval.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
+			    stencil.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
 			</a>
 			
 		    </div>
@@ -555,12 +511,8 @@ import org.scalatest.FunSuite
   }
 }
 
-class RegexpMatcherTest extends FunSuite with RegexpMatcher {
-  def testmatch(regexp: String, text: String, expected: Boolean) {
-    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
-      assertResult(expected){matchsearch(regexp, text)}
-    }
-  }
+trait RegexpMatcherTestCases {
+  def testmatch(regexp: String, text: String, expected: Boolean): Unit
 
   testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
   testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
@@ -577,6 +529,14 @@ class RegexpMatcherTest extends FunSuite with RegexpMatcher {
   testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true);
   testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false);
   testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false);
+}
+
+class RegexpMatcherTest extends FunSuite with RegexpMatcher with RegexpMatcherTestCases {
+  override def testmatch(regexp: String, text: String, expected: Boolean) {
+    test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
+      assertResult(expected){matchsearch(regexp, text)}
+    }
+  }
 }
 
 </code></pre>
@@ -640,7 +600,7 @@ class RegexpMatcherTest extends FunSuite with RegexpMatcher {
   }
 }
 
-class StagedRegexpMatcherTest extends TutorialFunSuite {
+class StagedRegexpMatcherTest extends TutorialFunSuite with RegexpMatcherTestCases {
   val under = &quot;sre&quot;
   var m = Map.empty[String, DslDriver[String,Boolean]]
   def cache(k: String, b: =&gt; DslDriver[String,Boolean]): DslDriver[String,Boolean] = {
@@ -651,7 +611,7 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
         m(k)
     }
   }
-  def testmatch(regexp: String, text: String, expected: Boolean) {
+  override def testmatch(regexp: String, text: String, expected: Boolean) {
     test(s&quot;&quot;&quot;matchsearch(&quot;$regexp&quot;, &quot;$text&quot;) == $expected&quot;&quot;&quot;) {
       val snippet = cache(regexp,
         new DslDriver[String,Boolean] with StagedRegexpMatcher {
@@ -662,22 +622,7 @@ class StagedRegexpMatcherTest extends TutorialFunSuite {
       assertResult(expected){snippet.eval(text)}
     }
   }
-
-  testmatch(&quot;^hello$&quot;, &quot;hello&quot;, true)
-  testmatch(&quot;^hello$&quot;, &quot;hell&quot;, false)
-  testmatch(&quot;hell&quot;, &quot;hello&quot;, true)
-  testmatch(&quot;hell&quot;, &quot;hell&quot;, true)
-  testmatch(&quot;hel*&quot;, &quot;he&quot;, true)
-  testmatch(&quot;hel*$&quot;, &quot;hello&quot;, false)
-  testmatch(&quot;hel*&quot;, &quot;yo hello&quot;, true)
-  testmatch(&quot;ab&quot;, &quot;hello ab hello&quot;, true)
-  testmatch(&quot;^ab&quot;, &quot;hello ab hello&quot;, false)
-  testmatch(&quot;a*b&quot;, &quot;hello aab hello&quot;, true)
-  testmatch(&quot;^ab*&quot;, &quot;abcd&quot;, true)
-  testmatch(&quot;^ab*&quot;, &quot;a&quot;, true)
-  testmatch(&quot;^ab*&quot;, &quot;ac&quot;, true)
-  testmatch(&quot;^ab*&quot;, &quot;bac&quot;, false)
-  testmatch(&quot;^ab*$&quot;, &quot;ac&quot;, false)
+}
 
 </code></pre>
 	    </div>
@@ -728,8 +673,7 @@ End of Generated Code
 
 	    </div>
 	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>}
-</code></pre>
+		<pre><code class='prettyprint lang-scala'></code></pre>
 	    </div>
 	    
 

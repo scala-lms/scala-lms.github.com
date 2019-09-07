@@ -338,108 +338,68 @@
 		    <div id="jump_toc"></div>
 		    <div id="jump_page">
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
-			    index.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
-			    eval.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged0.html">
-			    query_staged0.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
-			    utils.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
-			    shonan-live.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
-			    dynvar.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
-			    dslapi.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/02_basics.html">
-			    02_basics.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
-			    start.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
-			    fft.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_unstaged.html">
-			    query_unstaged.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/01_overview.html">
-			    01_overview.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
-			    scannerlib.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/03_compiler.html">
-			    03_compiler.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
-			    regex.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_optc.html">
-			    query_optc.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
-			    query.html
-			</a>
-			
 			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
 			    ack.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
-			    stencil.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/04_atwork.html">
-			    04_atwork.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
-			    scanner.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
-			    shonan.html
-			</a>
-			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live.html">
-			    query_live.html
 			</a>
 			
 			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
 			    automata.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_live_steps.html">
-			    query_live_steps.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dslapi.html">
+			    dslapi.html
 			</a>
 			
-			<a class="source" href="https://scala-lms.github.io/tutorials/query_staged.html">
-			    query_staged.html
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/eval.html">
+			    eval.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+			    shonan-live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/stencil.html">
+			    stencil.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
 			</a>
 			
 		    </div>
@@ -538,40 +498,40 @@ abstract class LMS_Driver[A:Manifest,B:Manifest] extends DslDriver[A,B]
 
 /*    
     val snippet = new LMS_Driver[Array[Int],Array[Int]] {
-      def snippet(v: Rep[Array[Int]]) = {
-
-        def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
-          val n = a0.length
-          val v1 = NewArray[Int](n)
-
-          val a = staticData(a0)
-
-          def unrollIf(c: Boolean)(r: Range) = new { 
-            def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-              if (c) {
-                for (j &lt;- r) {
-                  f(j)
-                }
-              } else {
-                for (j &lt;- (r.start until r.end):Rep[Range]) {
-                  f(j)
-                }
-              }
+      def unrollIf(c: Boolean)(r: Range) = new {
+        def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+          if (c) {
+            for (j &lt;- r) {
+              f(j)
             }
-
-          }
-
-
-          for (i &lt;- (0 until n):Range) {
-            val sparse = a0(i).count(_ != 0) &lt; 3
-            for (j &lt;- unrollIf(sparse)(0 until n)) {
-              v1(i) = v1(i) + a(i).apply(j) * v(j)
+          } else {
+            for (j &lt;- (r.start until r.end):Rep[Range]) {
+              f(j)
             }
           }
-          v1
         }
+      }
 
+      def matrix_vector_prod(a0: Array[Array[Int]], v: Rep[Array[Int]]) = {
+        val n = a0.length
+        val v1 = NewArray[Int](n)
+
+        val a = staticData(a0)
+
+        for (i &lt;- (0 until n):Range) {
+          val sparse = a0(i).count(_ != 0) &lt; 3
+          for (j &lt;- unrollIf(sparse)(0 until n)) {
+            v1(i) = v1(i) + a(i).apply(j) * v(j)
+          }
+        }
+        v1
+      }
+
+      def snippet(v: Rep[Array[Int]]) = {
         matrix_vector_prod(a,v)
+      }
+
+    }
 </code></pre>
 	    </div>
 	    
