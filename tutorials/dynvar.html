@@ -476,6 +476,59 @@ class DynVarWarmupTest extends TutorialFunSuite {
 </code></pre>
 	    </div>
 	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_1">&#182;</a>
+		</div>
+		<p>Compare the code of <code>warmup0</code>:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Int)) {
+  def apply(x0:Int): Int = {
+    val x1 = x0 == 0
+    val x3 = if (x1) {
+      val x2 = if (x1) {
+        0
+      } else {
+        2
+      }
+      x2
+    } else {
+      1
+    }
+    x3
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<p>and with that of <code>warmup1</code>:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Int)) {
+  def apply(x0:Int): Int = {
+    val x1 = x0 == 0
+    val x2 = if (x1) {
+      0
+    } else {
+      1
+    }
+    x2
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'></code></pre>
+	    </div>
+	    
 
 	    <p>
 		Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/dynvar.scala">View this file on GitHub</a>.
