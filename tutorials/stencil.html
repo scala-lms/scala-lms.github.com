@@ -442,396 +442,24 @@ import scala.reflect.SourceContext
 		<div class="pilwrap">
 		    <a class="pilcrow" href="#section_1">&#182;</a>
 		</div>
-		<h2>Infrastructure</h2>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait Sliding extends Dsl {
-  def infix_sliding[T:Typ](n: Rep[Int], f: Rep[Int] =&gt; Rep[T]): Rep[Array[T]] = {
-    val a = NewArray[T](n)
-    sliding(0,n)(i =&gt; a(i) = f(i))
-    a
-  }
-  def infix_sliding(r: Rep[Range]) = new {
-    def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] =
-      sliding(r.start, r.end)(f)
-  }
-  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit]
-}
-
-</code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_2">&#182;</a>
-		</div>
-		<h3>No Sliding (Baseline)</h3>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait NoSlidingExp extends DslExp with Sliding {
-  // not actually sliding -- just to have a baseline reference
-  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-    (start until end) foreach f
-  }
-}
-
-</code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_3">&#182;</a>
-		</div>
-		<h3>Sliding</h3>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait SlidingExp extends DslExp with Sliding {
-  object trans extends ForwardTransformer {
-    val IR: SlidingExp.this.type = SlidingExp.this
-  }
-  def log(x: Any): Unit = {
-    System.out.println(&quot;sliding log: &quot;+x)
-  }
-
-  // some arithmetic rewrites to maximize sliding sharing
-  override def int_plus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] =
-    ((lhs,rhs) match {
-      // (x+y)+z --&gt; x+(y+z)
-      case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y+z))
-      // (x-y)+z --&gt; x-(y-z)
-      case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y-z))
-      case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_minus(x, unit(-z))
-      case _ =&gt; super.int_plus(lhs,rhs)
-    }).asInstanceOf[Exp[Int]]
-
-  override def int_minus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] =
-    ((lhs,rhs) match {
-      // (x-y)-z --&gt; x-(y+z)
-      case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y+z))
-      // (x+y)-z --&gt; x+(y-z)
-      case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y-z))
-      case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_plus(x, unit(-z))
-      case _ =&gt; super.int_minus(lhs,rhs)
-    }).asInstanceOf[Exp[Int]]
-
-  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-    val i = fresh[Int]
-
-    val save = context
-    // evaluate loop contents f(i)
-    val (r0,stms0) = reifySubGraph(f(i))
-    val (((r1,stms1,subst1),(r2,stms2,subst2)), _) = reifySubGraph {
-      reflectSubGraph(stms0)
-      context = save
-      // evaluate loop contents f(i+1)
-      val ((r1,subst1),stms1) = reifySubGraph(trans.withSubstScope(i -&gt; (i+1)) {
-        stms0.foreach(s=&gt;trans.traverseStm(s))
-        (trans(r0), trans.subst)
-      })
-      val ((r2,stms2,subst2), _) = reifySubGraph {
-        reflectSubGraph(stms1)
-        context = save
-        // evaluate loop contents f(i+2)
-        val ((r2,subst2),stms2) = reifySubGraph(trans.withSubstScope(i -&gt; (i+2)) {
-          stms0.foreach(s=&gt;trans.traverseStm(s))
-          (trans(r0), trans.subst)
-        })
-        (r2,stms2,subst2)
-      }
-      ((r1,stms1,subst1), (r2,stms2,subst2))
-    }
-    context = save
-
-    val defs = stms0.flatMap(_.lhs)
-    // find overlap syms: defined by f(i), used by f(i+1) and f(i+2)
-    val overlap01 = stms1.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
-    val overlap02 = stms2.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
-
-    if (overlap02.nonEmpty)
-      log(&quot;Overlap beyond a single loop iteration is ignored, since not yet implemented.&quot;)
-
-    val overlap0 = (overlap01++overlap02).distinct
-    val overlap1 = overlap0 map subst1
-    // build a variable for each overlap sym.
-    // init variables by peeling first loop iteration.
-    if (end &gt; start) {
-      val (rX,substX) = trans.withSubstScope(i -&gt; start) {
-        stms0.foreach(s=&gt;trans.traverseStm(s))
-        (trans(r0), trans.subst)
-      }
-      val vars = overlap0 map (x =&gt; var_new(substX(x))(x.tp,x.pos.head))
-      // now generate the loop
-      for (j &lt;- (start + unit(1)) until end) {
-        // read the overlap variables
-        generate_comment(&quot;variable reads&quot;)
-        val reads = (overlap0 zip vars) map (p =&gt; (p._1, readVar(p._2)(p._1.tp,p._1.pos.head)))
-        // emit the transformed loop body
-        generate_comment(&quot;computation&quot;)
-        val (r,substY1) = trans.withSubstScope((reads:+(i-&gt;(j-unit(1)))): _*) {
-          stms1.foreach(s=&gt;trans.traverseStm(s))
-          (trans(r1), trans.subst)
-        }
-        // write the new values to the overlap vars
-        generate_comment(&quot;variable writes&quot;)
-        val writes = (overlap1 zip vars) map (p =&gt;
-          (p._1, var_assign(p._2, substY1(p._1))(p._1.tp,p._1.pos.head)))
-      }
-    }
-  }
-}
-
-</code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_4">&#182;</a>
-		</div>
-		<h3>Multi sliding</h3>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait SlidingMultiExp extends SlidingExp with DslExp with Sliding {
-  type Subst = scala.collection.immutable.Map[Exp[Any],Exp[Any]]
-  type Triplet = (Rep[Unit], List[Stm], Subst)
-
-  override def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
-    val i = fresh[Int]
-
-    val save = context
-    // evaluate loop contents f(i)
-    val (r0,stms0) = reifySubGraph(f(i))
-    val defs = stms0.flatMap(_.lhs)
-    def step(n: Int, last: List[Stm], acc: List[Triplet], overlap: List[Sym[Any]]): (Triplet, List[Sym[Any]]) = {
-      val (res: (Triplet, List[Sym[Any]]), _) = reifySubGraph {
-        reflectSubGraph(last)
-        context = save
-        val ((ri, substi), stmsi) = reifySubGraph(trans.withSubstScope(i -&gt; (i+n)) {
-          stms0.foreach(s =&gt; trans.traverseStm(s))
-          (trans(r0), trans.subst)
-        })
-
-        val overlapi = stmsi.flatMap{ case TP(s,d) =&gt; syms(d) filter (defs contains _)}.distinct
-        if (overlapi.nonEmpty)
-          step(n+1, stmsi, ((ri, stmsi, substi):Triplet)::acc, (overlap++overlapi).distinct)
-        else {
-          log(&quot;stopping at &quot;+n)
-          (acc.last, overlap)
-        }
-      }
-      res
-    }
-
-    val ((r1, stms1, subst1), overlap0) = step(1, stms0, Nil, Nil)
-    context = save
-
-    val overlap1 = overlap0 map subst1
-    // build a variable for each overlap sym.
-    // init variables by peeling first loop iteration.
-    if (end &gt; start) {
-      val (rX,substX) = trans.withSubstScope(i -&gt; start) {
-        stms0.foreach(s=&gt;trans.traverseStm(s))
-        (trans(r0), trans.subst)
-      }
-      val vars = overlap0.map{x =&gt; var_new(substX(x))(x.tp,x.pos.head)}
-      // now generate the loop
-      for (j &lt;- (start + unit(1)) until end) {
-        // read the overlap variables
-        generate_comment(&quot;variable reads&quot;)
-        val reads = (overlap0 zip vars).map(p =&gt; (p._1, readVar(p._2)(p._1.tp,p._1.pos.head)))
-        // emit the transformed loop body
-        generate_comment(&quot;computation&quot;)
-        val (ri, substY1: Subst) = trans.withSubstScope((reads:+(i-&gt;(j-unit(1)))): _*) {
-          stms1.foreach(s=&gt;trans.traverseStm(s))
-          (trans(r1), trans.subst)
-        }
-        // write the new values to the overlap vars
-        generate_comment(&quot;variable writes&quot;)
-        val writes = (overlap1 zip vars).map{p =&gt;
-          (p._1, var_assign(p._2, substY1(p._1))(p._1.tp,p._1.pos.head))}
-      }
-    }
-  }
-}
-
-</code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_5">&#182;</a>
-		</div>
-		<h2>Warmup</h2>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait SlidingWarmup extends Sliding {
-  def snippet(n: Rep[Int]): Rep[Array[Int]] = {
-    def compute(i: Rep[Int]) = 2*i+3
-    n sliding { i =&gt; compute(i) + compute(i+1) }
-  }
-}
-abstract class SlidingWarmupDriver extends DslDriver[Int,Array[Int]] with SlidingWarmup
-class SlidingWarmupTest extends TutorialFunSuite {
-  val under = &quot;sliding&quot;
-
-  test(&quot;warmup without sliding&quot;) {
-    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
-    check(&quot;0&quot;, sliding0.code)
-  }
-
-  test(&quot;warmup with sliding&quot;) {
-    val sliding1 = new SlidingWarmupDriver with SlidingExp
-    check(&quot;1&quot;, sliding1.code)
-  }
-
-  test(&quot;warmup with multi sliding&quot;) {
-    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
-    check(&quot;1&quot;, sliding2.code) // same as single sliding
-  }
-
-  test(&quot;warmup equal&quot;) {
-    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
-    val sliding1 = new SlidingWarmupDriver with SlidingExp
-    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
-    val input = 5
-    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding1.eval(input).mkString(&quot;,&quot;))
-    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding2.eval(input).mkString(&quot;,&quot;))
-  }
-}
-
-</code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_6">&#182;</a>
-		</div>
-		<h3>Generated code without sliding</h3>
-<pre><code class="prettyprint lang-scala">/*****************************************
-Emitting Generated Code
-*******************************************/
-class Snippet extends ((Int)=&gt;(Array[Int])) {
-  def apply(x0:Int): Array[Int] = {
-    val x1 = new Array[Int](x0)
-    var x3 : Int = 0
-    val x12 = while (x3 &lt; x0) {
-      val x4 = 2 * x3
-      val x5 = x4 + 3
-      val x6 = x3 + 1
-      val x7 = 2 * x6
-      val x8 = x7 + 3
-      val x9 = x5 + x8
-      val x10 = x1(x3) = x9
-      x3 = x3 + 1
-    }
-    x1
-  }
-}
-/*****************************************
-End of Generated Code
-*******************************************/
-</code></pre>
-<h3>Generated code with sliding</h3>
-<pre><code class="prettyprint lang-scala">/*****************************************
-Emitting Generated Code
-*******************************************/
-class Snippet extends ((Int)=&gt;(Array[Int])) {
-  def apply(x0:Int): Array[Int] = {
-    val x1 = new Array[Int](x0)
-    val x20 = x0 &gt; 0
-    val x42 = if (x20) {
-      val x21 = x1(0) = 8
-      var x22: Int = 5
-      var x23: Int = 1
-      var x25 : Int = 1
-      val x40 = while (x25 &lt; x0) {
-        // variable reads
-        val x27 = x22
-        val x28 = x23
-        // computation
-        val x31 = x25 + 1
-        val x32 = 2 * x31
-        val x33 = x32 + 3
-        val x34 = x27 + x33
-        val x35 = x1(x28) = x34
-        // variable writes
-        x22 = x33
-        x23 = x31
-        x25 = x25 + 1
-      }
-      x40
-    } else {
-      ()
-    }
-    x1
-  }
-}
-/*****************************************
-End of Generated Code
-*******************************************/
-</code></pre>
-<h3>Generated code with multi sliding</h3>
-<pre><code class="prettyprint lang-scala">/*****************************************
-Emitting Generated Code
-*******************************************/
-class Snippet extends ((Int)=&gt;(Array[Int])) {
-  def apply(x0:Int): Array[Int] = {
-    val x1 = new Array[Int](x0)
-    val x20 = x0 &gt; 0
-    val x46 = if (x20) {
-      val x21 = x1(0) = 8
-      var x22: Int = 5
-      var x23: Int = 1
-      var x25 : Int = 0
-      val x44 = while (x25 &lt; x0) {
-        // unrolled for k=0
-        val x27 = x25 + 1
-        val x28 = x27 &lt; x0
-        val x42 = if (x28) {
-          // variable reads
-          val x30 = x22
-          val x31 = x23
-          // computation
-          val x33 = x25 + 2
-          val x34 = 2 * x33
-          val x35 = x34 + 3
-          val x36 = x30 + x35
-          val x37 = x1(x31) = x36
-          // variable writes
-          x22 = x35
-          x23 = x33
-          ()
-        } else {
-          ()
-        }
-        x25 = x25 + 1
-      }
-      x44
-    } else {
-      ()
-    }
-    x1
-  }
-}
-/*****************************************
-End of Generated Code
-*******************************************/
-</code></pre>
-
-	    </div>
-	    <div class="code">
-		<pre><code class='prettyprint lang-scala'></code></pre>
-	    </div>
-	    
-	    <div class="docs">
-		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_7">&#182;</a>
-		</div>
 		<h2>Stencil Challenge</h2>
+<p>We implement the challenge using an almost regular staged loop,
+<br  />except using <code>sliding</code> staging-time abstraction.</p>
+<p>How does it work? We rely on the fact that LMS performs common
+<br  />subexpression elimination internally, and we insert variables for
+<br  />values that are re-used from one loop iteration to the next.</p>
+<p>We compute the code for loop iterations i and i + 1. For iteration i + 1,
+<br  />we substitute i + 1 for i.</p>
+<p>We peel the first loop iteration to initialize the variables.</p>
+<p>And then generate a modified loop that executes the remaining
+<br  />iterations. The loop body corresponds to the (i+1) iteration above
+<br  />plus the reads and write statements that maintain the variables.</p>
+<p>So with a twist on our general CSE facility, we implement CSE across
+<br  />loop iterations. The approach also works for window sizes larger than
+<br  />1, we just need to unroll more iterations of the loop.
+<br  />In the challenge example, if we look at iteration i + 2, we find that
+<br  />it does not reuse any memory access operations from iteration i, so
+<br  />a larger window is not necessary in this case.</p>
 
 	    </div>
 	    <div class="code">
@@ -885,7 +513,7 @@ class StencilTest extends TutorialFunSuite {
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_8">&#182;</a>
+		    <a class="pilcrow" href="#section_2">&#182;</a>
 		</div>
 		<h3>Generated code without sliding</h3>
 <pre><code class="prettyprint lang-scala">/*****************************************
@@ -1086,6 +714,510 @@ class Snippet extends ((Array[Double])=&gt;(Array[Double])) {
       ()
     }
     x2
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<p>Note that for the examples here, the multi sliding does not improve
+<br  />upon the number of shared variables.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'></code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_3">&#182;</a>
+		</div>
+		<h2>Infrastructure</h2>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait Sliding extends Dsl {
+  def infix_sliding[T:Typ](n: Rep[Int], f: Rep[Int] =&gt; Rep[T]): Rep[Array[T]] = {
+    val a = NewArray[T](n)
+    sliding(0,n)(i =&gt; a(i) = f(i))
+    a
+  }
+  def infix_sliding(r: Rep[Range]) = new {
+    def foreach(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] =
+      sliding(r.start, r.end)(f)
+  }
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit]
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_4">&#182;</a>
+		</div>
+		<h3>No Sliding (Baseline)</h3>
+<p>Not actually sliding &ndash; just to have a baseline reference.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait NoSlidingExp extends DslExp with Sliding {
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+    (start until end) foreach f
+  }
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_5">&#182;</a>
+		</div>
+		<h3>Sliding</h3>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait SlidingExp extends DslExp with Sliding {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_6">&#182;</a>
+		</div>
+		<p>We use a LMS transformer to evaluate the loop body
+<br  />across various iterations and transformations.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  object trans extends ForwardTransformer {
+    val IR: SlidingExp.this.type = SlidingExp.this
+  }
+  def log(x: Any): Unit = {
+    System.out.println(&quot;sliding log: &quot;+x)
+  }
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_7">&#182;</a>
+		</div>
+		<p>Some arithmetic rewrites to maximize sliding sharing.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  override def int_plus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] =
+    ((lhs,rhs) match {
+      // (x+y)+z --&gt; x+(y+z)
+      case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y+z))
+      // (x-y)+z --&gt; x-(y-z)
+      case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y-z))
+      case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_minus(x, unit(-z))
+      case _ =&gt; super.int_plus(lhs,rhs)
+    }).asInstanceOf[Exp[Int]]
+
+  override def int_minus(lhs: Exp[Int], rhs: Exp[Int])(implicit pos: SourceContext): Exp[Int] =
+    ((lhs,rhs) match {
+      // (x-y)-z --&gt; x-(y+z)
+      case (Def(IntMinus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_minus(x, unit(y+z))
+      // (x+y)-z --&gt; x+(y-z)
+      case (Def(IntPlus(x:Exp[Int],Const(y:Int))), Const(z:Int)) =&gt; int_plus(x, unit(y-z))
+      case (x: Exp[Int], Const(z:Int)) if z &lt; 0 =&gt; int_plus(x, unit(-z))
+      case _ =&gt; super.int_minus(lhs,rhs)
+    }).asInstanceOf[Exp[Int]]
+
+  type Subst = scala.collection.immutable.Map[Exp[Any],Exp[Any]]
+  type Doublet = (Rep[Unit], List[Stm])
+  type Triplet = (Rep[Unit], List[Stm], Subst)
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_8">&#182;</a>
+		</div>
+		<p>Find the overlapping symbols: defined by f(i), used by f(i+1), f(i+2), &hellip;
+<br  />We create a helper function so that we can generalize to a fixpoint calculation
+<br  />in the subclass below.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  def findOverlap(i: Sym[Int], f: Rep[Int] =&gt; Rep[Unit]): (List[Sym[Any]], Doublet, Triplet) = {
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_9">&#182;</a>
+		</div>
+		<p>We evaluate loop contents f(i), then f(i+1), then f(i+2).
+<br  />For evaluation, we use the reified sub graph for f(i), but we substitute i for i+1 or i+2.
+<br  />Each time, we reflect the statements from the previous iteration.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>    val save = context
+    // evaluate loop contents f(i)
+    val (r0,stms0) = reifySubGraph(f(i))
+    val (((r1,stms1,subst1),(r2,stms2,subst2)), _) = reifySubGraph {
+      reflectSubGraph(stms0)
+      context = save
+      // evaluate loop contents f(i+1)
+      val ((r1,subst1),stms1) = reifySubGraph(trans.withSubstScope(i -&gt; (i+1)) {
+        stms0.foreach(s=&gt;trans.traverseStm(s))
+        (trans(r0), trans.subst)
+      })
+      val ((r2,stms2,subst2), _) = reifySubGraph {
+        reflectSubGraph(stms1)
+        context = save
+        // evaluate loop contents f(i+2)
+        val ((r2,subst2),stms2) = reifySubGraph(trans.withSubstScope(i -&gt; (i+2)) {
+          stms0.foreach(s=&gt;trans.traverseStm(s))
+          (trans(r0), trans.subst)
+        })
+        (r2,stms2,subst2)
+      }
+      ((r1,stms1,subst1), (r2,stms2,subst2))
+    }
+    context = save
+
+    val defs = stms0.flatMap(_.lhs)
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_10">&#182;</a>
+		</div>
+		<p>Here, we find the overlap symbols: defined by f(i), used by f(i+1) and f(i+2).</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>    val overlap01 = stms1.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+    val overlap02 = stms2.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_11">&#182;</a>
+		</div>
+		<p>We haven't yet a fixed point yet, if there are still overlapping symbols in the last iteration.
+<br  />We will fix this in the subclass below.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>    if (overlap02.nonEmpty)
+      log(&quot;Overlap beyond a single loop iteration is ignored, since not yet implemented.&quot;)
+
+    val overlap0 = (overlap01++overlap02).distinct
+    (overlap0, (r0, stms0), (r1, stms1, subst1))
+  }
+
+  def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+    val i = fresh[Int]
+    val (overlap0, (r0, stms0), (r1, stms1, subst1)) = findOverlap(i, f)
+    val overlap1 = overlap0 map subst1
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_12">&#182;</a>
+		</div>
+		<p>Build a variable for each overlap symbol.
+<br  />Initialize the variables by peeling first loop iteration.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>    if (end &gt; start) {
+      val (rX,substX) = trans.withSubstScope(i -&gt; start) {
+        stms0.foreach(s=&gt;trans.traverseStm(s))
+        (trans(r0), trans.subst)
+      }
+      val vars = overlap0.map{x =&gt; var_new(substX(x))(x.tp,x.pos.head)}
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_13">&#182;</a>
+		</div>
+		<p>Now generate the loop:</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>      for (j &lt;- (start + unit(1)) until end) {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_14">&#182;</a>
+		</div>
+		<ul>
+<li>Read the overlap variables.</li>
+</ul>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>        generate_comment(&quot;variable reads&quot;)
+        val reads = (overlap0 zip vars).map(p =&gt; (p._1, readVar(p._2)(p._1.tp,p._1.pos.head)))
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_15">&#182;</a>
+		</div>
+		<ul>
+<li>Emit the transformed loop body.</li>
+</ul>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>        generate_comment(&quot;computation&quot;)
+        val (ri, substY1: Subst) = trans.withSubstScope((reads:+(i-&gt;(j-unit(1)))): _*) {
+          stms1.foreach(s=&gt;trans.traverseStm(s))
+          (trans(r1), trans.subst)
+        }
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_16">&#182;</a>
+		</div>
+		<ul>
+<li>Write the new values to the overlapping variables.</li>
+</ul>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>        generate_comment(&quot;variable writes&quot;)
+        val writes = (overlap1 zip vars).map{p =&gt;
+          (p._1, var_assign(p._2, substY1(p._1))(p._1.tp,p._1.pos.head))}
+      }
+    }
+  }
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_17">&#182;</a>
+		</div>
+		<h3>Multi sliding</h3>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait SlidingMultiExp extends SlidingExp with DslExp with Sliding {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_18">&#182;</a>
+		</div>
+		<p>Find overlapping symbols between iterations until there are no new ones.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  override def findOverlap(i: Sym[Int], f: Rep[Int] =&gt; Rep[Unit]) = {
+    val save = context
+    val (r0,stms0) = reifySubGraph(f(i))
+    val defs = stms0.flatMap(_.lhs)
+    def step(n: Int, last: List[Stm], acc: List[Triplet], overlap: List[Sym[Any]]): (Triplet, List[Sym[Any]]) = {
+      val (res: (Triplet, List[Sym[Any]]), _) = reifySubGraph {
+        reflectSubGraph(last)
+        context = save
+        val ((ri, substi), stmsi) = reifySubGraph(trans.withSubstScope(i -&gt; (i+n)) {
+          stms0.foreach(s =&gt; trans.traverseStm(s))
+          (trans(r0), trans.subst)
+        })
+
+        val overlapi = stmsi.flatMap{ case TP(s,d) =&gt; syms(d) filter (defs contains _)}.distinct
+        if (overlapi.nonEmpty)
+          step(n+1, stmsi, ((ri, stmsi, substi):Triplet)::acc, (overlap++overlapi).distinct)
+        else {
+          log(&quot;stopping at &quot;+n)
+          (acc.last, overlap)
+        }
+      }
+      res
+    }
+    val ((r1, stms1, subst1), overlap0) = step(1, stms0, Nil, Nil)
+    context = save
+    (overlap0, (r0, stms0), (r1, stms1, subst1))
+  }
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_19">&#182;</a>
+		</div>
+		<h2>Warmup</h2>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait SlidingWarmup extends Sliding {
+  def snippet(n: Rep[Int]): Rep[Array[Int]] = {
+    def compute(i: Rep[Int]) = 2*i+3
+    n sliding { i =&gt; compute(i) + compute(i+1) }
+  }
+}
+abstract class SlidingWarmupDriver extends DslDriver[Int,Array[Int]] with SlidingWarmup
+class SlidingWarmupTest extends TutorialFunSuite {
+  val under = &quot;sliding&quot;
+
+  test(&quot;warmup without sliding&quot;) {
+    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
+    check(&quot;0&quot;, sliding0.code)
+  }
+
+  test(&quot;warmup with sliding&quot;) {
+    val sliding1 = new SlidingWarmupDriver with SlidingExp
+    check(&quot;1&quot;, sliding1.code)
+  }
+
+  test(&quot;warmup with multi sliding&quot;) {
+    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
+    check(&quot;1&quot;, sliding2.code) // same as single sliding
+  }
+
+  test(&quot;warmup equal&quot;) {
+    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
+    val sliding1 = new SlidingWarmupDriver with SlidingExp
+    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
+    val input = 5
+    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding1.eval(input).mkString(&quot;,&quot;))
+    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding2.eval(input).mkString(&quot;,&quot;))
+  }
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_20">&#182;</a>
+		</div>
+		<h3>Generated code without sliding</h3>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    var x3 : Int = 0
+    val x12 = while (x3 &lt; x0) {
+      val x4 = 2 * x3
+      val x5 = x4 + 3
+      val x6 = x3 + 1
+      val x7 = 2 * x6
+      val x8 = x7 + 3
+      val x9 = x5 + x8
+      val x10 = x1(x3) = x9
+      x3 = x3 + 1
+    }
+    x1
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<h3>Generated code with sliding</h3>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    val x20 = x0 &gt; 0
+    val x42 = if (x20) {
+      val x21 = x1(0) = 8
+      var x22: Int = 5
+      var x23: Int = 1
+      var x25 : Int = 1
+      val x40 = while (x25 &lt; x0) {
+        // variable reads
+        val x27 = x22
+        val x28 = x23
+        // computation
+        val x31 = x25 + 1
+        val x32 = 2 * x31
+        val x33 = x32 + 3
+        val x34 = x27 + x33
+        val x35 = x1(x28) = x34
+        // variable writes
+        x22 = x33
+        x23 = x31
+        x25 = x25 + 1
+      }
+      x40
+    } else {
+      ()
+    }
+    x1
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<h3>Generated code with multi sliding</h3>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    val x20 = x0 &gt; 0
+    val x46 = if (x20) {
+      val x21 = x1(0) = 8
+      var x22: Int = 5
+      var x23: Int = 1
+      var x25 : Int = 0
+      val x44 = while (x25 &lt; x0) {
+        // unrolled for k=0
+        val x27 = x25 + 1
+        val x28 = x27 &lt; x0
+        val x42 = if (x28) {
+          // variable reads
+          val x30 = x22
+          val x31 = x23
+          // computation
+          val x33 = x25 + 2
+          val x34 = 2 * x33
+          val x35 = x34 + 3
+          val x36 = x30 + x35
+          val x37 = x1(x31) = x36
+          // variable writes
+          x22 = x35
+          x23 = x33
+          ()
+        } else {
+          ()
+        }
+        x25 = x25 + 1
+      }
+      x44
+    } else {
+      ()
+    }
+    x1
   }
 }
 /*****************************************
