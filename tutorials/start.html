@@ -474,8 +474,8 @@ class GettingStartedTest extends TutorialFunSuite {
 
       }
     }
-    assert(snippet.eval(0) === 2)
     check(&quot;1&quot;, snippet.code)
+    assert(snippet.eval(0) === 2)
   }
 </code></pre>
 	    </div>
@@ -488,7 +488,7 @@ class GettingStartedTest extends TutorialFunSuite {
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-  def apply(x1:Int): Int = {
+  def apply(x0:Int): Int = {
     2
   }
 }
@@ -517,8 +517,8 @@ End of Generated Code
 
       }
     }
-    assert(snippet.eval(2) === 2)
     check(&quot;2&quot;, snippet.code)
+    assert(snippet.eval(2) === 2)
   }
 </code></pre>
 	    </div>
@@ -531,14 +531,14 @@ End of Generated Code
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-  def apply(x3:Int): Int = {
-    val x4 = x3 == 1
-    val x5 = if (x4) {
+  def apply(x0:Int): Int = {
+    val x1 = x0 == 1
+    val x2 = if (x1) {
       1
     } else {
-      x3
+      x0
     }
-    x5
+    x2
   }
 }
 /*****************************************
@@ -573,8 +573,8 @@ End of Generated Code
         power(b, 7)
 
     }
-    assert(snippet.eval(2) === 128)
     check(&quot;power&quot;, snippet.code)
+    assert(snippet.eval(2) === 128)
   }
 
 </code></pre>
@@ -590,12 +590,12 @@ End of Generated Code
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-  def apply(x5:Int): Int = {
-    val x6 = x5 * x5
-    val x7 = x5 * x6
-    val x8 = x7 * x7
-    val x9 = x5 * x8
-    x9
+  def apply(x0:Int): Int = {
+    val x1 = x0 * x0
+    val x2 = x0 * x1
+    val x3 = x2 * x2
+    val x4 = x0 * x3
+    x4
   }
 }
 /*****************************************
@@ -620,8 +620,8 @@ End of Generated Code
         power(b, 7)
 
     }
-    assert(snippet.eval(2) === 128)
     check(&quot;powerfunsquare&quot;, snippet.code)
+    assert(snippet.eval(2) === 128)
   }
 
 </code></pre>
@@ -637,16 +637,16 @@ End of Generated Code
 Emitting Generated Code
 *******************************************/
 class Snippet extends ((Int)=&gt;(Int)) {
-  def apply(x8:Int): Int = {
+  def apply(x0:Int): Int = {
     val x1 = {x2: (Int) =&gt;
       val x3 = x2 * x2
       x3: Int
     }
-    val x9 = x1(x8)
-    val x10 = x8 * x9
-    val x11 = x1(x10)
-    val x12 = x8 * x11
-    x12
+    val x4 = x1(x0)
+    val x5 = x0 * x4
+    val x6 = x1(x5)
+    val x7 = x0 * x6
+    x7
   }
 }
 /*****************************************
