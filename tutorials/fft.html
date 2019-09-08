@@ -476,17 +476,10 @@
 <br  />to obtain compiled FFT implementations that
 <br  />realize the necessary data interface for a fixed input size.</p>
 <p>We can then define code that creates and uses compiled  FFT &ldquo;codelets&rdquo; by
-<br  />extending <a href="#FFTC"><code>FFTC</code></a>:</p>
-<pre><code>trait TestFFTC extends FFTC {
-  val fft4: Array[Double] =&gt; Array[Double] = fftc(4)
-  val fft8: Array[Double] =&gt; Array[Double] = fftc(8)
-
-  // embedded code using fft4, fft8, ...
-}
-</code></pre>
+<br  />extending <a href="#FFTC"><code>FFTC</code></a>. See the trait <a href="#TestFFTC"><code>TestFFTC</code></a>.</p>
 <p>Constructing an instance of this subtrait (mixed in with the appropriate LMS
 <br  />traits) will execute the embedded code:</p>
-<pre><code>val OP: TestFFC = new TestFFTC with FFTCExp ...
+<pre><code>val OP: TestFFC = new TestFFTC with FFTCExp
 </code></pre>
 <p>We can also use the compiled methods from outside the object:</p>
 <pre><code>OP.fft4(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0))
@@ -898,17 +891,32 @@ trait ScalaGenFlat extends ScalaGenEffect {
 
 	    </div>
 	    <div class="code">
-		<pre><code class='prettyprint lang-scala'>trait FFTC { this: FFT with Arith with Trig with Arrays with Compile =&gt;
-  def repClassTag[T:ClassTag]: ClassTag[Rep[T]]
+		<pre><code class='prettyprint lang-scala'>trait FFTC { this: FFT with Arith with Arrays with Compile =&gt;
   def fftc(size: Int) = compile { input: Rep[Array[Double]] =&gt;
     val arg = Array.tabulate(size){i =&gt;
       Complex(input(2*i), input(2*i+1))
     }
     val res = fft(arg)
-    updateArray[Double](input, (res.flatMap {
-      case Complex(re,im) =&gt; Array(re,im)(repClassTag[Double])
-    }).toArray(repClassTag[Double]))
+    updateArray(input, res.flatMap {
+      case Complex(re,im) =&gt; Array(re,im)
+    })
   }
+
+  // This is because we're using an Array of Rep.
+  implicit def repClassTag[T:ClassTag]: ClassTag[Rep[T]]
+}
+
+trait FFTCExp extends FFTC with FFT with ArithExpOptFFT with TrigExpOptFFT with ArraysExpOpt with CompileScala { self =&gt;
+  val IR: self.type = self
+  val codegen = new ScalaGenFFT {
+    val IR: self.type = self
+  }
+
+  def repClassTag[T:ClassTag]: ClassTag[Rep[T]] = classTag
+}
+
+trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with ScalaGenArrays {
+  val IR: FFTCExp
 }
 
 </code></pre>
@@ -927,18 +935,6 @@ trait ScalaGenFlat extends ScalaGenEffect {
   lazy val fft8: Array[Double] =&gt; Array[Double] = fftc(8)
 
   // embedded code using fft4, fft8, ...
-}
-
-trait FFTCExp extends FFTC with FFT with ArithExpOptFFT with TrigExpOptFFT with ArraysExpOpt with CompileScala { self =&gt;
-  def repClassTag[T:ClassTag]: ClassTag[Rep[T]] = classTag
-  val IR: self.type = self
-  val codegen = new ScalaGenFFT {
-    val IR: self.type = self
-  }
-}
-
-trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with ScalaGenArrays {
-  val IR: FFTCExp
 }
 
 </code></pre>
