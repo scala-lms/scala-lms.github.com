@@ -559,7 +559,78 @@ class SlidingWarmupTest extends TutorialFunSuite {
   }
 }
 
-trait Stencil extends Sliding {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_1">&#182;</a>
+		</div>
+		<p>Without sliding:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    var x3 : Int = 0
+    val x12 = while (x3 &lt; x0) {
+      val x4 = 2 * x3
+      val x5 = x4 + 3
+      val x6 = x3 + 1
+      val x7 = 2 * x6
+      val x8 = x7 + 3
+      val x9 = x5 + x8
+      val x10 = x1(x3) = x9
+      x3 = x3 + 1
+    }
+    x1
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<p>With sliding:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    val x20 = x0 &gt; 0
+    val x39 = if (x20) {
+      val x21 = x1(0) = 8
+      var x22: Int = 5
+      var x23: Int = 1
+      var x25 : Int = 1
+      val x37 = while (x25 &lt; x0) {
+        val x26 = x22
+        val x27 = x23
+        val x29 = x25 + 1
+        val x30 = 2 * x29
+        val x31 = x30 + 3
+        val x32 = x26 + x31
+        val x33 = x1(x27) = x32
+        x22 = x31
+        x23 = x29
+        x25 = x25 + 1
+      }
+      x37
+    } else {
+      ()
+    }
+    x1
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait Stencil extends Sliding {
   def snippet(v: Rep[Array[Double]]): Rep[Array[Double]] = {
     val n = v.length
     val input = v
@@ -589,7 +660,144 @@ class StencilTest extends TutorialFunSuite {
     check(&quot;1&quot;, stencil1.code)
   }
 }
+
 </code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_2">&#182;</a>
+		</div>
+		<p>Without sliding:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Array[Double])=&gt;(Array[Double])) {
+  def apply(x0:Array[Double]): Array[Double] = {
+    val x1 = x0.length
+    val x2 = new Array[Double](x1)
+    val x3 = x1 - 2
+    var x5 : Int = 2
+    val x40 = while (x5 &lt; x3) {
+      val x6 = x0(x5)
+      val x7 = x5 + 1
+      val x8 = x0(x7)
+      val x9 = x6 * x8
+      val x10 = x6 - x9
+      val x11 = x5 - 1
+      val x12 = x0(x11)
+      val x13 = x11 + 1
+      val x14 = x0(x13)
+      val x15 = x12 * x14
+      val x16 = x10 + x15
+      val x17 = x7 + 1
+      val x18 = x0(x17)
+      val x19 = x8 * x18
+      val x20 = x8 - x19
+      val x21 = x20 + x9
+      val x22 = x16 * x21
+      val x23 = x16 - x22
+      val x24 = x12 - x15
+      val x25 = x11 - 1
+      val x26 = x0(x25)
+      val x27 = x25 + 1
+      val x28 = x0(x27)
+      val x29 = x26 * x28
+      val x30 = x24 + x29
+      val x31 = x13 + 1
+      val x32 = x0(x31)
+      val x33 = x14 * x32
+      val x34 = x14 - x33
+      val x35 = x34 + x15
+      val x36 = x30 * x35
+      val x37 = x23 + x36
+      val x38 = x2(x5) = x37
+      x5 = x5 + 1
+    }
+    x2
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<p>With sliding:</p>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Array[Double])=&gt;(Array[Double])) {
+  def apply(x0:Array[Double]): Array[Double] = {
+    val x1 = x0.length
+    val x2 = new Array[Double](x1)
+    val x3 = x1 - 2
+    val x48 = x3 &gt; 2
+    val x102 = if (x48) {
+      val x49 = x0(2)
+      val x50 = x0(3)
+      val x51 = x49 * x50
+      val x52 = x49 - x51
+      val x53 = x0(1)
+      val x54 = x53 * x49
+      val x55 = x52 + x54
+      val x56 = x0(4)
+      val x57 = x50 * x56
+      val x58 = x50 - x57
+      val x59 = x58 + x51
+      val x60 = x55 * x59
+      val x61 = x55 - x60
+      val x62 = x53 - x54
+      val x63 = x0(0)
+      val x64 = x63 * x53
+      val x65 = x62 + x64
+      val x66 = x65 * x55
+      val x67 = x61 + x66
+      val x68 = x2(2) = x67
+      var x69: Double = x56
+      var x70: Double = x57
+      var x71: Double = x59
+      var x72: Double = x60
+      var x73: Int = 3
+      var x74: Int = 4
+      var x76 : Int = 3
+      val x100 = while (x76 &lt; x3) {
+        val x77 = x69
+        val x78 = x70
+        val x79 = x71
+        val x80 = x72
+        val x81 = x73
+        val x82 = x74
+        val x84 = x76 + 2
+        val x85 = x0(x84)
+        val x86 = x77 * x85
+        val x87 = x77 - x86
+        val x88 = x87 + x78
+        val x89 = x79 * x88
+        val x90 = x79 - x89
+        val x91 = x90 + x80
+        val x92 = x2(x81) = x91
+        x69 = x85
+        x70 = x86
+        x71 = x88
+        x72 = x89
+        x73 = x82
+        x74 = x84
+        x76 = x76 + 1
+      }
+      x100
+    } else {
+      ()
+    }
+    x2
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'></code></pre>
 	    </div>
 	    
 
