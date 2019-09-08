@@ -827,8 +827,18 @@ trait DisableDCE extends GraphTraversal {
     mergeEvenOdd(even.toList, odd.toList).toArray
 }
 
-/** &lt;a name=&quot;ArithExpOptFFT&quot;&gt;&lt;/a&gt; */
-trait ArithExpOptFFT extends ArithExpOpt {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_8">&#182;</a>
+		</div>
+		<p><a name="ArithExpOptFFT"></a></p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait ArithExpOptFFT extends ArithExpOpt {
   override def infix_+(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) =
     (x, y) match {
       case (x, Def(Minus(Const(0.0) | Const(-0.0), y))) =&gt; infix_-(x, y)
@@ -877,8 +887,18 @@ trait ScalaGenFlat extends ScalaGenEffect {
   }
 }
 
-/** &lt;a name=&quot;FFTC&quot;&gt;&lt;/a&gt; */
-trait FFTC { this: FFT with Arith with Trig with Arrays with Compile =&gt;
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_9">&#182;</a>
+		</div>
+		<p><a name="FFTC"></a></p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait FFTC { this: FFT with Arith with Trig with Arrays with Compile =&gt;
   def repClassTag[T:ClassTag]: ClassTag[Rep[T]]
   def fftc(size: Int) = compile { input: Rep[Array[Double]] =&gt;
     val arg = Array.tabulate(size){i =&gt;
@@ -891,8 +911,18 @@ trait FFTC { this: FFT with Arith with Trig with Arrays with Compile =&gt;
   }
 }
 
-/** &lt;a name=&quot;TestFFTC&quot;&gt;&lt;/a&gt; */
-trait TestFFTC { this: FFTC =&gt;
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_10">&#182;</a>
+		</div>
+		<p><a name="TestFFTC"></a></p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait TestFFTC { this: FFTC =&gt;
   lazy val fft4: Array[Double] =&gt; Array[Double] = fftc(4)
   lazy val fft8: Array[Double] =&gt; Array[Double] = fftc(8)
 
@@ -912,7 +942,7 @@ trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_8">&#182;</a>
+		    <a class="pilcrow" href="#section_11">&#182;</a>
 		</div>
 		<h3>Tests</h3>
 
@@ -941,7 +971,7 @@ trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_9">&#182;</a>
+		    <a class="pilcrow" href="#section_12">&#182;</a>
 		</div>
 		<p><center>
 <br  /><img src="fft4-unopt.png" width="600"></img>
@@ -970,7 +1000,7 @@ trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_10">&#182;</a>
+		    <a class="pilcrow" href="#section_13">&#182;</a>
 		</div>
 		<p><center>
 <br  /><img src="fft4.png"></img>
@@ -1001,7 +1031,7 @@ trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_11">&#182;</a>
+		    <a class="pilcrow" href="#section_14">&#182;</a>
 		</div>
 		<p>Generated code for FFT4, optimized, as well as sample output.</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
