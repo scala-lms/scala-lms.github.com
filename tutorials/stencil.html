@@ -459,19 +459,41 @@ import scala.reflect.SourceContext
   def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit]
 }
 
-trait NoSlidingExp extends DslExp with Sliding {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_2">&#182;</a>
+		</div>
+		<h3>No Sliding (Baseline)</h3>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait NoSlidingExp extends DslExp with Sliding {
   // not actually sliding -- just to have a baseline reference
   def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
     (start until end) foreach f
   }
 }
 
-trait SlidingExp extends DslExp with Sliding {
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_3">&#182;</a>
+		</div>
+		<h3>Sliding</h3>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait SlidingExp extends DslExp with Sliding {
   object trans extends ForwardTransformer {
     val IR: SlidingExp.this.type = SlidingExp.this
   }
   def log(x: Any): Unit = {
-    System.out.println(&quot;sliding log: &quot;+x)
+    System.err.println(&quot;sliding log: &quot;+x)
   }
 
   // some arithmetic rewrites to maximize sliding sharing
@@ -566,7 +588,91 @@ trait SlidingExp extends DslExp with Sliding {
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_2">&#182;</a>
+		    <a class="pilcrow" href="#section_4">&#182;</a>
+		</div>
+		<h3>Multi sliding</h3>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>trait SlidingMultiExp extends SlidingExp with DslExp with Sliding {
+  type Subst = scala.collection.immutable.Map[Exp[Any],Exp[Any]]
+  type Triplet = (Rep[Unit], List[Stm], Subst)
+
+  override def sliding(start: Rep[Int], end: Rep[Int])(f: Rep[Int] =&gt; Rep[Unit]): Rep[Unit] = {
+    val i = fresh[Int]
+
+    val save = context
+    // evaluate loop contents f(i)
+    val (r0,stms0) = reifySubGraph(f(i))
+    val defs = stms0.flatMap(_.lhs)
+    def step(n: Int, last: List[Stm], acc: List[Triplet], overlap: List[Sym[Any]]): (Int, List[Triplet], List[Sym[Any]]) = {
+      val (res: (Int, List[Triplet], List[Sym[Any]]), _) = reifySubGraph {
+        reflectSubGraph(last)
+        context = save
+        val ((ri, substi), stmsi) = reifySubGraph(trans.withSubstScope(i -&gt; (i+n)) {
+          stms0.foreach(s =&gt; trans.traverseStm(s))
+          (trans(r0), trans.subst)
+        })
+
+        val overlapi = stmsi.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+        if (overlapi.nonEmpty)
+          step(n+1, stmsi, ((ri, stmsi, substi):Triplet)::acc, (overlap++overlapi).distinct)
+        else {
+          log(&quot;stopping at &quot;+n)
+          (n-1, acc, overlap)
+        }
+      }
+      res
+    }
+
+    val (n, acc, overlap) = step(1, stms0, Nil, Nil)
+    context = save
+
+    val ls = acc.reverse
+    val overlap0 = overlap
+    val overlaps = ls.map({case (_, _, substi) =&gt; overlap0 map substi})
+    val overlaps_pred = overlap0::overlaps
+    // build a variable for each overlap sym.
+    // init variables by peeling first loop iteration.
+    if (end &gt; start) {
+      val (rX,substX) = trans.withSubstScope(i -&gt; start) {
+        stms0.foreach(s=&gt;trans.traverseStm(s))
+        (trans(r0), trans.subst)
+      }
+      val vars = overlap0.map{x =&gt; var_new(substX(x))(x.tp,x.pos.head)}
+      // now generate the loop
+      for (j &lt;- 0 until (end-start)/n) {
+        val base = n*j+start
+        for (k &lt;- 0 until n: Range) {
+          generate_comment(&quot;unrolled for k=&quot;+k)
+          val index = base+k+1
+          if (index &lt; end) {
+            // read the overlap variables
+            generate_comment(&quot;variable reads&quot;)
+            val reads = (overlaps_pred(k) zip vars).map(p =&gt; (p._1, readVar(p._2)(p._1.tp,p._1.pos.head)))
+            // emit the transformed loop body
+            generate_comment(&quot;computation&quot;)
+            val (ri, substYi: Subst) = trans.withSubstScope((reads:+(i-&gt;base)): _*) {
+              ls(k)._2.foreach(s=&gt;trans.traverseStm(s))
+              (trans(ls(k)._1), trans.subst)
+            }
+            // write the new values to the overlap vars
+            generate_comment(&quot;variable writes&quot;)
+            val writes = (overlaps(k) zip vars).map{p =&gt;
+              (p._1, var_assign(p._2, substYi(p._1))(p._1.tp,p._1.pos.head))}
+          }
+        }
+      }
+    }
+  }
+}
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_5">&#182;</a>
 		</div>
 		<h2>Warmup</h2>
 
@@ -591,6 +697,20 @@ class SlidingWarmupTest extends TutorialFunSuite {
     val sliding1 = new SlidingWarmupDriver with SlidingExp
     check(&quot;1&quot;, sliding1.code)
   }
+
+  test(&quot;warmup with multi sliding&quot;) {
+    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
+    check(&quot;2&quot;, sliding2.code) // same as single sliding
+  }
+
+  test(&quot;warmup equal&quot;) {
+    val sliding0 = new SlidingWarmupDriver with NoSlidingExp
+    val sliding1 = new SlidingWarmupDriver with SlidingExp
+    val sliding2 = new SlidingWarmupDriver with SlidingMultiExp
+    val input = 5
+    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding1.eval(input).mkString(&quot;,&quot;))
+    assert(sliding0.eval(input).mkString(&quot;,&quot;) == sliding2.eval(input).mkString(&quot;,&quot;))
+  }
 }
 
 </code></pre>
@@ -598,7 +718,7 @@ class SlidingWarmupTest extends TutorialFunSuite {
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_3">&#182;</a>
+		    <a class="pilcrow" href="#section_6">&#182;</a>
 		</div>
 		<h3>Generated code without sliding</h3>
 <pre><code class="prettyprint lang-scala">/*****************************************
@@ -664,6 +784,53 @@ class Snippet extends ((Int)=&gt;(Array[Int])) {
 End of Generated Code
 *******************************************/
 </code></pre>
+<h3>Generated code with multi sliding</h3>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Int)=&gt;(Array[Int])) {
+  def apply(x0:Int): Array[Int] = {
+    val x1 = new Array[Int](x0)
+    val x20 = x0 &gt; 0
+    val x46 = if (x20) {
+      val x21 = x1(0) = 8
+      var x22: Int = 5
+      var x23: Int = 1
+      var x25 : Int = 0
+      val x44 = while (x25 &lt; x0) {
+        // unrolled for k=0
+        val x27 = x25 + 1
+        val x28 = x27 &lt; x0
+        val x42 = if (x28) {
+          // variable reads
+          val x30 = x22
+          val x31 = x23
+          // computation
+          val x33 = x25 + 2
+          val x34 = 2 * x33
+          val x35 = x34 + 3
+          val x36 = x30 + x35
+          val x37 = x1(x31) = x36
+          // variable writes
+          x22 = x35
+          x23 = x33
+          ()
+        } else {
+          ()
+        }
+        x25 = x25 + 1
+      }
+      x44
+    } else {
+      ()
+    }
+    x1
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
 
 	    </div>
 	    <div class="code">
@@ -672,7 +839,7 @@ End of Generated Code
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_4">&#182;</a>
+		    <a class="pilcrow" href="#section_7">&#182;</a>
 		</div>
 		<h2>Stencil Challenge</h2>
 
@@ -707,6 +874,20 @@ class StencilTest extends TutorialFunSuite {
     val stencil1 = new StencilDriver with SlidingExp
     check(&quot;1&quot;, stencil1.code)
   }
+
+  test(&quot;stencil with multi sliding&quot;) {
+    val stencil2 = new StencilDriver with SlidingMultiExp
+    check(&quot;2&quot;, stencil2.code)
+  }
+
+  test(&quot;stencil equal&quot;) {
+    val stencil0 = new StencilDriver with NoSlidingExp
+    val stencil1 = new StencilDriver with SlidingExp
+    val stencil2 = new StencilDriver with SlidingMultiExp
+    val input = Array(1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 7.0, 8.0, 9.0, 10.0)
+    assert(stencil0.eval(input).mkString(&quot;,&quot;) == stencil1.eval(input).mkString(&quot;,&quot;))
+    assert(stencil0.eval(input).mkString(&quot;,&quot;) == stencil2.eval(input).mkString(&quot;,&quot;))
+  }
 }
 
 </code></pre>
@@ -714,7 +895,7 @@ class StencilTest extends TutorialFunSuite {
 	    
 	    <div class="docs">
 		<div class="pilwrap">
-		    <a class="pilcrow" href="#section_5">&#182;</a>
+		    <a class="pilcrow" href="#section_8">&#182;</a>
 		</div>
 		<h3>Generated code without sliding</h3>
 <pre><code class="prettyprint lang-scala">/*****************************************
@@ -835,6 +1016,125 @@ class Snippet extends ((Array[Double])=&gt;(Array[Double])) {
         x76 = x76 + 1
       }
       x103
+    } else {
+      ()
+    }
+    x2
+  }
+}
+/*****************************************
+End of Generated Code
+*******************************************/
+</code></pre>
+<h3>Generated code with multi sliding</h3>
+<pre><code class="prettyprint lang-scala">/*****************************************
+Emitting Generated Code
+*******************************************/
+class Snippet extends ((Array[Double])=&gt;(Array[Double])) {
+  def apply(x0:Array[Double]): Array[Double] = {
+    val x1 = x0.length
+    val x2 = new Array[Double](x1)
+    val x3 = x1 - 2
+    val x57 = x3 &gt; 2
+    val x151 = if (x57) {
+      val x58 = x0(2)
+      val x59 = x0(3)
+      val x60 = x58 * x59
+      val x61 = x58 - x60
+      val x62 = x0(1)
+      val x63 = x62 * x58
+      val x64 = x61 + x63
+      val x65 = x0(4)
+      val x66 = x59 * x65
+      val x67 = x59 - x66
+      val x68 = x67 + x60
+      val x69 = x64 * x68
+      val x70 = x64 - x69
+      val x71 = x62 - x63
+      val x72 = x0(0)
+      val x73 = x72 * x62
+      val x74 = x71 + x73
+      val x75 = x74 * x64
+      val x76 = x70 + x75
+      val x77 = x2(2) = x76
+      var x78: Double = x65
+      var x79: Double = x66
+      var x80: Double = x68
+      var x81: Double = x69
+      var x82: Int = 3
+      var x83: Int = 4
+      val x84 = x1 - 4
+      val x85 = x84 / 2
+      var x87 : Int = 0
+      val x149 = while (x87 &lt; x85) {
+        // unrolled for k=0
+        val x88 = 2 * x87
+        val x91 = x88 + 3
+        val x92 = x91 &lt; x3
+        val x118 = if (x92) {
+          // variable reads
+          val x94 = x78
+          val x95 = x79
+          val x96 = x80
+          val x97 = x81
+          val x98 = x82
+          val x99 = x83
+          // computation
+          val x101 = x88 + 5
+          val x102 = x0(x101)
+          val x103 = x94 * x102
+          val x104 = x94 - x103
+          val x105 = x104 + x95
+          val x106 = x96 * x105
+          val x107 = x96 - x106
+          val x108 = x107 + x97
+          val x109 = x2(x98) = x108
+          // variable writes
+          x78 = x102
+          x79 = x103
+          x80 = x105
+          x81 = x106
+          x82 = x99
+          x83 = x101
+          ()
+        } else {
+          ()
+        }
+        // unrolled for k=1
+        val x120 = x88 + 4
+        val x121 = x120 &lt; x3
+        val x147 = if (x121) {
+          // variable reads
+          val x123 = x78
+          val x124 = x79
+          val x125 = x80
+          val x126 = x81
+          val x127 = x82
+          val x128 = x83
+          // computation
+          val x130 = x88 + 6
+          val x131 = x0(x130)
+          val x132 = x123 * x131
+          val x133 = x123 - x132
+          val x134 = x133 + x124
+          val x135 = x125 * x134
+          val x136 = x125 - x135
+          val x137 = x136 + x126
+          val x138 = x2(x127) = x137
+          // variable writes
+          x78 = x131
+          x79 = x132
+          x80 = x134
+          x81 = x135
+          x82 = x128
+          x83 = x130
+          ()
+        } else {
+          ()
+        }
+        x87 = x87 + 1
+      }
+      x149
     } else {
       ()
     }
