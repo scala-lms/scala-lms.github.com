@@ -1021,7 +1021,7 @@ trait ScalaGenFFT extends ScalaGenFlat with ScalaGenArith with ScalaGenTrig with
       val OP: TestFFTC = new TestFFTC with FFTCExp {
         dumpGeneratedCode = true
       }
-      val code = utils.captureOut(OP.fft4)
+      val code = utils.captureLocalOut(OP.fft4)
       println(code.replace(&quot;compilation: ok&quot;, &quot;// compilation: ok&quot;))
       println(OP.fft4(Array(
         1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0, 1.0,0.0, 1.0,0.0, 0.0,0.0, 0.0,0.0

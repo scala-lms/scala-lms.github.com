@@ -531,10 +531,15 @@ object utils {
     println(&quot;%d microseconds&quot;.format(micros))
     result
   }
+  def captureLocalOut(func: =&gt; Any): String = {
+    val source = new java.io.ByteArrayOutputStream()
+    withOutput(new java.io.PrintStream(source))(func)
+    source.toString
+  }
   def captureOut(func: =&gt; Any): String = {
     val source = new java.io.ByteArrayOutputStream()
     withOutputFull(new java.io.PrintStream(source))(func)
-    source.toString    
+    source.toString
   }
   def withOutput[T](out: PrintStream)(f: =&gt; Unit): Unit = {
     scala.Console.withOut(out)(scala.Console.withErr(out)(f))
