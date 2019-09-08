@@ -614,7 +614,7 @@ import scala.reflect.SourceContext
           (trans(r0), trans.subst)
         })
 
-        val overlapi = stmsi.flatMap { case TP(s,d) =&gt; syms(d) filter (defs contains _) }.distinct
+        val overlapi = stmsi.flatMap{ case TP(s,d) =&gt; syms(d) filter (defs contains _)}.distinct
         if (overlapi.nonEmpty)
           step(n+1, stmsi, ((ri, stmsi, substi):Triplet)::acc, (overlap++overlapi).distinct)
         else {
