@@ -1,0 +1,974 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../images/favicon.ico">
+
+	<title>mpi.scala</title>
+
+	<!-- Google Analytics -->
+	<script>
+	 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	 ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+	 ga('send', 'pageview');
+
+	</script>
+
+	<!-- Bootstrap core CSS -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- font awesome -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+	<style type="text/css">
+	 @import url(../stylesheets/pygment_trac.css);
+	 /* head fancy: Lobster, Pacifico */
+	 /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
+	 /* dense bold: Squada One, Oswald; */
+	 @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+	 body {
+	     /*line-height: 1.7;*/
+	     /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+	     font-family: 'Helvetica Neue';
+	     /*font-size: 15pt;*/
+	     color: rgb(41,41,41);
+	 }
+
+	 h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+	     font-family: 'Roboto Slab';
+	     font-weight: 700;
+	 }
+
+
+	 .container h1,h2 {
+	     border-bottom: 1px solid #e5e5e5;
+	     /*  margin-bottom: 1em;
+		margin-top: 2em;*/
+	 }
+
+	 .jumbotron {
+	     background: transparent;
+	 }
+
+	 /* Space out content a bit */
+	 /*body {
+	    padding-top: 20px;
+	    padding-bottom: 20px;
+	    }*/
+
+	 /* Everything but the jumbotron gets side spacing for mobile first views */
+	 .header,
+	 .marketing,
+	 .footer {
+	     padding-right: 15px;
+	     padding-left: 15px;
+	 }
+
+	 /* Custom page header */
+	 .header {
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 /* Make the masthead heading the same height as the navigation */
+	 .header h3 {
+	     padding-bottom: 19px;
+	     margin-top: 0;
+	     margin-bottom: 0;
+	     line-height: 40px;
+	 }
+
+	 /* Custom page footer */
+	 .footer {
+	     padding-top: 19px;
+	     color: #777;
+	     border-top: 1px solid #e5e5e5;
+	 }
+
+	 /* Customize container */
+	 @media (min-width: 768px) {
+	     .jumbotron .container {
+		 max-width: 730px;
+	     }
+	     .container {
+		 max-width: 730px;
+	     }
+	 }
+	 .container-narrow > hr {
+	     margin: 30px 0;
+	 }
+
+	 /* Main marketing message and sign up button */
+	 .jumbotron {
+	     text-align: center;
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 .jumbotron .btn {
+	     padding: 14px 24px;
+	     font-size: 21px;
+	 }
+
+	 /* Supporting marketing content */
+	 .marketing {
+	     margin: 40px 0;
+	 }
+	 .marketing p + h4 {
+	     margin-top: 28px;
+	 }
+
+	 /* Responsive: Portrait tablets and up */
+	 @media screen and (min-width: 768px) {
+	     /* Remove the padding we set earlier */
+	     .header,
+	     .marketing,
+	     .footer {
+		 padding-right: 0;
+		 padding-left: 0;
+	     }
+	     /* Space out the masthead */
+	     .header {
+		 margin-bottom: 30px;
+	     }
+	     /* Remove the bottom border on the jumbotron for visual effect */
+	     .jumbotron {
+		 border-bottom: 1px solid #e5e5e5;
+	     }
+	 }
+
+
+         #jump_to, #jump_page, #jump_toc {
+             background: white;
+             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+             font: 10px Arial;
+             text-transform: uppercase;
+             cursor: pointer;
+             text-align: right;
+         }
+         #jump_to, #jump_wrapper {
+             position: fixed;
+             right: 0; top: 0;
+             padding: 5px 10px;
+         }
+         #jump_wrapper {
+             padding: 0;
+             display: none;
+         }
+         #jump_to:hover #jump_wrapper {
+             display: block;
+         }
+         #jump_page {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_page .source {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_page .source:hover {
+             background: #f5f5ff;
+         }
+         #jump_page .source:first-child {
+         }
+
+
+         #jump_toc {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_toc li {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_toc li:hover {
+             background: #f5f5ff;
+         }
+         #jump_toc li:first-child {
+         }
+
+
+
+         table td {
+             border: 0;
+             outline: 0;
+         }
+         td.docs, th.docs {
+             min-width: 575px;
+             /*max-width: 450px;
+		min-width: 450px;
+		min-height: 5px;*/
+             padding: 10px 25px 1px 50px;
+             /*overflow-x: hidden;*
+		vertical-align: top;
+		text-align: left;*/
+         }
+         .docs pre {
+             margin: 15px 0 15px;
+             padding-left: 15px;
+         }
+         .docs p tt, .docs p code, .doc code {
+             background: #f8f8ff;
+             border: 1px solid #dedede;
+             font-size: 12px;
+             padding: 0 0.2em;
+         }
+         .pilwrap {
+             position: relative;
+         }
+         .pilcrow {
+             font: 12px Arial;
+             text-decoration: none;
+             color: #454545;
+             position: absolute;
+             top: 3px; left: -20px;
+             padding: 1px 2px;
+             opacity: 0;
+             -webkit-transition: opacity 0.2s linear;
+         }
+         td.docs:hover .pilcrow {
+             opacity: 1;
+         }
+         pre {
+             border: none;
+             /*width: 100%;*/
+             vertical-align: top;
+             background: #f5f5ff;
+             /*border-left: 1px solid #e5e5ee;*/
+         }
+
+         pre.prettyprint.prettyprinted {
+             border: none;
+	 }
+
+         pre, tt, code {
+             font-size: 12px; line-height: 18px;
+             font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+         }
+
+	 /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+         .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+         table.doc { margin-bottom: 20px; }
+         td.doc { border-bottom: 1px dashed #708090; }
+         td.param { font-weight: bold; }
+         td.return { font-weight: bold; text-decoration: underline; }
+
+
+	</style>
+	<script type="text/x-mathjax-config">
+	 MathJax.Hub.Config({
+	     extensions: ["tex2jax.js"],
+	     jax: ["input/TeX", "output/HTML-CSS"],
+	     tex2jax: {
+		 skipTags: ["script","noscript","style","textarea"],
+		 inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		 displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		 processEscapes: true
+	     },
+	     "HTML-CSS": { availableFonts: ["TeX"] }
+	 });
+	</script>
+	<script type="text/javascript" async
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+    </head>
+
+    <body>
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+		<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		    </button>
+		    <a class="navbar-brand" href="index.html">LMS</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		    <ul class="nav navbar-nav">
+			<li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+			<li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+			<li><a href="../resources.html">Resources</a></li>
+			<li><a href="../publications.html">Publications</a></li>
+			<li><a href="../community.html">Community</a></li>
+			<!--<li><a href="community.html">Community</a></li>-->
+			<!--<li class="dropdown">
+			     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+			     <ul class="dropdown-menu" role="menu">
+			     <li><a href="#">Action</a></li>
+			     <li><a href="#">Another action</a></li>
+			     <li><a href="#">Something else here</a></li>
+			     <li class="divider"></li>
+			     <li class="dropdown-header">Nav header</li>
+			     <li><a href="#">Separated link</a></li>
+			     <li><a href="#">One more separated link</a></li>
+			     </ul>
+			     </li>-->
+		    </ul>
+		</div>
+	    </div>
+	</div>
+
+	<div class="container">
+	    <div id="background"></div>
+	    <div id="jump_to">
+		mpi.scala // Jump To &hellip;
+		<div id="jump_wrapper">
+		    <div id="jump_toc"></div>
+		    <div id="jump_page">
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
+			    ack.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
+			    automata.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi.html">
+			    mpi.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi2.html">
+			    mpi2.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+			    shonan-live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
+			</a>
+			
+		    </div>
+		</div>
+	    </div>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">mpi.scala</li>
+	    </ol>
+
+
+	    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+	    <!-- tbd whether it should be here ?? -->
+
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_0">&#182;</a>
+		</div>
+		<h1>Distributed Computing with MPI</h1>
+<p>In this tutorial, we build up to a distributed word count implementation using MPI.</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>package scala.lms.tutorial
+
+import lms.core.stub._
+import lms.core.utils
+import lms.macros.SourceContext
+import lms.core.virtualize
+import scala.collection.{mutable,immutable}
+
+@virtualize
+class MPITest extends TutorialFunSuite {
+  val under = &quot;mpi_&quot;
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_1">&#182;</a>
+		</div>
+		<h2>MPI API</h2>
+<p>Using MPI requires a few additional headers and support functions, and programs are
+typically compiled and launched with the <code>mpicc</code> and <code>mpirun</code> tools. We define a
+subclass of <code>DslDriver</code> that contains the necessary infrastructure.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  abstract class MPIDriver[T:Manifest,U:Manifest] extends DslDriverC[T,U] with ScannerLowerExp { q =&gt;
+    override val codegen = new DslGenC with CGenScannerLower with Run.CGenPreamble {
+      val IR: q.type = q
+    }
+    codegen.registerHeader(&quot;&lt;mpi.h&gt;&quot;)
+    codegen.registerHeader(&quot;&lt;string.h&gt;&quot;)
+    compilerCommand = &quot;mpicc&quot;
+    override def eval(a: T): Unit = { 
+      import scala.sys.process._
+      import lms.core.utils._
+      val f1 = f; // compile!
+      def f2(a: T) = (s&quot;mpirun /tmp/snippet $a&quot;: ProcessBuilder).lines.foreach(Console.println _) 
+      time(&quot;eval&quot;)(f2(a)) 
+    }
+
+    var pid: Rep[Int] = null
+    var nprocs: Rep[Int] = null
+
+    override def wrapper(x: Rep[T]): Rep[U] = {
+      unchecked[Unit](&quot;int argc = 0; char** argv = (char**)malloc(0); int provided&quot;);
+      unchecked[Unit](&quot;MPI_Init_thread(&amp;argc, &amp;argv, MPI_THREAD_FUNNELED, &amp;provided)&quot;)
+
+      var nprocs1 = 0
+      unchecked[Unit](&quot;MPI_Comm_size(MPI_COMM_WORLD, &amp;&quot;, nprocs1, &quot;)&quot;)
+
+      var myrank = 0
+      unchecked[Unit](&quot;MPI_Comm_rank(MPI_COMM_WORLD, &amp;&quot;, myrank, &quot;)&quot;)
+
+      unchecked[Unit](&quot;MPI_Request req&quot;)
+      unchecked[Unit](&quot;MPI_Status status&quot;)
+
+      pid = readVar(myrank)
+      nprocs = readVar(nprocs1)
+      val res = super.wrapper(x)
+
+      unchecked[Unit](&quot;MPI_Finalize()&quot;)
+      res
+    }
+
+    def MPI_Issend(msg: Rep[Array[Int]], off: Rep[Int], len: Rep[Int], dst: Rep[Int]) = unchecked[Unit](&quot;MPI_Issend(&quot;,msg,&quot; + (&quot;,off,&quot;), &quot;,len,&quot;, MPI_INT, &quot;,dst,&quot;, 0, MPI_COMM_WORLD, &amp;req)&quot;)
+    def MPI_Irecv(msg: Rep[Array[Int]], off: Rep[Int], len: Rep[Int], src: Rep[Int]) = unchecked[Unit](&quot;MPI_Irecv(&quot;,msg,&quot; + (&quot;,off,&quot;), &quot;,len,&quot;, MPI_INT, &quot;,src,&quot;, 0, MPI_COMM_WORLD, &amp;req)&quot;)
+    def MPI_Barrier() = unchecked[Unit](&quot;MPI_Barrier(MPI_COMM_WORLD)&quot;)
+  }
+
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_2">&#182;</a>
+		</div>
+		<h2>First Step: Distributed Character Histogram</h2>
+<p>As a first example of map-reduce-style processing, we would like to
+compute a character histogram in a distributed fashion, counting the
+number of occurances of each character in some input data across
+a cluster of machines.</p>
+<h3>Sequential Reference Implementation</h3>
+<hr />
+<p>The code below is a sequential reference implementation. The check
+<code>if (pid == 0)</code> ensures that we only rum one instance of the code,
+even if multiple processes are launched (this is how MPI works).</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  test(&quot;charcount_seq&quot;) {
+    val str = 
+      &quot;My name is Ozymandias, King of Kings; &quot; +
+      &quot;Look on my Works, ye Mighty, and despair!&quot;
+
+    val snippet = new MPIDriver[String,Unit] {
+      def snippet(arg: Rep[String]): Rep[Unit] = {
+        if (pid == 0) {
+          val input: Rep[String] = str
+
+          val histogram = NewArray[Int](256);
+          for (i &lt;- 0 until histogram.length)
+            histogram(i) = 0
+
+          for (i &lt;- 0 until input.length)
+            histogram(input(i).toInt) += 1
+
+          for (i &lt;- (0 until 256): Rep[Range])
+            if (histogram(i) != 0) printf(&quot;'%c' %d\n&quot;, i.toChar, histogram(i))
+        }
+      }
+    }
+    val expected = str.groupBy(c =&gt; c).map { case (c,cs) =&gt; s&quot;'$c' ${cs.length}&quot; }.toSet
+    val actual = lms.core.utils.captureOut(snippet.eval(&quot;ARG&quot;)).lines.toSet
+    assert { actual == expected }
+    check(&quot;charcount_seq&quot;, snippet.code, &quot;c&quot;)
+  }
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_3">&#182;</a>
+		</div>
+		<h3>Proper Distributed Implementation</h3>
+<hr />
+<p>We now add abstractions for partitioned input handling and for a
+distributed histogram implementation that accumulates values
+locally and exchanges and merges them with other processes so
+that the result is partioned by keys.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  test(&quot;charcount_par&quot;) {
+    val snippet = new MPIDriver[String,Unit] {
+
+      // A distributed input view, processing a chunk on each node
+      case class Input(input: Rep[String]) {
+        val chunkLen = (input.length - 1) / nprocs + 1
+        def foreach(f: Rep[Char] =&gt; Unit): Unit = {
+          val start = pid * chunkLen
+          val end = if (pid == nprocs - 1) input.length else start + chunkLen
+          for (i &lt;- start until end)
+            f(input(i))
+        }
+      }
+
+      // A logical slice of an array
+      case class View(data: Rep[Array[Int]], off: Rep[Int], len: Rep[Int]) {
+        def apply(i: Rep[Int]) = data(off + i)
+        def update(i: Rep[Int], x: Rep[Int]) = data(off + i) = x
+        def +=(that: View) = for (j &lt;- 0 until len) this(j) += that(j)
+        def send(dst: Rep[Int]) = MPI_Issend(data,off,len,dst)
+        def receive(src: Rep[Int]) = MPI_Irecv(data,off,len,src)
+      }
+
+      // A distributed character histogram, accumulating counts
+      // for each node, exchanging, and merging so that the result
+      // histogram is partitioned across nodes by key
+      case class Histogram() {
+        val size = 256
+        val histogram = NewArray[Int](size) // store and send buffer
+        for (i &lt;- 0 until histogram.length)
+          histogram(i) = 0
+
+        val histogramR = NewArray[Int](size) // receive and traverse buffer
+
+        val bucketLen = size / nprocs
+        def bucket(i: Rep[Int]) = View(histogram, i * bucketLen, bucketLen)
+        def bucketR(i: Rep[Int]) = View(histogramR, i * bucketLen, bucketLen)
+
+        // accumulator api
+        def apply(i: Rep[Char]) = new { 
+          val b = bucket(i.toInt % nprocs)
+          def += (n: Rep[Int]) = {
+            b(i.toInt / nprocs) = b(i.toInt / nprocs) + n
+          }
+        }
+
+        // transfers
+        def send() = {
+          for (i &lt;- 0 until nprocs) if (i != pid)
+            bucket(i).send(i)
+        }
+
+        def receive() = {
+          for (i &lt;- 0 until nprocs) if (i != pid)
+            bucketR(i).receive(i)
+        }
+
+        def merge() = {
+          val b = bucket(pid)
+          for (i &lt;- (0 until nprocs)) if (i != pid)
+            b += bucketR(i)
+        }
+
+        def sync() = MPI_Barrier()
+
+        def exchange() = {
+          send()
+          receive()
+          sync()
+          merge()
+        }
+
+        // generator api
+        def foreach(f: (Rep[Char], Rep[Int]) =&gt; Unit): Unit = {
+          val b = bucket(pid)
+          for (j &lt;- 0 until bucketLen)
+            f((pid + j * nprocs).toChar, b(j))
+        }
+
+      }
+
+      val str = &quot;My name is Ozymandias, King of Kings; Look on my Works, ye Mighty, and despair!&quot;
+
+      def snippet(arg: Rep[String]): Rep[Unit] = {
+        val input = Input(str)
+        val histogram = Histogram()
+
+        input.foreach { c =&gt;
+          histogram(c) += 1
+        }
+
+        histogram.exchange()
+
+        histogram.foreach { (c,n) =&gt;
+          if (n != 0) printf(&quot;%d: '%c' %d\n&quot;, pid, c, n)
+        }
+      }
+    }
+    val expected = snippet.str.groupBy(c =&gt; c).map { case (c,cs) =&gt; s&quot;: '$c' ${cs.length}&quot; }.toSet
+    val actual = lms.core.utils.captureOut(snippet.eval(&quot;ARG&quot;)).lines.map(s =&gt; s.substring(s.indexOf(':'))).toSet // drop pid, since we don't know many here
+    assert { actual == expected }
+    check(&quot;charcount_par&quot;, snippet.code, &quot;c&quot;)
+  }
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_4">&#182;</a>
+		</div>
+		<h2>Second Step: Distributed Word Counts</h2>
+<p>How to go from character counts to word counts? The major
+difference is that we can no longer use dense fixed-size
+arrays to represent histograms but need a sparse data structure
+such as hash tables.</p>
+<h3>Unstaged Reference Implementation</h3>
+<p>We provide an unstaged reference implementation below
+that simulates multi-thread or multi-process execution.
+This will serve as stepping stone for our actual MPI
+implementation.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>  trait API {
+
+    trait Scanner {
+      def next(d: Char): String
+      def hasNext: Boolean
+    }
+
+    trait Generator[T] {
+      def foreach(f: T =&gt; Unit): Unit
+    }
+
+    trait Accumulator[T] {
+      def +=(x: T): Unit
+    }
+
+    def StringScanner(data: String) = new Scanner {
+      var pos = 0
+      def next(d: Char) = {
+        val start = pos
+        while (pos &lt; data.length &amp;&amp; data(pos) != d)
+          pos += 1
+        try data.substring(start,pos)
+        finally if (pos &lt; data.length) pos += 1
+      }
+      def hasNext = pos &lt; data.length
+    }
+
+    def WordGen(input: String) = new Generator[String] {
+      val sc = StringScanner(input)
+      def foreach(f: String =&gt; Unit): Unit = {
+        while(sc.hasNext) {
+          f(sc.next(' '))
+        }
+      }
+    }
+
+    case class HashPlusAcc() extends Accumulator[(String,Int)] with Generator[(String,Int)] {
+      val hm = new mutable.HashMap[String,Int]
+      def +=(x: (String,Int)): Unit = {
+        hm(x._1) = hm.getOrElse(x._1, 0) + x._2
+      }
+      def foreach(f: ((String,Int)) =&gt; Unit): Unit = {
+        hm.foreach(f)
+      }
+    }
+
+    // ----
+
+    val nThreads = 4
+    var curThreadOpt: Option[Int] = None
+    def curThread = curThreadOpt.get
+
+    def par(f: =&gt; Unit): Unit = {
+      assert(curThreadOpt.isEmpty)
+      for (i &lt;- 0 until nThreads) {
+        curThreadOpt = Some(i)
+        try f finally curThreadOpt = None
+      }
+    }
+
+    case class WordGenWithOverhang(input: String) extends Generator[String] {      
+      val sc = StringScanner(input)
+      var overhang = &quot;&quot;
+      def skip() = sc.next(' ')
+      def foreach(f: String =&gt; Unit): Unit = {
+        while(sc.hasNext) {
+          val w = sc.next(' ')
+          // if at end, deal with overhang
+          if (sc.pos == input.length &amp;&amp; overhang != &quot;&quot;) {
+            if (input(sc.pos-1) == ' ') {
+              f(w); f(overhang)
+            } else {
+              f(w + overhang)
+            }
+          } else {
+            f(w)
+          }
+        }
+      }
+    }
+
+
+    case class WordGenPar(input: Array[String]) extends Generator[String] {
+      assert(input.length == nThreads)
+      val sc = new Array[WordGenWithOverhang](nThreads)
+      par { sc(curThread) = WordGenWithOverhang(input(curThread)) }
+
+      par { if (curThread &gt; 0) sc(curThread-1).overhang = sc(curThread).skip() }
+
+      def foreach(f: String =&gt; Unit): Unit = {
+        par { sc(curThread).foreach(f) }
+      }
+    }
+
+
+    case class HashPlusAccPar() extends Accumulator[(String,Int)] with Generator[(String,Int)] {
+
+      val hm = new Array[HashPlusAcc](nThreads)
+      par { hm(curThread) = HashPlusAcc() }
+
+      def +=(x: (String,Int)): Unit = {
+        // shared mem could use CAS
+        hm(x._1.hashCode % nThreads) += x
+      }
+      def foreach(f: ((String,Int)) =&gt; Unit): Unit = {
+        par { hm(curThread).foreach(f) }
+      }
+    }
+
+
+    case class HashPlusAccPartitioned(n: Int) extends Accumulator[(String,Int)] with Generator[(String,Int)] {
+
+      val hm = new Array[HashPlusAcc](n)
+      for (i &lt;- 0 until n) { hm(i) = HashPlusAcc() }
+
+      def +=(x: (String,Int)): Unit = {
+        hm(x._1.hashCode % n) += x
+      }
+      def foreach(f: ((String,Int)) =&gt; Unit): Unit = {
+        for (i &lt;- 0 until n) hm(i).foreach(f)
+      }
+    }
+
+
+    case class HashPlusAccDist() extends Accumulator[(String,Int)] with Generator[(String,Int)] {
+
+      val hm = new Array[HashPlusAccPartitioned](nThreads) // index by cur thread, then target thread
+      par { hm(curThread) = HashPlusAccPartitioned(nThreads) }
+
+      def +=(x: (String,Int)): Unit = {
+        hm(curThread) += x
+      }
+      def foreach(f: ((String,Int)) =&gt; Unit): Unit = {
+        // exchange:
+        // process i, send hm(i,j) to process j
+        // process j accumulates
+        par {
+          // for all target, send(hm(curThread).hm(target), target)
+          // for all source, received(hm1(curThread).hm(source), from source
+          // accumulate all hm1(curThread).hm(source)
+          // want to do this in a chunked, round-robin, way?
+        }
+
+        par { 
+          // only write to hm(curThread)(curThread)
+          val hm1 = hm(curThread).hm(curThread)
+          for (i &lt;- 0 until nThreads) {
+            if (i != curThread)
+              hm(i).hm(curThread).foreach(x =&gt; hm1 += x)
+          }
+          hm1.foreach(f)
+        }
+      }
+    }
+  }
+
+
+  test(&quot;wordcount_unstaged_seq&quot;) {
+    val actual = lms.core.utils.captureOut(new API {
+      val input = &quot;foo bar baz foo bar foo foo foo boom bang boom boom yum&quot;
+
+      val wg = WordGen(input)
+      val hm = HashPlusAcc()
+
+      wg.foreach { w =&gt;
+        hm += (w, 1)
+      }
+
+      hm.foreach { case (w,c) =&gt;
+        println(s&quot;$w ${w.hashCode % 4} $c&quot;)
+      }
+    })
+    assert(actual == 
+&quot;&quot;&quot;baz 3 1
+boom 3 3
+bang 0 1
+yum 1 1
+foo 2 5
+bar 3 2
+&quot;&quot;&quot;)
+  }
+
+  test(&quot;wordcount_unstaged_par&quot;) {
+    val actual = lms.core.utils.captureOut(new API {
+      val input = &quot;foo bar baz foo bar foo foo foo boom bang boom boom yum&quot;
+      val inputs = input.grouped((input.length - 1) / nThreads + 1).toArray
+
+      println(inputs.deep)
+      println(inputs.map(_.length).deep)
+
+      val wg = WordGenPar(inputs)
+      val hm = HashPlusAccDist()
+
+      wg.foreach { w =&gt;
+        hm += (w, 1)
+      }
+
+      hm.foreach { case (w,c) =&gt;
+        println(s&quot;$w ${w.hashCode % 4} $c&quot;)
+      }
+    })
+    assert(actual == 
+&quot;&quot;&quot;Array(foo bar baz fo, o bar foo foo , foo boom bang , boom boom yum)
+Array(14, 14, 14, 13)
+bang 0 1
+yum 1 1
+foo 2 5
+baz 3 1
+boom 3 3
+bar 3 2
+&quot;&quot;&quot;)
+  }
+
+</code></pre>
+	    </div>
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_5">&#182;</a>
+		</div>
+		<h3>Staged and Distributed Implementation</h3>
+<p>TODO / Exercise: complete the implementation by writing an mmap-based
+Scanner (assuming each cluster node has access to a common file system)
+and adapting the hash table implementation used for <code>GroupBy</code> in the
+query tutorial to the distributed setting with communication along the
+lines used in the character histogram above.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'>}
+</code></pre>
+	    </div>
+	    
+
+	    <p>
+		Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/mpi.scala">View this file on GitHub</a>.
+	    </p>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">mpi.scala</li>
+	    </ol>
+
+	</div>
+
+	<!-- FOOTER -->
+	<div class="footer">
+	    <div class="container">
+		<p class="pull-right"><a href="#">Back to top</a></p>
+		<p>&copy; 2011-2016 EPFL and collaborators</p>
+	    </div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+	     ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="../bootstrap/assets/js/docs.min.js"></script>
+	<script src="../javascripts/toc.min.js"></script>
+	<script type="text/javascript">
+
+	 $(document).ready(function() {
+	     $("pre").removeClass().addClass('prettyprint');
+	 });
+	 $(document).ready(function() {
+	     $(".container").tableofcontents({
+		 id: "#tableofcontents"
+	     });
+	     $(".container").tableofcontents({
+		 id: "#jump_toc"
+	     });
+	 });
+
+	 /*
+	    $('#my-affix').affix({
+	    offset: {
+	    top: 100
+	    , bottom: function () {
+	    return (this.bottom = $('.footer').outerHeight(true))
+	    }
+	    }
+	    })
+	  */
+	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    </body>
+</html>

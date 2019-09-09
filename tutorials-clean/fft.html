@@ -1,0 +1,797 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../images/favicon.ico">
+
+	<title>fft.scala</title>
+
+	<!-- Google Analytics -->
+	<script>
+	 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	 ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+	 ga('send', 'pageview');
+
+	</script>
+
+	<!-- Bootstrap core CSS -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- font awesome -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+	<style type="text/css">
+	 @import url(../stylesheets/pygment_trac.css);
+	 /* head fancy: Lobster, Pacifico */
+	 /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
+	 /* dense bold: Squada One, Oswald; */
+	 @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+	 body {
+	     /*line-height: 1.7;*/
+	     /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+	     font-family: 'Helvetica Neue';
+	     /*font-size: 15pt;*/
+	     color: rgb(41,41,41);
+	 }
+
+	 h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+	     font-family: 'Roboto Slab';
+	     font-weight: 700;
+	 }
+
+
+	 .container h1,h2 {
+	     border-bottom: 1px solid #e5e5e5;
+	     /*  margin-bottom: 1em;
+		margin-top: 2em;*/
+	 }
+
+	 .jumbotron {
+	     background: transparent;
+	 }
+
+	 /* Space out content a bit */
+	 /*body {
+	    padding-top: 20px;
+	    padding-bottom: 20px;
+	    }*/
+
+	 /* Everything but the jumbotron gets side spacing for mobile first views */
+	 .header,
+	 .marketing,
+	 .footer {
+	     padding-right: 15px;
+	     padding-left: 15px;
+	 }
+
+	 /* Custom page header */
+	 .header {
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 /* Make the masthead heading the same height as the navigation */
+	 .header h3 {
+	     padding-bottom: 19px;
+	     margin-top: 0;
+	     margin-bottom: 0;
+	     line-height: 40px;
+	 }
+
+	 /* Custom page footer */
+	 .footer {
+	     padding-top: 19px;
+	     color: #777;
+	     border-top: 1px solid #e5e5e5;
+	 }
+
+	 /* Customize container */
+	 @media (min-width: 768px) {
+	     .jumbotron .container {
+		 max-width: 730px;
+	     }
+	     .container {
+		 max-width: 730px;
+	     }
+	 }
+	 .container-narrow > hr {
+	     margin: 30px 0;
+	 }
+
+	 /* Main marketing message and sign up button */
+	 .jumbotron {
+	     text-align: center;
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 .jumbotron .btn {
+	     padding: 14px 24px;
+	     font-size: 21px;
+	 }
+
+	 /* Supporting marketing content */
+	 .marketing {
+	     margin: 40px 0;
+	 }
+	 .marketing p + h4 {
+	     margin-top: 28px;
+	 }
+
+	 /* Responsive: Portrait tablets and up */
+	 @media screen and (min-width: 768px) {
+	     /* Remove the padding we set earlier */
+	     .header,
+	     .marketing,
+	     .footer {
+		 padding-right: 0;
+		 padding-left: 0;
+	     }
+	     /* Space out the masthead */
+	     .header {
+		 margin-bottom: 30px;
+	     }
+	     /* Remove the bottom border on the jumbotron for visual effect */
+	     .jumbotron {
+		 border-bottom: 1px solid #e5e5e5;
+	     }
+	 }
+
+
+         #jump_to, #jump_page, #jump_toc {
+             background: white;
+             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+             font: 10px Arial;
+             text-transform: uppercase;
+             cursor: pointer;
+             text-align: right;
+         }
+         #jump_to, #jump_wrapper {
+             position: fixed;
+             right: 0; top: 0;
+             padding: 5px 10px;
+         }
+         #jump_wrapper {
+             padding: 0;
+             display: none;
+         }
+         #jump_to:hover #jump_wrapper {
+             display: block;
+         }
+         #jump_page {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_page .source {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_page .source:hover {
+             background: #f5f5ff;
+         }
+         #jump_page .source:first-child {
+         }
+
+
+         #jump_toc {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_toc li {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_toc li:hover {
+             background: #f5f5ff;
+         }
+         #jump_toc li:first-child {
+         }
+
+
+
+         table td {
+             border: 0;
+             outline: 0;
+         }
+         td.docs, th.docs {
+             min-width: 575px;
+             /*max-width: 450px;
+		min-width: 450px;
+		min-height: 5px;*/
+             padding: 10px 25px 1px 50px;
+             /*overflow-x: hidden;*
+		vertical-align: top;
+		text-align: left;*/
+         }
+         .docs pre {
+             margin: 15px 0 15px;
+             padding-left: 15px;
+         }
+         .docs p tt, .docs p code, .doc code {
+             background: #f8f8ff;
+             border: 1px solid #dedede;
+             font-size: 12px;
+             padding: 0 0.2em;
+         }
+         .pilwrap {
+             position: relative;
+         }
+         .pilcrow {
+             font: 12px Arial;
+             text-decoration: none;
+             color: #454545;
+             position: absolute;
+             top: 3px; left: -20px;
+             padding: 1px 2px;
+             opacity: 0;
+             -webkit-transition: opacity 0.2s linear;
+         }
+         td.docs:hover .pilcrow {
+             opacity: 1;
+         }
+         pre {
+             border: none;
+             /*width: 100%;*/
+             vertical-align: top;
+             background: #f5f5ff;
+             /*border-left: 1px solid #e5e5ee;*/
+         }
+
+         pre.prettyprint.prettyprinted {
+             border: none;
+	 }
+
+         pre, tt, code {
+             font-size: 12px; line-height: 18px;
+             font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+         }
+
+	 /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+         .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+         table.doc { margin-bottom: 20px; }
+         td.doc { border-bottom: 1px dashed #708090; }
+         td.param { font-weight: bold; }
+         td.return { font-weight: bold; text-decoration: underline; }
+
+
+	</style>
+	<script type="text/x-mathjax-config">
+	 MathJax.Hub.Config({
+	     extensions: ["tex2jax.js"],
+	     jax: ["input/TeX", "output/HTML-CSS"],
+	     tex2jax: {
+		 skipTags: ["script","noscript","style","textarea"],
+		 inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		 displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		 processEscapes: true
+	     },
+	     "HTML-CSS": { availableFonts: ["TeX"] }
+	 });
+	</script>
+	<script type="text/javascript" async
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+    </head>
+
+    <body>
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+		<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		    </button>
+		    <a class="navbar-brand" href="index.html">LMS</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		    <ul class="nav navbar-nav">
+			<li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+			<li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+			<li><a href="../resources.html">Resources</a></li>
+			<li><a href="../publications.html">Publications</a></li>
+			<li><a href="../community.html">Community</a></li>
+			<!--<li><a href="community.html">Community</a></li>-->
+			<!--<li class="dropdown">
+			     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+			     <ul class="dropdown-menu" role="menu">
+			     <li><a href="#">Action</a></li>
+			     <li><a href="#">Another action</a></li>
+			     <li><a href="#">Something else here</a></li>
+			     <li class="divider"></li>
+			     <li class="dropdown-header">Nav header</li>
+			     <li><a href="#">Separated link</a></li>
+			     <li><a href="#">One more separated link</a></li>
+			     </ul>
+			     </li>-->
+		    </ul>
+		</div>
+	    </div>
+	</div>
+
+	<div class="container">
+	    <div id="background"></div>
+	    <div id="jump_to">
+		fft.scala // Jump To &hellip;
+		<div id="jump_wrapper">
+		    <div id="jump_toc"></div>
+		    <div id="jump_page">
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
+			    ack.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
+			    automata.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi.html">
+			    mpi.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi2.html">
+			    mpi2.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+			    shonan-live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
+			</a>
+			
+		    </div>
+		</div>
+	    </div>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">fft.scala</li>
+	    </ol>
+
+
+	    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+	    <!-- tbd whether it should be here ?? -->
+
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_0">&#182;</a>
+		</div>
+		<h1>Fast Fourier Transform (FFT)</h1>
+<p><a name="sec:Afft"></a></p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
+<p>We consider staging a fast fourier transform (FFT) algorithm.  A staged FFT,
+implemented in MetaOCaml, has been presented by Kiselyov et~al.\
+<a href="DBLP:conf/emsoft/KiselyovST04">(*)</a> Their work is a very good example for how
+staging allows to transform a simple, unoptimized algorithm into an efficient
+program generator. Achieving this in the context of MetaOCaml, however,
+required restructuring the program into monadic style and adding a front-end
+layer for performing symbolic rewritings. Using our approach of just adding
+<code>Rep</code> types, we can go from the naive textbook-algorithm to the staged version
+(shown below) by changing literally two lines of code:</p>
+<pre><code>trait FFT { this: Arith with Trig =&gt;
+  case class Complex(re: Rep[Double], im: Rep[Double])
+  ...
+}
+</code></pre>
+<p>All that is needed is adding the self-type annotation to import arithmetic and
+trigonometric operations and changing the type of the real and imaginary
+components of complex numbers from <code>Double</code> to <code>Rep[Double]</code>.</p>
+<pre><code>trait FFT { this: Arith with Trig =&gt;
+  case class Complex(re: Rep[Double], im: Rep[Double]) {
+    def +(that: Complex) = Complex(this.re + that.re, this.im + that.im)
+    def *(that: Complex) = ...
+  }
+  def omega(k: Int, N: Int): Complex = {
+    val kth = -2.0 * k * Math.Pi / N
+    Complex(cos(kth), sin(kth))
+  }
+  def fft(xs: Array[Complex]): Array[Complex] = xs match {
+    case (x :: Nil) =&gt; xs
+    case _ =&gt;
+      val N = xs.length // assume it's a power of two
+      val (even0, odd0) = splitEvenOdd(xs)
+      val (even1, odd1) = (fft(even0), fft(odd0))
+      val (even2, odd2) = (even1 zip odd1 zipWithIndex) map {
+        case ((x, y), k) =&gt;
+          val z = omega(k, N) * y
+          (x + z, x - z)
+      }.unzip;
+      even2 ::: odd2
+  }
+}
+</code></pre>
+<p>FFT code. Only the real and imaginary components of complex numbers need to be
+staged.</p>
+<p>\begin{figure}\centering
+\includegraphics[scale=0.5]{papers/cacm2012/figures/test2-fft2-x-dot.pdf}
+\caption{\label{fig:fftgraph} Computation graph for size-4 FFT. Auto-generated from
+staged code in Figure~\ref{fig:fftcode}.}
+\end{figure}</p>
+<p>Merely changing the types  will not provide us with  the desired optimizations
+yet.  We will see below how we can add the transformations described by
+Kiselyov et~al.\ to generate the same fixed-size FFT code, corresponding to
+the famous FFT butterfly networks (see Figure~\ref{fig:fftgraph}). Despite the
+seemingly naive algorithm, this staged code is free of branches, intermediate
+data structures and redundant computations. The important point here is that
+we can add these transformations without any further changes to the code in
+Figure~\ref{fig:fftcode}, just by mixing in the trait <code>FFT</code> with a few others.</p>
+<pre><code>trait ArithExpOptFFT extends ArithExp {
+  override def infix_*(x:Exp[Double],y:Exp[Double]) = (x,y) match {
+    case (Const(k), Def(Times(Const(l), y))) =&gt; Const(k * l) * y
+    case (x, Def(Times(Const(k), y))) =&gt; Const(k) * (x * y))
+    case (Def(Times(Const(k), x)), y) =&gt; Const(k) * (x * y))
+    ...
+    case (x, Const(y)) =&gt; Times(Const(y), x)
+    case _ =&gt; super.infix_*(x, y)
+  }
+}
+</code></pre>
+<p>Extending the generic implementation from <a href="#sec:308addOpts">here</a> with FFT-
+specific optimizations.</p>
+<h2>Implementing Optimizations</h2>
+<p>As already discussed <a href="#sec:308addOpts">here</a>, some profitable optimizations
+are very generic (CSE, DCE, etc), whereas others are specific to the actual
+program. In the FFT case, Kiselyov et al.\
+<a href="DBLP:conf/emsoft/KiselyovST04">(*)</a> describe  a number of rewritings that are
+particularly effective for the patterns of code generated by the FFT algorithm
+but not as much for other programs.</p>
+<p>What we want to achieve again is modularity, such that optimizations can be
+combined in a way that is most useful for a given task.  This can be achieved
+by overriding smart constructors,  as shown by trait <code>ArithExpOptFFT</code> (see
+Figure~\ref{fig:expOpt}).  Note that the use of <code>x*y</code> within the body of
+<code>infix_*</code> will apply the optimization  recursively.</p>
+<h2>Running the Generated Code</h2>
+<p>Extending the FFT component from Figure~\ref{fig:fftcode} with explicit
+compilation.</p>
+<pre><code>trait FFTC extends FFT { this: Arrays with Compile =&gt;
+  def fftc(size: Int) = compile { input: Rep[Array[Double]] =&gt;
+    assert(&lt;size is power of 2&gt;) // happens at staging time
+    val arg = Array.tabulate(size) { i =&gt;
+      Complex(input(2*i), input(2*i+1))
+    }
+    val res = fft(arg)
+    updateArray(input, res.flatMap {
+      case Complex(re,im) =&gt; Array(re,im)
+    })
+  }
+}
+</code></pre>
+<p>Using the staged FFT implementation as part of some larger Scala program is
+straightforward but requires us to interface the generic algorithm with a
+concrete data representation. The algorithm in Figure~\ref{fig:fftcode}
+expects an array of <code>Complex</code> objects as input, each of which contains fields
+of type <code>Rep[Double]</code>. The algorithm itself has no notion of staged arrays but
+uses arrays only in the generator stage, which means that it is agnostic to
+how data is stored. The enclosing program, however, will store arrays of
+complex numbers in some native format which we will need to feed into the
+algorithm. A simple choice of representation is to use <code>Array[Double]</code> with
+the complex numbers flattened into adjacent slots. When applying <code>compile</code>, we
+will thus receive  input of type <code>Rep[Array[Double]]</code>.  Figure~\ref{fig:fftc}
+shows how we can  extend trait <code>FFT</code> to <code>FFTC</code> to obtain compiled FFT
+implementations that realize the necessary data interface for a  fixed input
+size.</p>
+<p>We can then define code that creates and uses compiled  FFT &ldquo;codelets&rdquo; by
+extending <code>FFTC</code>:</p>
+<pre><code>trait TestFFTC extends FFTC {
+  val fft4: Array[Double] =&gt; Array[Double] = fftc(4)
+  val fft8: Array[Double] =&gt; Array[Double] = fftc(8)
+
+  // embedded code using fft4, fft8, ...
+}
+</code></pre>
+<p>Constructing an instance of this subtrait (mixed in with the appropriate LMS
+traits) will execute the embedded code:</p>
+<pre><code>val OP: TestFFC = new TestFFTC with CompileScala
+  with ArithExpOpt  with ArithExpOptFFT with ScalaGenArith
+  with TrigExpOpt   with ScalaGenTrig
+  with ArraysExpOpt with ScalaGenArrays
+</code></pre>
+<p>We can also use the compiled methods from outside the object:</p>
+<pre><code>OP.fft4(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0))
+$\hookrightarrow$ Array(6.0,0.0,-1.0,1.0,0.0,0.0,-1.0,-1.0)
+</code></pre>
+<p>Providing an explicit type in the definition <code>val OP: TestFFC = ...</code> ensures
+that the internal representation is not accessible from the outside, only the
+members defined by <code>TestFFC</code>.</p>
+<p>The full code is below:</p>
+<pre><code>package scala.lms
+package epfl
+package test2
+
+import common._
+import test1._
+import reflect.SourceContext
+
+import java.io.PrintWriter
+
+import org.scalatest._
+
+
+trait FFT { this: Arith with Trig =&gt;
+
+  def omega(k: Int, N: Int): Complex = {
+    val kth = -2.0 * k * math.Pi / N
+    Complex(cos(kth), sin(kth))
+  }
+
+  case class Complex(re: Rep[Double], im: Rep[Double]) {
+    def +(that: Complex) = Complex(this.re + that.re, this.im + that.im)
+    def -(that: Complex) = Complex(this.re - that.re, this.im - that.im)
+    def *(that: Complex) = Complex(this.re * that.re - this.im * that.im, this.re * that.im + this.im * that.re)
+  }
+
+  def splitEvenOdd[T](xs: List[T]): (List[T], List[T]) = (xs: @unchecked) match {
+    case e :: o :: xt =&gt;
+      val (es, os) = splitEvenOdd(xt)
+      ((e :: es), (o :: os))
+    case Nil =&gt; (Nil, Nil)
+    // cases?
+  }
+
+  def mergeEvenOdd[T](even: List[T], odd: List[T]): List[T] = ((even, odd): @unchecked) match {
+    case (Nil, Nil) =&gt;
+      Nil
+    case ((e :: es), (o :: os)) =&gt;
+      e :: (o :: mergeEvenOdd(es, os))
+    // cases?
+  }
+
+  def fft(xs: List[Complex]): List[Complex] = xs match {
+    case (x :: Nil) =&gt; xs
+    case _ =&gt;
+      val N = xs.length // assume it's a power of two
+      val (even0, odd0) = splitEvenOdd(xs)
+      val (even1, odd1) = (fft(even0), fft(odd0))
+      val (even2, odd2) = (even1 zip odd1 zipWithIndex) map {
+        case ((x, y), k) =&gt;
+          val z = omega(k, N) * y
+          (x + z, x - z)
+      } unzip;
+      even2 ::: odd2
+  }
+
+}
+
+
+
+
+
+trait ArithExpOptFFT extends ArithExpOpt {
+
+  override def infix_+(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Def(Minus(Const(0.0) | Const(-0.0), y))) =&gt; infix_-(x, y)
+    case _ =&gt; super.infix_+(x, y)
+  }
+
+  override def infix_-(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Def(Minus(Const(0.0) | Const(-0.0), y))) =&gt; infix_+(x, y)
+    case _ =&gt; super.infix_-(x, y)
+  }
+
+  override def infix_*(x: Exp[Double], y: Exp[Double])(implicit pos: SourceContext) = (x, y) match {
+    case (x, Const(-1.0)) =&gt; infix_-(0.0, x)
+    case (Const(-1.0), y) =&gt; infix_-(0.0, y)
+    case _ =&gt; super.infix_*(x, y)
+  }
+}
+
+
+
+trait TrigExpOptFFT extends TrigExpOpt {
+  override def cos(x: Exp[Double]) = x match {
+    case Const(x) if { val z = x / math.Pi / 0.5; z != 0 &amp;&amp; z == z.toInt } =&gt; Const(0.0)
+    case _ =&gt; super.cos(x)
+  }
+}
+
+
+trait FlatResult extends BaseExp { // just to make dot output nicer
+
+  case class Result(x: Any) extends Def[Any]
+
+  def result(x: Any): Exp[Any] = toAtom(Result(x))
+
+}
+
+trait ScalaGenFlat extends ScalaGenBase {
+   import IR._
+   type Block[+T] = Exp[T]
+   def getBlockResultFull[T](x: Block[T]): Exp[T] = x
+   def reifyBlock[T:Typ](x: =&gt;Exp[T]): Block[T] = x
+   def traverseBlock[A](block: Block[A]): Unit = {
+     buildScheduleForResult(block) foreach traverseStm
+   }
+}
+
+
+
+class TestFFT extends FileDiffSuite {
+
+  val prefix = home + "test-out/epfl/test2-"
+
+  def testFFT1 = {
+    withOutFile(prefix+"fft1") {
+      val o = new FFT with ArithExp with TrigExpOpt with FlatResult with DisableCSE //with DisableDCE
+      import o._
+
+      val r = fft(List.tabulate(4)(_ =&gt; Complex(fresh, fresh)))
+      println(globalDefs.mkString("\n"))
+      println(r)
+
+      val p = new ExportGraph with DisableDCE { val IR: o.type = o }
+      p.emitDepGraph(result(r), prefix+"fft1-dot", true)
+    }
+    assertFileEqualsCheck(prefix+"fft1")
+    assertFileEqualsCheck(prefix+"fft1-dot")
+  }
+
+  def testFFT2 = {
+    withOutFile(prefix+"fft2") {
+      val o = new FFT with ArithExpOptFFT with TrigExpOptFFT with FlatResult
+      import o._
+
+      case class Result(x: Any) extends Exp[Any]
+
+      val r = fft(List.tabulate(4)(_ =&gt; Complex(fresh, fresh)))
+      println(globalDefs.mkString("\n"))
+      println(r)
+
+      val p = new ExportGraph { val IR: o.type = o }
+      p.emitDepGraph(result(r), prefix+"fft2-dot", true)
+    }
+    assertFileEqualsCheck(prefix+"fft2")
+    assertFileEqualsCheck(prefix+"fft2-dot")
+  }
+
+  def testFFT3 = {
+    withOutFile(prefix+"fft3") {
+      class FooBar extends FFT
+        with ArithExpOptFFT with TrigExpOptFFT with ArraysExp
+        with CompileScala {
+
+        def ffts(input: Rep[Array[Double]], size: Int) = {
+          val list = List.tabulate(size)(i =&gt; Complex(input(2*i), input(2*i+1)))
+          val r = fft(list)
+          // make a new array for now - doing in-place update would be better
+          makeArray(r.flatMap { case Complex(re,im) =&gt; List(re,im) })
+        }
+
+        val codegen = new ScalaGenFlat with ScalaGenArith with ScalaGenArrays { val IR: FooBar.this.type = FooBar.this } // TODO: find a better way...
+      }
+      val o = new FooBar
+      import o._
+
+      val fft4 = (input: Rep[Array[Double]]) =&gt; ffts(input, 4)
+      codegen.emitSource(fft4, "FFT4", new PrintWriter(System.out))
+      val fft4c = compile(fft4)
+      println(fft4c(Array(1.0,0.0, 1.0,0.0, 2.0,0.0, 2.0,0.0, 1.0,0.0, 1.0,0.0, 0.0,0.0, 0.0,0.0)).mkString(","))
+    }
+    assertFileEqualsCheck(prefix+"fft3")
+  }
+
+}
+</code></pre>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'></code></pre>
+	    </div>
+	    
+
+	    <p>
+		Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/fft.scala">View this file on GitHub</a>.
+	    </p>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">fft.scala</li>
+	    </ol>
+
+	</div>
+
+	<!-- FOOTER -->
+	<div class="footer">
+	    <div class="container">
+		<p class="pull-right"><a href="#">Back to top</a></p>
+		<p>&copy; 2011-2016 EPFL and collaborators</p>
+	    </div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+	     ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="../bootstrap/assets/js/docs.min.js"></script>
+	<script src="../javascripts/toc.min.js"></script>
+	<script type="text/javascript">
+
+	 $(document).ready(function() {
+	     $("pre").removeClass().addClass('prettyprint');
+	 });
+	 $(document).ready(function() {
+	     $(".container").tableofcontents({
+		 id: "#tableofcontents"
+	     });
+	     $(".container").tableofcontents({
+		 id: "#jump_toc"
+	     });
+	 });
+
+	 /*
+	    $('#my-affix').affix({
+	    offset: {
+	    top: 100
+	    , bottom: function () {
+	    return (this.bottom = $('.footer').outerHeight(true))
+	    }
+	    }
+	    })
+	  */
+	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    </body>
+</html>

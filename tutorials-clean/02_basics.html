@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="">
+	<meta name="author" content="">
+	<link rel="icon" href="../images/favicon.ico">
+
+	<title>02_basics.scala</title>
+
+	<!-- Google Analytics -->
+	<script>
+	 (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+	     (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				  m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+	 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+	 ga('create', 'UA-39122235-2', 'scala-lms.github.io');
+	 ga('send', 'pageview');
+
+	</script>
+
+	<!-- Bootstrap core CSS -->
+	<link href="../bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+	<!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
+	<!--[if lt IE 9]>
+	    <script src="https://oss.maxcdn.com/html5shiv/3.7.2/html5shiv.min.js"></script>
+	    <script src="https://oss.maxcdn.com/respond/1.4.2/respond.min.js"></script>
+	<![endif]-->
+
+	<!-- font awesome -->
+	<link href="https://maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+
+
+	<style type="text/css">
+	 @import url(../stylesheets/pygment_trac.css);
+	 /* head fancy: Lobster, Pacifico */
+	 /* head serif: Arvo, Bitter, Podkova, Roboto Slab */
+	 /* dense bold: Squada One, Oswald; */
+	 @import url(https://fonts.googleapis.com/css?family=Arvo:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Bitter:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Podkova:400,700);
+	 @import url(https://fonts.googleapis.com/css?family=Roboto+Slab:400,700);
+	 body {
+	     /*line-height: 1.7;*/
+	     /*font-family: 'Myriad Pro', Calibri, Helvetica, Arial, sans-serif;*/
+	     font-family: 'Helvetica Neue';
+	     /*font-size: 15pt;*/
+	     color: rgb(41,41,41);
+	 }
+
+	 h1,h2,h3,h4,h5,h6,.h1,.h2,.h3,.h4,.h5,.h6 {
+	     font-family: 'Roboto Slab';
+	     font-weight: 700;
+	 }
+
+
+	 .container h1,h2 {
+	     border-bottom: 1px solid #e5e5e5;
+	     /*  margin-bottom: 1em;
+		margin-top: 2em;*/
+	 }
+
+	 .jumbotron {
+	     background: transparent;
+	 }
+
+	 /* Space out content a bit */
+	 /*body {
+	    padding-top: 20px;
+	    padding-bottom: 20px;
+	    }*/
+
+	 /* Everything but the jumbotron gets side spacing for mobile first views */
+	 .header,
+	 .marketing,
+	 .footer {
+	     padding-right: 15px;
+	     padding-left: 15px;
+	 }
+
+	 /* Custom page header */
+	 .header {
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 /* Make the masthead heading the same height as the navigation */
+	 .header h3 {
+	     padding-bottom: 19px;
+	     margin-top: 0;
+	     margin-bottom: 0;
+	     line-height: 40px;
+	 }
+
+	 /* Custom page footer */
+	 .footer {
+	     padding-top: 19px;
+	     color: #777;
+	     border-top: 1px solid #e5e5e5;
+	 }
+
+	 /* Customize container */
+	 @media (min-width: 768px) {
+	     .jumbotron .container {
+		 max-width: 730px;
+	     }
+	     .container {
+		 max-width: 730px;
+	     }
+	 }
+	 .container-narrow > hr {
+	     margin: 30px 0;
+	 }
+
+	 /* Main marketing message and sign up button */
+	 .jumbotron {
+	     text-align: center;
+	     border-bottom: 1px solid #e5e5e5;
+	 }
+	 .jumbotron .btn {
+	     padding: 14px 24px;
+	     font-size: 21px;
+	 }
+
+	 /* Supporting marketing content */
+	 .marketing {
+	     margin: 40px 0;
+	 }
+	 .marketing p + h4 {
+	     margin-top: 28px;
+	 }
+
+	 /* Responsive: Portrait tablets and up */
+	 @media screen and (min-width: 768px) {
+	     /* Remove the padding we set earlier */
+	     .header,
+	     .marketing,
+	     .footer {
+		 padding-right: 0;
+		 padding-left: 0;
+	     }
+	     /* Space out the masthead */
+	     .header {
+		 margin-bottom: 30px;
+	     }
+	     /* Remove the bottom border on the jumbotron for visual effect */
+	     .jumbotron {
+		 border-bottom: 1px solid #e5e5e5;
+	     }
+	 }
+
+
+         #jump_to, #jump_page, #jump_toc {
+             background: white;
+             -webkit-box-shadow: 0 0 25px #777; -moz-box-shadow: 0 0 25px #777;
+             -webkit-border-bottom-left-radius: 5px; -moz-border-radius-bottomleft: 5px;
+             font: 10px Arial;
+             text-transform: uppercase;
+             cursor: pointer;
+             text-align: right;
+         }
+         #jump_to, #jump_wrapper {
+             position: fixed;
+             right: 0; top: 0;
+             padding: 5px 10px;
+         }
+         #jump_wrapper {
+             padding: 0;
+             display: none;
+         }
+         #jump_to:hover #jump_wrapper {
+             display: block;
+         }
+         #jump_page {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_page .source {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_page .source:hover {
+             background: #f5f5ff;
+         }
+         #jump_page .source:first-child {
+         }
+
+
+         #jump_toc {
+             padding: 5px 0 3px;
+             margin: 0 0 25px 25px;
+         }
+         #jump_toc li {
+             display: block;
+             padding: 5px 10px;
+             text-decoration: none;
+             border-top: 1px solid #eee;
+         }
+         #jump_toc li:hover {
+             background: #f5f5ff;
+         }
+         #jump_toc li:first-child {
+         }
+
+
+
+         table td {
+             border: 0;
+             outline: 0;
+         }
+         td.docs, th.docs {
+             min-width: 575px;
+             /*max-width: 450px;
+		min-width: 450px;
+		min-height: 5px;*/
+             padding: 10px 25px 1px 50px;
+             /*overflow-x: hidden;*
+		vertical-align: top;
+		text-align: left;*/
+         }
+         .docs pre {
+             margin: 15px 0 15px;
+             padding-left: 15px;
+         }
+         .docs p tt, .docs p code, .doc code {
+             background: #f8f8ff;
+             border: 1px solid #dedede;
+             font-size: 12px;
+             padding: 0 0.2em;
+         }
+         .pilwrap {
+             position: relative;
+         }
+         .pilcrow {
+             font: 12px Arial;
+             text-decoration: none;
+             color: #454545;
+             position: absolute;
+             top: 3px; left: -20px;
+             padding: 1px 2px;
+             opacity: 0;
+             -webkit-transition: opacity 0.2s linear;
+         }
+         td.docs:hover .pilcrow {
+             opacity: 1;
+         }
+         pre {
+             border: none;
+             /*width: 100%;*/
+             vertical-align: top;
+             background: #f5f5ff;
+             /*border-left: 1px solid #e5e5ee;*/
+         }
+
+         pre.prettyprint.prettyprinted {
+             border: none;
+	 }
+
+         pre, tt, code {
+             font-size: 12px; line-height: 18px;
+             font-family: Menlo, Monaco, Consolas, "Lucida Console", monospace;
+         }
+
+	 /*---------------------- Prettify Syntax Highlighting -----------------------------*/
+         .str{color:#080}.kwd{color:#008}.com{color:#800}.typ{color:#606}.lit{color:#066}.pun{color:#660}.pln{color:#000}.tag{color:#008}.atn{color:#606}.atv{color:#080}.dec{color:#606}pre.prettyprint{padding:2px;border:1px solid #888}ol.linenums{margin-top:0;margin-bottom:0}li.L0,li.L1,li.L2,li.L3,li.L5,li.L6,li.L7,li.L8{list-style:none}li.L1,li.L3,li.L5,li.L7,li.L9{background:#eee}@media print{.str{color:#060}.kwd{color:#006;font-weight:bold}.com{color:#600;font-style:italic}.typ{color:#404;font-weight:bold}.lit{color:#044}.pun{color:#440}.pln{color:#000}.tag{color:#006;font-weight:bold}.atn{color:#404}.atv{color:#060}}
+
+         table.doc { margin-bottom: 20px; }
+         td.doc { border-bottom: 1px dashed #708090; }
+         td.param { font-weight: bold; }
+         td.return { font-weight: bold; text-decoration: underline; }
+
+
+	</style>
+	<script type="text/x-mathjax-config">
+	 MathJax.Hub.Config({
+	     extensions: ["tex2jax.js"],
+	     jax: ["input/TeX", "output/HTML-CSS"],
+	     tex2jax: {
+		 skipTags: ["script","noscript","style","textarea"],
+		 inlineMath: [ ['$','$'], ["\\(","\\)"] ],
+		 displayMath: [ ['$$','$$'], ["\\[","\\]"] ],
+		 processEscapes: true
+	     },
+	     "HTML-CSS": { availableFonts: ["TeX"] }
+	 });
+	</script>
+	<script type="text/javascript" async
+		src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-MML-AM_CHTML">
+	</script>
+    </head>
+
+    <body>
+	<div class="navbar navbar-default navbar-static-top" role="navigation">
+	    <div class="container">
+		<div class="navbar-header">
+		    <button type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+			<span class="sr-only">Toggle navigation</span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+			<span class="icon-bar"></span>
+		    </button>
+		    <a class="navbar-brand" href="index.html">LMS</a>
+		</div>
+		<div class="navbar-collapse collapse">
+		    <ul class="nav navbar-nav">
+			<li><a href="../index.html"><span class="glyphicon glyphicon-home"></span> Home</a></li>
+			<li class="active"><a href="../tutorials/index.html"><i class="fa fa-book"></i> Documentation</a></li>
+			<li><a href="../resources.html">Resources</a></li>
+			<li><a href="../publications.html">Publications</a></li>
+			<li><a href="../community.html">Community</a></li>
+			<!--<li><a href="community.html">Community</a></li>-->
+			<!--<li class="dropdown">
+			     <a href="#" class="dropdown-toggle" data-toggle="dropdown">Dropdown <span class="caret"></span></a>
+			     <ul class="dropdown-menu" role="menu">
+			     <li><a href="#">Action</a></li>
+			     <li><a href="#">Another action</a></li>
+			     <li><a href="#">Something else here</a></li>
+			     <li class="divider"></li>
+			     <li class="dropdown-header">Nav header</li>
+			     <li><a href="#">Separated link</a></li>
+			     <li><a href="#">One more separated link</a></li>
+			     </ul>
+			     </li>-->
+		    </ul>
+		</div>
+	    </div>
+	</div>
+
+	<div class="container">
+	    <div id="background"></div>
+	    <div id="jump_to">
+		02_basics.scala // Jump To &hellip;
+		<div id="jump_wrapper">
+		    <div id="jump_toc"></div>
+		    <div id="jump_page">
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/ack.html">
+			    ack.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/automata.html">
+			    automata.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/dynvar.html">
+			    dynvar.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/fft.html">
+			    fft.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/index.html">
+			    index.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi.html">
+			    mpi.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/mpi2.html">
+			    mpi2.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/query.html">
+			    query.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/regex.html">
+			    regex.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scanner.html">
+			    scanner.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/scannerlib.html">
+			    scannerlib.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan-live.html">
+			    shonan-live.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/shonan.html">
+			    shonan.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/start.html">
+			    start.html
+			</a>
+			
+			<a class="source" href="https://scala-lms.github.io/tutorials/utils.html">
+			    utils.html
+			</a>
+			
+		    </div>
+		</div>
+	    </div>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">02_basics.scala</li>
+	    </ol>
+
+
+	    <!--<div id="tableofcontents" style="position: fixed; right: 0; top: 0; margin-top:75px; margin-right:20px; width: 150px;">-->
+	    <!-- tbd whether it should be here ?? -->
+
+	    
+	    <div class="docs">
+		<div class="pilwrap">
+		    <a class="pilcrow" href="#section_0">&#182;</a>
+		</div>
+		<p><a name="sec:221"></a></p>
+<h1>Generative Programming Basics</h1>
+<p>Previous staging approaches either work directly with strings that represent
+concrete program syntax or make use of quasiquoting to compose abstract syntax
+trees. We examine both approaches in turn, with an eye on how linguistic reuse
+improves productivity and safety for the multi-stage programmer.</p>
+<p>Outline:</p>
+<div id="tableofcontents"></div>
+<h2>Program Generation with Strings</h2>
+<p>As a simple example, let us turn the power function:</p>
+<pre><code>def power(b: Double, n: Int): Double =
+  if (n == 0) 1.0 else b * power(b, n - 1)
+</code></pre>
+<p>into a code generator:</p>
+<pre><code>def power(b: String, n: Int): String =
+  if (n == 0) "1.0" else "(" + b + " * " + power(b, n - 1) + ")"
+</code></pre>
+<p>As result of an invocation we obtain:</p>
+<pre><code>power("x",4) // "(x * (x * (x * (x * 1.0)))"
+</code></pre>
+<p>However there is a problem: We can produce arbitrary strings that might not be
+valid code.  It is very easy to make subtle mistakes:</p>
+<pre><code>def power(b: String, n: Int): String =
+  if (n == 0) "1.0" else "b * " + power(b, n - 1) + ")"
+</code></pre>
+<p>We have accidentally omitted a parenthesis, so the result is not syntactically
+well formed code. Furthermore, the literal identifier <code>b</code> is part of the
+output:</p>
+<pre><code>power("x",4) // "b * b * b * b * 1.0)))"
+</code></pre>
+<p>This code will not compile and even if we fix the syntax, the code is no
+longer well scoped. The free  identifier <code>b</code> can lead to variable capture when
+the code is  spliced in somewhere else.</p>
+<p>We have seen two problems, syntax correctness and scope correctness.  Two
+other problems are type correctness and value correctness. If we cannot
+guarantee to generate valid programs, we can much less guarantee that programs
+are well-typed or compute correct results.</p>
+<p><a name="sec:220quasi"></a></p>
+<h2>Program Generation with Quasi-Quotes</h2>
+<p>Strings model concrete syntax, but we can also use abstract syntax. This idea
+is inspired by Lisp's &ldquo;code as data&rdquo; model.  We start with a slightly more
+convenient string notation, denoted by <code>s"..."</code> quotes:</p>
+<pre><code>def power(b: String, n: Int): String =
+  if (n == 0) s"1.0" else s"($b * ${ power(b, n - 1) })"
+</code></pre>
+<p>The notation <code>${ ... }</code> denotes a hole in the string, to be filled by the
+string result of evaluating the enclosed expression.</p>
+<p>The same idea applies to abstract syntax. Let <code>[[ ... ]]</code> denote the AST of
+the enclosed expression, and let <code>Tree</code> be the type of AST nodes. Holes will
+require an expression of type <code>Tree</code>:</p>
+<pre><code>def power(b: Tree, n: Int): Tree =
+  if (n == 0) [[ 1.0 ]] else [[$b * ${ power(b, n - 1) } ]]"
+</code></pre>
+<p>Now we have a program generator that assembles AST nodes.</p>
+<h2>Syntactic Correctness through Deep Reuse of Syntax</h2>
+<p>The multi-stage language compiler parses the whole program and builds  ASTs
+for all expressions, quoted or not, at once. Thus we obtain syntax
+correctness. However the multi-stage language compiler must know about the
+syntax of the object language. This is trivial if meta-language and object
+language are the same. Otherwise it is slightly more difficult
+<a href="mainland07quasiquoting">(*)</a>.</p>
+<p>The <code>Tree</code> type can be left abstract. Some implementations  hide the exact
+data structures to guarantee safety of optimizations on object code. Silently
+modifying trees with rewrites that  maintain semantic but not structural
+equality (e.g. beta reduction) can change the behavior of programs that
+inspect the tree structure <a href="DBLP:conf/pepm/Taha00">(*)</a>. In general,
+optimizations should not change the result of a program.</p>
+<h2>Scope Correctness through Deep Reuse of Scope</h2>
+<p>The multi-stage compiler can bind identifiers at the definition site of the
+quote. This avoids variable capture and ensures scope correctness (hygiene).</p>
+<p>Another possible issue is <em>scope extrusion</em>. This happens when a variable
+bound in quoted code escapes through a hole:</p>
+<pre><code>var x: Tree;
+$[[$ val y = 7; $\$${ x = y }$]]$
+</code></pre>
+<p>Scope extrusion can be prevented by appropriate type systems
+<a href="DBLP:conf/pldi/WestbrookRIYAT10,DBLP:conf/pepm/KameyamaKS09">(*)</a>, which are
+beyond the scope of this thesis. Scope extrusion is a real problem for code
+generators that imperatively manage staged program fragments. For generators
+expressed in a functional style it it far less of an issue, regardless of
+whether the object program uses effects or not.</p>
+<h2>Type Correctness through Deep Reuse of Types</h2>
+<p>With syntax and scoping out of the way, we turn our attention to type
+correctness. Fortunately, type correctness falls out naturally if parametric
+types are available. We just replace type <code>Tree</code> with <code>Tree[T]</code>:</p>
+<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] =
+</code></pre>
+<p>Now the type system ensures that <code>power</code> is only applied to AST nodes that
+compute <code>Double</code> values in the next stage.</p>
+<p>Note that the use of parametric types alone does not prevent scope extrusion,
+which can also be seen as a type error in the sense of a well-typed multi-
+stage program &ldquo;going wrong&rdquo;
+<a href="DBLP:conf/icalp/TahaBS98,DBLP:conf/popl/TahaN03">(*)</a>.  Thus we do not obtain
+a guarantee that <em>all</em>  generated programs type check, but the slightly
+weaker assurance  that all generated programs that are well-formed are also
+type  correct.</p>
+<h2>Value Correctness is an Open Problem</h2>
+<p><a name="sec:221valcorr"></a></p>
+<p>The remaining big problem is what we (somewhat vaguely) call <em>value
+correctness</em> or more generally preservation of program semantics:  How can we
+be reasonably certain that a program computes the same result after adding
+staging annotations?  We cannot expect a strong guarantee in all cases for
+reasons of  nontermination but what is troubling is that there are many
+practical cases  where staging annotations change a program's behavior quite
+drastically. This fact is well documented in the literature
+<a href="techreport/EckhardtKSTK04,DBLP:journals/scp/CohenDGHKP06,DBLP:conf/gpce/CaretteK05,DBLP:conf/pepm/SwadiTKP06,DBLP:conf/esop/InoueT12">(*)</a>.</p>
+<p>The problem manifests itself both with strings and with trees. The root cause
+is that both approaches are based on syntactic expansion, irrespective of
+semantics such as order of execution.</p>
+<p>Using the regular, unstaged power implementation:</p>
+<pre><code>def power(b: Double, n: Int): Double = ...
+
+val x = computeA()       // computeA executed here
+power(computeB() + x, 4) // computeB executed before calling power (cbv)
+</code></pre>
+<p>Both compute functions will be executed once, in order. Afterwards, power will
+be applied to the result.</p>
+<p>Let us compare this with the staged implementation:</p>
+<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] = ...
+
+val x = $[[$computeA()$]]$
+power($[[$computeB() + $\$$x$]]$, 4)
+</code></pre>
+<p>Result:</p>
+<pre><code>((computeB() + computeA()) *
+ ((computeB() + computeA()) *
+  ((computeB() + computeA()) *
+   ((computeB() + computeA()) * 1.0))))"
+</code></pre>
+<p>In this case, the computation has been duplicated $n$ times and  the order of
+the function calls has been reversed.  Effectively we ignore all bindings and
+follow a call-by-name policy even though power declares its arguments as call-
+by-value. If either of the compute functions depends on side effects the
+staged function computation will produce a very different result. Imagine for
+example:</p>
+<pre><code>def computeA() = readNextInputValue()
+</code></pre>
+<p>We clearly want to read only one value, not four.</p>
+<p>Even if both functions are pure, it will be much more expensive to compute the
+result. If we applied staging to obtaining better performance we have not
+achieved our goal.</p>
+<p>As another example, let us switch to a better algorithm:</p>
+<pre><code>def power(b: Tree[Double], n: Int): Tree[Double] =
+  if (n == 0) $[[$ 1.0 $]]$
+  else if ((n&amp;1) == 0) { val y = power(b, n/2); $[[ \$y$ * $\$y ]]$ }
+  else $[[ \$b$ * $\$\{$ power(b, n - 1) $\} ]]$
+</code></pre>
+<p>Result:</p>
+<pre><code>power($[[$x$]]$) // (((x*1.0)*(x*1.0))*((x*1.0)*(x*1.0)))
+</code></pre>
+<p>Staging has turned the more efficient algorithm into a less efficient one.
+This effect of staging undoing binding and memoization is widely known
+<a href="DBLP:conf/pepm/SwadiTKP06,techreport/EckhardtKSTK04">(*)</a>.</p>
+<h2>Let Insertion as a Remedy</h2>
+<p>One way of fixing the order of staged expressions is to insert let-bindings in
+strategic places. This is frequently done by separate front ends. Staging
+effectively becomes an &ldquo;assembly language&rdquo; for code generation.  The front
+end can assemble pieces of generated code using explicit side effects, or the
+code generators are written in monadic style or continuation passing style
+(CPS), in which case the monadic bind operation will insert let-bindings to
+maintain the desired evaluation order <a href="DBLP:conf/pepm/SwadiTKP06">(*)</a>.
+Effectful code generators are much more likely to cause scope extrusion.
+Explicit monadic style or CPS complicate code generators a lot. This dilemma
+is described as an &ldquo;agonizing trade-off&rdquo;, due to which one &ldquo;cannot achieve
+clarity, safety, and efficiency at the same time&rdquo;
+<a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>. Only very recently have type-systems been
+devised to handle both staging and effects
+<a href="DBLP:conf/pepm/KameyamaKS08,DBLP:conf/pepm/KameyamaKS09,DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>.
+They are not excessively restrictive but not without restrictions either.
+Mint <a href="DBLP:conf/pldi/WestbrookRIYAT10">(*)</a>, a multi-stage extension of Java,
+restricts non-local operations within escapes  to final classes which excludes
+much of the standard Java library. Languages that support both staging  and
+first class delimited continuations can mitigate this overhead but front ends
+that encapsulate the staging  primitives are still needed
+<a href="DBLP:conf/pepm/KameyamaKS09">(*)</a>.</p>
+<p>In the partial evaluation community, specialization of effectful programs has
+been achieved by inserting let-bindings eagerly for each effectful  statement
+<a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a>, achieving on-the-fly
+conversion to administrative normal form  (ANF,
+<a href="DBLP:conf/pldi/FlanaganSDF93">(*)</a>. As we will show below, a simplified
+variant of this approach naturally  extends to staging with and without
+quasiquotes.</p>
+<h1>The LMS Way</h1>
+<p><a name="sec:222"></a></p>
+<p>We first show how to maintain value correctness through deep reuse of
+evaluation order. The key idea is similar to that employed in partial
+evaluation <a href="thiemann1999partial,DBLP:conf/tacs/LawallT97">(*)</a> and applies to
+both quasiquoting and LMS. Our presentation differs from the partial
+evaluation literature in that it is independent of any partial evaluation
+mechanics such as CPS  conversion and expressed in a simple, purely
+operational way. Continuing with quasiquoting, we show how we can remove
+syntactic overhead and arrive at a more restricted object language by
+providing a typed API over staged <code>Rep[T]</code> values that hides the internal
+implementation. At this point, quasiquoting becomes an implementation detail
+that is no longer strictly needed because the higher level object language
+interface has taken over most of the staging guarantees. Staging can be
+implemented as a library, without  specific language support. Linguistic reuse
+is enabled by lifting operations from type <code>T</code> to <code>Rep[T]</code>. The object
+language can be divided into reusable components. Since there is only a single
+shared <code>Rep[T]</code> type, no layerings or translations between components are
+necessary.  Deep reuse of type inference enables a form of semi-automatic
+local BTA since method overloading will select either staged or unstaged
+operations depending on the types. In many cases, methods can be staged by
+just changing their parameter types.</p>
+<h2>Value Correctness through Deep Reuse of Evaluation Order</h2>
+<p><a name="sec220:evalOrder"></a></p>
+<p>The key idea is to treat quoted fragments as context-sensitive statements,
+not context-free expressions. This means that we will need to explicitly
+<em>perform</em> a statement. We continue the description  with strings as the
+representation type since it is the most basic.  Performing a statement will
+register the side effects of this statement in the current context. The
+counterpart to <em>perform</em> is <em>accumulate</em>, which defines such a
+context and returns a program fragment that captures all the effects within
+the context. To make sure that all code fragments are treated in this way we
+introduce the following typings:</p>
+<pre><code>type Code
+def perform(stm: String): Code
+def accumulate(res: =&gt; Code): String
+</code></pre>
+<p>Note the by-name argument of accumulate. The <code>Code</code> type and the method
+implementations can remain abstract for the moment.</p>
+<p>We can put perform and accumulate to use in the power example as follows:</p>
+<pre><code>def power(b: Code, n: Int): Code =
+  if (n == 0) perform("1.0") else
+  perform("(" + accumulate { b } + " * " + accumulate { power(b, n - 1) } + ")")
+</code></pre>
+<p>We define perform and accumulate in the following way to perform automatic
+eager let insertion. The private constructor <code>code</code> builds a <code>Code</code> object
+from a string:</p>
+<pre><code>accumulate { E[ perform("str") ] }
+    $\longrightarrow$ "{ val fresh = str; " + accumulate { E[ code("fresh") ] } + "}"
+accumulate { code("str") }
+    $\longrightarrow$ "str"
+</code></pre>
+<p>Where <code>E</code> is an accumulate-free evaluation context and <code>fresh</code> a fresh
+identifier. These rules can be implemented using one piece of mutable state in
+a  straightforward way.</p>
+<p>We are reusing the execution order of the meta language: In the meta language
+we execute perform whenever we encounter an object program expression.  If we
+force the object program to replay the order of the perform calls  by
+inserting a let binding for each of them, we are sure to execute the performed
+statements in the right order. Whenever we have a hole to fill in an object
+program fragment, we use accumulate to gather all statements performed while
+computing the fragment to splice into the hole.</p>
+<p>Perform and accumulate form a reflect/reify pair that translates between a
+syntactic and a semantic layer. Alternatively, perform could be called
+reflectEffects, accumulate reifyEffects. This hints at the view that we are
+embedding perform and accumulate in the (invisible) computation  monad of the
+meta language using Filinski's notion of monadic reflection
+<a href="DBLP:conf/popl/Filinski94,DBLP:conf/popl/Filinski10">(*)</a>.  Accumulate is a
+left inverse of perform with respect to extensional equality ($\equiv$)  of
+the generated code:</p>
+<pre><code>accumulate { perform("a") } $\longrightarrow^{*}$ "{ val fresh = a; fresh }"       $\equiv$     "a"
+</code></pre>
+<p>If structural equality is desired, a simple special case can be added to  the
+above definition to directly translate  <code>accumulate(perform("a"))</code> to <code>a</code>.
+Within a suitable context, perform is also a left inverse of accumulate:
+Performing a set of accumulated statements together  is the same as just
+performing the statements individually.</p>
+<p>Clearly, using perform and accumulate manually is tedious. However we can
+incorporate them entirely inside the quasi quotation / interpolation syntax:</p>
+<pre><code>s" foo $\$${ bar } baz " $\longrightarrow$ " foo " + bar + " baz "  // regular interpolation
+q" foo $\$${ bar } baz " $\longrightarrow$ perform(" foo " + accumulate { bar } + " baz ")
+</code></pre>
+<p>In essence, we identify quotation with perform and
+holes with accumulate.</p>
+<p>We get back to a power implementation using quasiquotes. This time
+we use type Code, although we are still working with concrete syntax:</p>
+<pre><code>def power(b: Code, n: Int): Code =
+  if (n == 0) q"1.0" else  q"($\$$b * $\$${ power(b, n - 1) } )"
+</code></pre>
+<p>The same mechanism can be used to implement order preserving
+versions of (type-safe) abstract syntax quotation $[[ &hellip; ]]$.
+The signatures will change from strings to trees:</p>
+<pre><code>type Code[T]
+def perform(stm: Tree[T]): Code[T]
+def accumulate(res: =&gt; Code[T]): Tree[T]
+</code></pre>
+<p>We put the modified quasiquotes to test by invoking power
+on the example from the <a href="#sec:221valcorr">previous Section</a>:</p>
+<pre><code>def power(b: Code[T], n: Int): Code[T] = ...
+
+val x = $[[$computeA()$]]$
+power($[[$computeB() + $\$$x$]]$, 4)
+</code></pre>
+<p>We obtain as intermediate result before invoking power (dropping unnecessary
+braces and replacing semicolons with newlines):</p>
+<pre><code>val x1 = computeA()
+val x3 = { val x2 = computeB() + x1; x2 }
+power(x3,4)
+</code></pre>
+<p>And as the final result:</p>
+<pre><code>val x1 = computeA()
+val x3 = { val x2 = computeB() + x1; x2 }
+val x4 = 1.0
+val x5 = x3 * x4
+val x6 = x3 * x5
+val x7 = x3 * x6
+val x8 = x3 * x7
+x8
+</code></pre>
+<p>It is easy to see that this is the correct sequencing of statements. No
+computation is duplicated. Likewise, if we use the improved algorithm, we
+actually get better performance.</p>
+<p>We have removed the need for monadic or side-effecting front-ends (in this
+case, in other cases they may still be needed but never to perform let
+insertion).  Since we have extended the core staging primitives with a
+controlled form of side effect, we have removed the need for uncontrolled side
+effects in the generator. This makes otherwise common errors such as scope
+extrusion much less likely.</p>
+<h2>Removing Syntactic Overhead</h2>
+<p>We have seen how we can improve staging based on  quasiquotes or direct string
+generation. Now we turn to other approaches of delineating embedded object
+programs. Our aim is embedding domain specific  compilers. We want object
+languages tailored to specific applications, with custom compiler components.
+The &ldquo;one size fits all&rdquo; approach of having the same meta and object language
+is not ideal for this purpose. In our case, we would have to inspect Scala
+ASTs and reject or possibly interpret constructs that have no correspondence
+in the object language (type, class or method definitions, etc).</p>
+<p>The staged power implementations with quasi quotes look OK but they do contain
+a fair bit of syntactic noise. Also, we might want stronger guarantees about
+the staged code, for example that it does not use a particular language
+feature, which we know is detrimental to performance. What is more, we might
+want to generate code in a different language (JavaScript, CUDA, SQL).</p>
+<p>We already hide the internal code representation from client programs. There
+are good reasons to also hide the full power of  arbitrary program composition
+/ quasi quoting from client programs.</p>
+<p>Programs, such as power, use quasiquotes for two purposes: lifting primitives
+and operations:</p>
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
+  if (n == 0) q"1.0" else  q"($\$$b * $\$${ power(b, n - 1) } )"
+</code></pre>
+<p>We already identify object code via <code>Code[T]</code> types. Instead of quasiquotes we
+can employ other ways of lifting the necessary  operations on type <code>T</code> to type
+<code>Code[T]</code>:</p>
+<pre><code>implicit def liftDouble(x: Double): Code[Double] = q"x"
+def infix_*(x: Code[Double], y: Code[Double]): Code[Double] = q"$\$$x * $\$$y"
+</code></pre>
+<p>Now power can be implemented like this:</p>
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
+  if (n == 0) liftDouble(1.0) else infix_*(b, power(b, n - 1))
+</code></pre>
+<p>But we can simplify further. In fact, the Scala compiler will do most of  the
+work for us and we can write just this:</p>
+<pre><code>def power(b: Code[Double], n: Int): Code[Double] =
+  if (n == 0) 1.0 else b * power(b, n - 1)
+</code></pre>
+<p>Apart from the <code>Code[_]</code> types, we have re-engineered exactly the regular,
+unstaged power function! All other traces of staging annotations are gone.</p>
+<p>We are relying on Scala's support for implicit conversions (views) and Scala-
+Virtualized support for infix methods. Other expressive languages provide
+similar features.</p>
+<h2>Staging as a Library and Modular Definition of Object Languages</h2>
+<p>With the object language definition given by method signatures we can
+implement staging as a library, without dedicated language support and with
+roughly the same guarantees as a multi-stage language with  quasi quotation.
+Furthermore, we can easily generate code in another target language, for
+example emit JavaScript from staged Scala expressions.  Given that the multi-
+stage program is in control of defining the object language we can model
+additional guarantees about the absence of certain operations from staged
+code, simply by not including these operations in the object language
+interface.</p>
+<p>The core idea is to delegate correctness issues to the implementations of the
+lifted operations, i.e. the implementation of the object language interface.
+Client code can access staging only through the object language API, so if the
+implementation is correct, the interface ensures correctness  of the client
+code.</p>
+<p>We can use any representation we like for staged expressions. For the sake of
+simplicity we will stick to strings. Where we have used type <code>Code[T]</code> above,
+we will use <code>Rep[T]</code> from now on because we want to allude to thinking more
+about the <em>representation</em> of a <code>T</code> value in the next stage and less
+about composing code fragments.</p>
+<p>Where quasiquoting allowed the full language to be staged, we now have to
+explicitly &ldquo;white-list&rdquo; all operations we want to make available. Clearly
+there is a tradeoff, as explicit white-listing of operations can be tedious.
+However we can remedy the white-listing effort to a large extent by providing
+libraries of reusable components that contain sets of lifted operations from
+which different flavors of object languages can be assembled. It is also
+possible to lift whole traits or classes using reflection
+<a href="DBLP:conf/ecoop/KossakowskiARO12">(*)</a>.</p>
+<p>We can define a simple object language <code>MyStagedLanguage</code> as follows,  using
+<code>private</code> access qualifiers to ensure that the staging primitives  perform and
+accumulate are inaccessible to client code outside of package <code>internal</code>:</p>
+<pre><code>package internal
+trait Base extends EmbeddedControls {
+  type Rep[T]
+  private[internal] def perform[T](stm: String): Rep[T]
+  private[internal] def accumulate[T](res: =&gt; Rep[T]): String
+}
+trait LiftPrimitives extends Base {
+  implicit def liftDouble(x: Double): Rep[Double] = perform(x.toString)
+}
+trait Arith extends Base {
+  def infix_*(x: Rep[Double], y: Rep[Double]): Rep[Double] = perform(x+"*"+y)
+}
+trait IfThenElse extends Base {
+  def __ifThenElse[T](c: Rep[Boolean], a: =&gt;Rep[T], a: =&gt;Rep[T]): Rep[T] =
+    perform("if (" + c + ") " + accumulate(a) + " else " + accumulate(b))
+}
+trait MyStagedLanguage extends LiftPrimitives with Arith with IfThenElse
+</code></pre>
+<p>Note that we invoke accumulate only for by-name parameters. All others are
+already object code values, so evaluating them is a no-op and cannot have side
+effects. In doing so we silently assume a sensible <code>toString</code> operation on
+<code>Rep[T]</code>. If we do not want to make this assumption then we need accumulate
+calls everywhere a <code>Rep[T]</code> value is converted to a string representation.</p>
+<p>Client code just needs access to an object of type <code>MyStagedLanguage</code> to call
+methods on it. Common ways to achieve this include path-dependent types and
+imports:</p>
+<pre><code>val p: MyStagedLanguage = ...
+import p._
+def power(b: Rep[Double], n: Int): Rep[Double] = ...
+</code></pre>
+<p>In which case the desugared method signature is:</p>
+<pre><code>def power(b: p.Rep[Double], n: Int): p.Rep[Double] = ...
+</code></pre>
+<p>Or by structuring the client code as traits itself:</p>
+<pre><code>trait Power { this: MyStagedLanguage =&gt;
+  def power(b: Rep[Double], n: Int): Rep[Double] = ...
+}
+</code></pre>
+<p>In the following we briefly revisit the various static guarantees  and show
+how they are fulfilled in LMS.</p>
+<h3>Syntax correctness through Embedding as Methods</h3>
+<p>Generating syntactically well formed programs is delegated to  methods
+implementing the object language interface. Client code never assembles pieces
+of code directly. If clients only  use the API methods, and their
+implementations produce syntax correct code, overall syntax correctness
+follows.</p>
+<h3>Scope Correctness through Deep Reuse Of Val Bindings</h3>
+<p>The staging primitives perform eager let insertion and perform will assign a
+fresh identifier to each and every subexpression encountered, essentially
+producing on object program in administrative normal form (ANF). This removes
+the need for explicit val bindings in object code. Instead, programmers can
+just use val bindings in the meta program. This is an example of deep
+linguistic reuse, as the &ldquo;feature&rdquo; of val bindings is translated away.</p>
+<p>As for scope correctness, we have not encountered any binders in object code
+so far. <a href="#sec:220functions">Below</a> we will introduce staged
+functions  using higher order abstract syntax (HOAS)
+<a href="DBLP:conf/pldi/PfenningE88">(*)</a>:</p>
+<pre><code>def lambda[A,B](f: Rep[A] =&gt; Rep[B]): Rep[A=&gt;B]
+lambda { (x:Rep[Int]) =&gt; ... }  // a staged function object
+</code></pre>
+<p>The essence of HOAS is to reuse meta language bindings to implement object
+language bindings. Unless subverted by explicit scope extrusion,  the reuse of
+meta language bindings ensures scope correctness of  object programs.</p>
+<h3>Type Correctness through Typed Embedding (Deep Reuse of Types)</h3>
+<p>The object language API exposes only typed methods. If the implementations of
+these methods produce type correct code, then overall type correctness
+follows.</p>
+<h3>Value Correctness through Deep Reuse of Evaluation Order</h3>
+<p>The perform and accumulate abstraction has been described at length
+<a href="#sec220:evalOrder">above</a>.</p>
+<h2>Functions and Recursion</h2>
+<p><a name="sec:220functions"></a></p>
+<p>Many features can be added to the object language in a way that is analogous
+to  what we have seen above but some require a bit more thought. In this
+section  we will take a closer look at staged functions. Basic support for
+staged function definitions and function applications can be defined in terms
+of a simple higher-order abstract syntax (HOAS)
+<a href="DBLP:conf/pldi/PfenningE88">(*)</a> representation, similar to those of Carette
+et al. <a href="DBLP:journals/jfp/CaretteKS09">(*)</a>  and Hofer et al.
+<a href="DBLP:conf/gpce/HoferORM08">(*)</a>.</p>
+<p>The idea is to provide a <code>lambda</code> operation that transforms present-stage
+functions over staged values (type <code>Rep[A] =&gt; Rep[B]</code>) to staged function
+values (type <code>Rep[A=&gt;B]</code>).</p>
+<pre><code>trait Functions extends Base {
+  def lambda[A,B](f: Rep[A] =&gt; Rep[B]): Rep[A=&gt;B]
+  def infix_apply[A,B](f: Rep[A=&gt;B], x: Rep[A]): Rep[B]
+}
+</code></pre>
+<p>To give an example, the staged
+recursive factorial function will look like this:</p>
+<pre><code>def fac: Rep[Int =&gt; Int] = lambda { n =&gt;
+  if (n == 0) 1
+  else n * fac(n - 1)
+}
+</code></pre>
+<p>As opposed to the earlier power example, an invocation <code>fac(m)</code> will not
+inline the definition of <code>fac</code> but result in an actual function call in  the
+generated code.</p>
+<p>However the HOAS representation has the disadvantage of being opaque: there is
+no immediate way to &ldquo;look into&rdquo; a Scala function object. If we want to treat
+functions in the same way as other program constructs, we need a way to
+transform the HOAS encoding into our string representation. We can implement
+<code>lambda(f)</code> to call</p>
+<pre><code>accumulate { f(fresh[A]) }
+</code></pre>
+<p>which will unfold the function definition into a block that represents the
+entire computation defined by the function (assuming that <code>fresh[A]</code> creates a
+fresh symbol of type <code>A</code>). But eagerly expanding function definitions is
+problematic. For recursive functions, the result would be infinite, i.e. the
+computation will not terminate. What we would like to do instead is to detect
+recursion and generate a finite  representation that makes the recursive call
+explicit. However this is difficult because recursion might be very indirect:</p>
+<pre><code>def foo(x: Rep[Int]) = {
+  val f = (x: Rep[Int]) =&gt; foo(x + 1)
+  val g = lambda(f)
+  g(x)
+}
+</code></pre>
+<p>Each incarnation of <code>foo</code> creates a new function <code>f</code>; unfolding will thus
+create unboundedly many different function objects.</p>
+<p>To detect cycles, we have to <em>compare</em> those functions. This, of course,
+is undecidable in the general case of taking equality to be defined
+extensionally, i.e. saying that two functions are equal if they map equal
+inputs to equal outputs. The standard reference equality, by contrast,  is too
+weak for our purpose:</p>
+<pre><code>def adder(x:Int) = (y: Int) =&gt; x + y
+adder(3) == adder(3)
+$\hookrightarrow$ false
+</code></pre>
+<p>However, we can approximate extensional equality by intensional (i.e.
+structural) equality, which is sufficient in most cases because recursion will
+cycle through a well defined code path in the program text.  Testing
+intensional equality amounts to checking if two functions are defined at the
+same syntactic location in the source program and whether all data referenced
+by their free variables is equal. Fortunately, the implementation of first-
+class functions as closure objects offers (at least in principle) access to a
+&ldquo;defunctionalized&rdquo;  data type representation on which equality can easily be
+checked. A bit of care must be taken though, because the structure can be
+cyclic. On the JVM there is a particularly neat trick.  We can serialize the
+function objects into a byte array and compare the serialized representations:</p>
+<pre><code>serialize(adder(3)) == serialize(adder(3))
+$\hookrightarrow$ true
+</code></pre>
+<p>With this method of testing equality, we can implement <em>controlled</em>
+unfolding. Unfolding functions only once at the definition site and
+associating a fresh symbol with the function being unfolded allows us to
+construct a block that contains a recursive call to the symbol we created.
+Thus, we can create the expected representation for the factorial function
+above.</p>
+<h2>Semi-Automatic BTA through Deep Reuse of Type Inference</h2>
+<p>Given a method or function implementation:</p>
+<pre><code>def power(b: _, n: Int) =
+  if (n == 0) 1.0 else b * power(b, n - 1)
+</code></pre>
+<p>Scala's type inference can determine whether the operations and the result
+will be staged or not. We just have to provide  the binding time for parameter
+<code>b</code>. Note that staging <code>n</code> would require explicit use of <code>lambda</code> because
+there is no static criterion to stop the recursion.</p>
+<p>In some cases we need to be conservative, for example for mutable objects:</p>
+<pre><code>var i = 0
+if (c)    // c: Rep[Boolean]
+  i += 1
+</code></pre>
+<p>The variable <code>i</code> must be lifted because writes depend  on dynamic control
+flow. We can accomplish this by implementing the virtualized var constructor
+to always lift variable declarations, even if the initial right-hand side is a
+static value. Packaged up in a trait, it can be selectively imported:</p>
+<pre><code>trait MyProg { this: LiftVariables =&gt;
+  ... // all variables are lifted in this scope
+}
+</code></pre>
+<h2>Generating and Loading Executable Code</h2>
+<p><a name="sec:230codegen"></a></p>
+<p>Code generation in LMS is an explicit operation. For the common case where
+generated code is to be loaded immediately into the running program,  trait
+<code>Compile</code> provides a suitable interface in form of the abstract  method
+<code>compile</code>:</p>
+<pre><code>trait Compile extends Base {
+  def compile[A,B](f: Rep[A] =&gt; Rep[B]): A=&gt;B
+}
+</code></pre>
+<p>The contract of <code>compile</code> is to &ldquo;unstage&rdquo; a function from staged to staged
+values into a function operating on  present-stage values that can be used
+just like any other function object in the running program. Of course this
+only works for functions that do not reference externally bound <code>Rep[T]</code>
+values, otherwise the generate code will not compile due to free identifiers.
+The given encoding into Scala's type system does not prevent this kind of
+error.</p>
+<p>For generating Scala code, an implementation of the compilation interface is
+provided by trait <code>CompileScala</code>:</p>
+<pre><code>trait CompileScala extends Compile {
+  def compile[A,B](f: Rep[A] =&gt; Rep[B]) = {
+    val x = fresh[A]
+    val y = accumulate { f(x) }
+    // emit header
+    emitBlock(y)
+    // emit footer
+    // invoke compiler
+    // load generated class file
+    // instantiate object of that class
+  }
+}
+</code></pre>
+<p>The overall compilation logic of <code>CompileScala</code> is relatively simple: emit a
+class and <code>apply</code>-method declaration header, emit instructions for each
+definition node according to  the schedule, close the source file, invoke the
+Scala compiler, load the generated class file and return a newly instantiated
+object of that class.</p>
+
+	    </div>
+	    <div class="code">
+		<pre><code class='prettyprint lang-scala'></code></pre>
+	    </div>
+	    
+
+	    <p>
+		Comments? Suggestions for improvement? <a class="source" href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/02_basics.scala">View this file on GitHub</a>.
+	    </p>
+
+	    <ol class="breadcrumb">
+		<li><a href="../">LMS</a></li>
+		<li><a href="index.html">Tutorials</a></li>
+		<li class="active">02_basics.scala</li>
+	    </ol>
+
+	</div>
+
+	<!-- FOOTER -->
+	<div class="footer">
+	    <div class="container">
+		<p class="pull-right"><a href="#">Back to top</a></p>
+		<p>&copy; 2011-2016 EPFL and collaborators</p>
+	    </div>
+	</div>
+
+	<!-- Bootstrap core JavaScript
+	     ================================================== -->
+	<!-- Placed at the end of the document so the pages load faster -->
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+	<script src="../bootstrap/js/bootstrap.min.js"></script>
+	<script src="../bootstrap/assets/js/docs.min.js"></script>
+	<script src="../javascripts/toc.min.js"></script>
+	<script type="text/javascript">
+
+	 $(document).ready(function() {
+	     $("pre").removeClass().addClass('prettyprint');
+	 });
+	 $(document).ready(function() {
+	     $(".container").tableofcontents({
+		 id: "#tableofcontents"
+	     });
+	     $(".container").tableofcontents({
+		 id: "#jump_toc"
+	     });
+	 });
+
+	 /*
+	    $('#my-affix').affix({
+	    offset: {
+	    top: 100
+	    , bottom: function () {
+	    return (this.bottom = $('.footer').outerHeight(true))
+	    }
+	    }
+	    })
+	  */
+	</script>
+	<script src="https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js"></script>
+    </body>
+</html>
