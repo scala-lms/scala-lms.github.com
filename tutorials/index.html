@@ -419,7 +419,7 @@
 		</div>
 		<h1>Tutorials and Documentation</h1>
 <p>This tutorial series introduces <em>Lightweight Modular Staging</em> (LMS), a framework for
-<br  />runtime code generation in Scala.</p>
+runtime code generation in Scala.</p>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <h2>Quick Start</h2>
@@ -429,46 +429,46 @@
 <p>Check the <a href="https://github.com/scala-lms/tutorials/blob/master/README.md"><code>README.md</code></a> file for prerequisites and start hacking!</p>
 <h3>Why Generative Programming ?</h3>
 <p>Because it enables <strong>abstraction without regret</strong>: the key idea is to write very high-level
-<br  />and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
+and generic programs that generate specialized and extremely fast low-level code at runtime.</p>
 <p>Programming abstractions that would usually be avoided in performance-sensitive code
-<br  />(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
-<br  />affecting performance of the <strong>generated code</strong>.</p>
+(objects, type classes, higher-order functions) can be used <strong>during generation</strong> without
+affecting performance of the <strong>generated code</strong>.</p>
 <h3>Why LMS ?</h3>
 <p>Because it is <strong>lightweight</strong> and <strong>modular</strong>: LMS is just a Scala library. With types, it distinguishes
-<br  />expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
+expressions that are evaluated <em>now</em> (type <code>T</code>) vs <em>later</em> (type <code>Rep[T]</code>).</p>
 <p>LMS comes with <strong>batteries included</strong>: it provides many optimizations such as common subexpression elimination out of the box, and it goes beyond purely generative approaches by
-<br  />providing an extensible intermediate representation that can be used to implement
-<br  />sophisticated domain-specific compiler pipelines.</p>
+providing an extensible intermediate representation that can be used to implement
+sophisticated domain-specific compiler pipelines.</p>
 <p>At the same time LMS is <strong>hackable</strong>: since it is just a library, all aspects can be
-<br  />modified or extended to suit a particular purpose.</p>
+modified or extended to suit a particular purpose.</p>
 <h2>Self-Contained Tutorials</h2>
 <p>The following tutorials are available:</p>
 <ul>
 <li><p><a href="start.html">Getting Started</a>
-<br  />Rep[T] vs T</p>
+<br/>Rep[T] vs T</p>
 </li>
 <li><p><a href="shonan.html">Shonan HMM Challenge</a>
-<br  />Sparse matrix vector multiplication
-<br  />Selective unrolling and precomputation</p>
+<br/>Sparse matrix vector multiplication
+<br/>Selective unrolling and precomputation</p>
 </li>
 <li><p><a href="regex.html">Regular Expressions</a>
-<br  />From interpreters to compilers using staging</p>
+<br/>From interpreters to compilers using staging</p>
 </li>
 <li><p><a href="ack.html">Ackermann's Function</a>
-<br  />From recursive functions to automata
-<br  />Automatic specialization using staging</p>
+<br/>From recursive functions to automata
+<br/>Automatic specialization using staging</p>
 </li>
 <li><p><a href="automata.html">Automata-Based Regex Matcher</a>
-<br  />NFA to DFA conversion using staging</p>
+<br/>NFA to DFA conversion using staging</p>
 </li>
 <li><p><a href="query.html">SQL Engine</a>
-<br  />Efficient data processing</p>
+<br/>Efficient data processing</p>
 </li>
 <li><p><a href="fft.html">Fast Fourier Transform (FFT)</a>
-<br  />Numeric kernels and rewriting optimizations</p>
+<br/>Numeric kernels and rewriting optimizations</p>
 </li>
 <li><p><a href="stencil.html">Sliding Stencil</a>
-<br  />Rearranging loop shapes</p>
+<br/>Rearranging loop shapes</p>
 </li>
 </ul>
 <!--
@@ -540,7 +540,7 @@ Advanced:
 -->
 <h2>LMS In Depth</h2>
 <p>The material below has been extracted from Tiark's PhD thesis (<a href="http://infoscience.epfl.ch/record/180642/files/EPFL_TH5456.pdf">PDF</a>) and is still undergoing
-<br  />revision for the web.</p>
+revision for the web.</p>
 <ol>
 <li><a href="01_overview.html">About generative programming</a></li>
 <li><a href="02_basics.html">Generative programming and LMS basics</a></li>

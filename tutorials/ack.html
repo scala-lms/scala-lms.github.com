@@ -419,8 +419,8 @@
 		</div>
 		<h1>Ackermann's Function</h1>
 <p>By selectively specializing on a subset of the argument, we can turn
-<br  />a recursive function into an automaton, i.e. a set of mutually recursive
-<br  />functions.</p>
+a recursive function into an automaton, i.e. a set of mutually recursive
+functions.</p>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 
@@ -437,9 +437,9 @@
 		</div>
 		<h2>Ackermann's Function</h2>
 <p>We define Ackermann's function using a static first argument <code>m</code> and a
-<br  />dynamic second argument <code>n</code>. Our definition is also curried so that we
-<br  />can treat any partial static application as a function to specialize
-<br  />and re-use.</p>
+dynamic second argument <code>n</code>. Our definition is also curried so that we
+can treat any partial static application as a function to specialize
+and re-use.</p>
 
 	    </div>
 	    <div class="code">
@@ -464,8 +464,8 @@
 <p>The stated goal is to specialize Ackermann's function for <code>m=2</code>.</p>
 <p><code>ack(2,n)</code> should specialize to this tower of recursive functions:</p>
 <p><code>ack_2(n) =  if n=0 then ack_1(1) else  ack_1(ack_2(n-1))</code>
-<br  /><code>ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))</code>
-<br  /><code>ack_0(n) =  n+1</code></p>
+<code>ack_1(n) =  if n=0 then ack_0(1) else  ack_0(ack_1(n-1))</code>
+<code>ack_0(n) =  n+1</code></p>
 
 	    </div>
 	    <div class="code">

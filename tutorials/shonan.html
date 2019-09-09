@@ -420,13 +420,13 @@
 		<h1>Shonan Challenge</h1>
 <p>In this tutorial we will develop a solution to the HMM problem from the Shonan Challenge.</p>
 <p>The task is to implement a sparse matrix vector product, where the matrix is statically
-<br  />known but the vector is not. This situation comes up in hidden markov models (HMM),
-<br  />where a single transition matrix is multiplied by many different observation vectors.
-<br  />Therefore, it pays off to generate code that is specialized to a particular matrix.</p>
+known but the vector is not. This situation comes up in hidden markov models (HMM),
+where a single transition matrix is multiplied by many different observation vectors.
+Therefore, it pays off to generate code that is specialized to a particular matrix.</p>
 <p>For further reference, see:</p>
 <ul>
 <li>Shonan Challenge for Generative Programming (<a href="http://homes.sice.indiana.edu/ccshan/metafx/pepm2013.pdf">PDF</a>) (<a href="https://github.com/StagedHPC/shonan-challenge">official code repository</a>)
-<br  />Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13</li>
+<br/>Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13</li>
 </ul>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
@@ -450,7 +450,7 @@ class ShonanTest extends TutorialFunSuite {
 		    <a class="pilcrow" href="#section_1">&#182;</a>
 		</div>
 		<p>We first define our static matrix. We notice that some rows are dense,
-<br  />some rows are sparse, and some rows contain only zeroes.</p>
+some rows are sparse, and some rows contain only zeroes.</p>
 
 	    </div>
 	    <div class="code">
@@ -508,7 +508,7 @@ class ShonanTest extends TutorialFunSuite {
 </code></pre>
 <h2>STEP 0.5: static vs dynamic conditional</h2>
 <p>Now we add basic code generation facilities and, as a recap of how
-<br  />LMS works, play with static vs dynamic expressions.</p>
+LMS works, play with static vs dynamic expressions.</p>
 
 	    </div>
 	    <div class="code">
@@ -536,7 +536,7 @@ class ShonanTest extends TutorialFunSuite {
 		    <a class="pilcrow" href="#section_4">&#182;</a>
 		</div>
 		<p>The condition above is fully static, so it does not show up in
-<br  />the generated code:</p>
+the generated code:</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
 Emitting Generated Code
 *******************************************/
@@ -551,7 +551,7 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>If we change the condition to depend on the (dynamic) input array,
-<br  />an <code>if/else</code> statement will be generated.</p>
+an <code>if/else</code> statement will be generated.</p>
 
 	    </div>
 	    <div class="code">
@@ -601,15 +601,15 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>Aside: LMS relies on Scala's local type inference to propagate dynamic
-<br  />expressions (<code>Rep</code> types) automatically within a method, and on
-<br  />Scala's type checker to ensure the binding times (dynamic vs static)
-<br  />are consistent.</p>
+expressions (<code>Rep</code> types) automatically within a method, and on
+Scala's type checker to ensure the binding times (dynamic vs static)
+are consistent.</p>
 <p>Aside: In the snippet, the <code>if/else</code> statement with the dynamic
-<br  />condition is peculiar, because its condition is not a plain <code>Boolean</code>
-<br  />but a <code>Rep[Boolean]</code>. Hence, LMS also relies on virtualization of
-<br  />control structures to overload the meaning of control structures such
-<br  />as <code>if/else</code> and <code>while</code> &ndash; in the same way that the <code>for</code> syntax is
-<br  />overloaded in Scala.</p>
+condition is peculiar, because its condition is not a plain <code>Boolean</code>
+but a <code>Rep[Boolean]</code>. Hence, LMS also relies on virtualization of
+control structures to overload the meaning of control structures such
+as <code>if/else</code> and <code>while</code> &ndash; in the same way that the <code>for</code> syntax is
+overloaded in Scala.</p>
 
 	    </div>
 	    <div class="code">
@@ -622,21 +622,21 @@ End of Generated Code
 		</div>
 		<h2>STEP 1: Staging the matrix vector product</h2>
 <p>We want to change the <code>matrix_vector_prod</code> function to take a dynamic
-<br  />vector and a static matrix. We move it into the <code>DslDriver</code> trait so
-<br  />that it can use <code>Rep</code>.</p>
+vector and a static matrix. We move it into the <code>DslDriver</code> trait so
+that it can use <code>Rep</code>.</p>
 <p>We generate nested loops by default (type <code>Rep[Range]</code>). This means that
-<br  />the loop index becomes a <code>Rep[Int]</code> value. To access the static matrix,
-<br  />we need to lift it to a <code>Rep</code> value as well. We accomplish this with
-<br  />the help of <code>staticData</code>.</p>
+the loop index becomes a <code>Rep[Int]</code> value. To access the static matrix,
+we need to lift it to a <code>Rep</code> value as well. We accomplish this with
+the help of <code>staticData</code>.</p>
 <p>We also need to replace <code>new Array</code> with <code>NewArray</code>: instead of creating
-<br  />an array at staging time, we want to generate code to create a the array.</p>
+an array at staging time, we want to generate code to create a the array.</p>
 <p>Now we can play with the loop shapes: <code>Range</code> loops are computed
-<br  />statically, i.e. unrolled at staging time. <code>Rep[Range]</code> loops cause
-<br  />generation of loop code.</p>
+statically, i.e. unrolled at staging time. <code>Rep[Range]</code> loops cause
+generation of loop code.</p>
 <p>We can make unrolling decisions in a very fine-grained manner:
-<br  />for dense rows we want to generate a loop, for sparse rows
-<br  />we want to unroll. We just add a condition <code>sparse</code> and dispatch
-<br  />to either a <code>Range</code> or a <code>Rep[Range]</code> loop.</p>
+for dense rows we want to generate a loop, for sparse rows
+we want to unroll. We just add a condition <code>sparse</code> and dispatch
+to either a <code>Range</code> or a <code>Rep[Range]</code> loop.</p>
 
 	    </div>
 	    <div class="code">
@@ -679,8 +679,8 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_7">&#182;</a>
 		</div>
 		<p>Looking at the generated code, we can easily see that we get a while
-<br  />loop for row 0, which is dense, no operations for row 1, and an
-<br  />unrolled loop for row 2, which is sparse:</p>
+loop for row 0, which is dense, no operations for row 1, and an
+unrolled loop for row 2, which is sparse:</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
 Emitting Generated Code
 *******************************************/
@@ -723,10 +723,10 @@ End of Generated Code
 </code></pre>
 <h2>STEP 2: Conditional unrolling</h2>
 <p>The code duplication of the loop body above is not very nice. Fortunately,
-<br  />we can create arbitrary staging-time abstractions. Here, we create an auxiliary
-<br  />method <code>unrollIf</code> that captures the conditional unrolling pattern in a general
-<br  />way. The <code>matrix_vector_prod</code> function no longer needs to express the loop
-<br  />body twice.</p>
+we can create arbitrary staging-time abstractions. Here, we create an auxiliary
+method <code>unrollIf</code> that captures the conditional unrolling pattern in a general
+way. The <code>matrix_vector_prod</code> function no longer needs to express the loop
+body twice.</p>
 <p>The generated code is identical: <em>&ldquo;abstraction without regret&rdquo;</em> FTW!</p>
 
 	    </div>

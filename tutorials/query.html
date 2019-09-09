@@ -419,31 +419,31 @@
 		</div>
 		<h1>A SQL Query Compiler</h1>
 <p>Commercial and open source database systems consist of millions of lines of highly
-<br  />optimized C code. Yet, their performance on individual queries falls 10x or 100x
-<br  />short of what a hand-written, specialized, implementation of the same query can
-<br  />achieve.</p>
+optimized C code. Yet, their performance on individual queries falls 10x or 100x
+short of what a hand-written, specialized, implementation of the same query can
+achieve.</p>
 <p>In this tutorial, we will build a small SQL processing engine that consists of
-<br  />just about 500 lines of high-level Scala code. Whereas other systems interpret query
-<br  />plans, operator by operator, we will use LMS to generate and compile low-level C
-<br  />code for entire queries.</p>
+just about 500 lines of high-level Scala code. Whereas other systems interpret query
+plans, operator by operator, we will use LMS to generate and compile low-level C
+code for entire queries.</p>
 <p>We keep the query functionality intentionally simple. A more complete engine
-<br  />that handles the full TPCH benchmark suite and consists of about 3000 lines of
-<br  />code has been developed in the <a href="http://data.epfl.ch/legobase">LegoBase</a> project, which recently received
-<br  />a best paper award at VLDB'14.</p>
+that handles the full TPCH benchmark suite and consists of about 3000 lines of
+code has been developed in the <a href="http://data.epfl.ch/legobase">LegoBase</a> project, which recently received
+a best paper award at VLDB'14.</p>
 <p>See also:</p>
 <ul>
 <li>Building Efficient Query Engines in a High-Level Language (<a href="http://infoscience.epfl.ch/record/198693/files/801-klonatos.pdf">PDF</a>)
-<br  />Yannis Klonatos, Christoph Koch, Tiark Rompf, Hassan Chafi. VLDB'14</li>
+<br/>Yannis Klonatos, Christoph Koch, Tiark Rompf, Hassan Chafi. VLDB'14</li>
 <li>Functional pearl: A SQL to C Compiler in 500 Lines of Code (<a href="https://www.cs.purdue.edu/homes/rompf/papers/rompf-icfp15.pdf">PDF</a>)
-<br  />Tiark Rompf, Nada Amin. ICFP'15</li>
+<br/>Tiark Rompf, Nada Amin. ICFP'15</li>
 </ul>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <h2>Setting the Stage</h2>
 <p>Let us run a few quick benchmarks to get an idea of the relative performance of different
-<br  />data processing systems. We take a data sample from <a href="https://books.google.com/ngrams">the Google Books NGram Viewer</a> project.
-<br  />The 2GB file that contains statistics for words starting with the letter 'A' is a good candidate to run
-<br  />some simple queries. We might be interested in all occurrences of the word 'Auswanderung':</p>
+data processing systems. We take a data sample from <a href="https://books.google.com/ngrams">the Google Books NGram Viewer</a> project.
+The 2GB file that contains statistics for words starting with the letter 'A' is a good candidate to run
+some simple queries. We might be interested in all occurrences of the word 'Auswanderung':</p>
 <pre><code>select * from 1gram_a where n_gram = 'Auswanderung'
 </code></pre>
 <p>Here are some timings:</p>
@@ -459,7 +459,7 @@
 <li><p>A hand-written specialized <a href="https://github.com/scala-lms/tutorials/blob/master/src/out/query_t1gram2.hand0.scala/">Scala program</a> takes 13 sec.</p>
 </li>
 <li><p>A similar hand-written <a href="https://github.com/scala-lms/tutorials/blob/master/src/out/query_t1gram2.hand.c/">C program</a> performs marginally faster,
-<br  />but with <a href="https://github.com/scala-lms/tutorials/blob/master/src/out/query_t1gram2.hand2.c/">more optimizations</a> we can get as good as 3.2 seconds.</p>
+but with <a href="https://github.com/scala-lms/tutorials/blob/master/src/out/query_t1gram2.hand2.c/">more optimizations</a> we can get as good as 3.2 seconds.</p>
 </li>
 </ul>
 <p>The query processor we will develop in this tutorial matches the performance of the handwritten Scala and C queries (13s and 3s, respectively).</p>
@@ -480,7 +480,7 @@ import scala.lms.common._
 		</div>
 		<h2>Relational Algebra AST</h2>
 <p>The core of any query processing engine is an AST representation of
-<br  />relational algebra operators.</p>
+relational algebra operators.</p>
 
 	    </div>
 	    <div class="code">
@@ -589,8 +589,8 @@ import scala.lms.common._
 		</div>
 		<h2>Iterative Development of a Query Processor</h2>
 <p>We develop our SQL engine in multiple steps. Each steps leads to a
-<br  />working processor, and each successive step either adds a feature or
-<br  />optimization.</p>
+working processor, and each successive step either adds a feature or
+optimization.</p>
 <h3>Step 1: A (Plain) Query Interpreter</h3>
 <p>We start with a plain query processor: an interpreter.</p>
 <ul>
@@ -598,32 +598,32 @@ import scala.lms.common._
 </ul>
 <h3>Step 2: A Staged Query Interpreter (= Compiler)</h3>
 <p>Staging our query interpreter yields a query compiler.
-<br  />In the first iteration we generate Scala code but we disregard
-<br  />operators that require internal data structures:</p>
+In the first iteration we generate Scala code but we disregard
+operators that require internal data structures:</p>
 <ul>
 <li><a href="query_staged0.html">query_staged0</a></li>
 </ul>
 <h3>Step 3: Specializing Data Structures</h3>
 <p>The next iteration adds optimized data structure implementations
-<br  />that follow a column-store layout. This includes specialized hash
-<br  />tables for groupBy and join operators:</p>
+that follow a column-store layout. This includes specialized hash
+tables for groupBy and join operators:</p>
 <ul>
 <li><a href="query_staged.html">query_staged</a></li>
 </ul>
 <h3>Step 4: Switching to C and Optimizing IO</h3>
 <p>For additional low-level optimizations we switch to generating C
-<br  />code:</p>
+code:</p>
 <ul>
 <li><a href="query_optc.html">query_optc</a></li>
 </ul>
 <p>On the C level, we optimize the IO layer by mapping files directly
-<br  />into memory and we further specialize internal data structures
-<br  />to minimize data conversions and to enable representing string objects
-<br  />directly as pointers into the memory-mapped input file.</p>
+into memory and we further specialize internal data structures
+to minimize data conversions and to enable representing string objects
+directly as pointers into the memory-mapped input file.</p>
 <h2>Plumbing</h2>
 <p>To actually run queries and test the different implementations side
-<br  />by side, a little bit of plumbing is necessary. We define a common
-<br  />interface for all query processors (plain or staged, Scala or C).</p>
+by side, a little bit of plumbing is necessary. We define a common
+interface for all query processors (plain or staged, Scala or C).</p>
 
 	    </div>
 	    <div class="code">
@@ -920,26 +920,26 @@ object Run {
 		</div>
 		<h2>Suggestions for Exercises</h2>
 <p>The query engine we presented is decidedly simple, so as to present an
-<br  />end-to-end system that can be understood in total. Below are a few
-<br  />suggestions for interesting extensions.</p>
+end-to-end system that can be understood in total. Below are a few
+suggestions for interesting extensions.</p>
 <ul>
 <li><p>Implement a scanner that reads on demand from a URL.</p>
 <p>(Cool with: a new operator that only prints the first N results.)</p>
 </li>
 <li><p>(easy) Implement a typed schema in the Scala version, so that the
-<br  />types of columns are statically known, while the values are not.</p>
+types of columns are statically known, while the values are not.</p>
 <p>(Hint: the C version already does this, but is also more involved
-<br  />because of the custom type representations.)</p>
+because of the custom type representations.)</p>
 </li>
 <li><p>(easy) Implement more predicates (e.g. <code>LessThan</code>) and predicate
-<br  />combinators (e.g. <code>And</code>, <code>Or</code>) in order to run more interesting
-<br  />queries.</p>
+combinators (e.g. <code>And</code>, <code>Or</code>) in order to run more interesting
+queries.</p>
 </li>
 <li><p>(medium) Implement a real column-oriented database, where each column has its
-<br  />own file so that it can be read independently.</p>
+own file so that it can be read independently.</p>
 </li>
 <li><p>(hard) Implement an optimizer on the relational algebra before generating code.
-<br  />(Hint: smart constructors might help.)</p>
+(Hint: smart constructors might help.)</p>
 <p>The query optimizer should rearrange query operator trees for a better join ordering, i.e. decide whether to execute joins on relations S0 x S1 x S2 as  (S0 x (S1 x S2)) vs ((S0 x S1) x S2).</p>
 <p>Use a dynamic programming algorithm, that for n joins on tables S0 x S1 x &hellip;x Sn tries to find an optimal solution for S1 x .. x Sn first, and then the optimal combination with S0.</p>
 <p>To find an optimal combination, try all alternatives and estimate the cost of each. Cost can be measured roughly as number of records processed. As a simple approximation, you can use the size of each input table and assume that all filter predicates match uniformly with probability 0.5.</p>

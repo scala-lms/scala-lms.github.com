@@ -422,18 +422,18 @@
 <div id="tableofcontents"></div>
 <h2>Staging and LMS</h2>
 <p>What is staging? The idea behind staging is to delay computation of
-<br  />certain expressions, generating code to compute them later. The
-<br  />benefit is <em>abstraction without regret</em>: using high-level programming
-<br  />abstractions once, to structure generated code, instead of all the
-<br  />time during execution.</p>
+certain expressions, generating code to compute them later. The
+benefit is <em>abstraction without regret</em>: using high-level programming
+abstractions once, to structure generated code, instead of all the
+time during execution.</p>
 <p>Lightweight Modular Staging (LMS) is a staging technique driven by
-<br  />types. In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
-<br  />because it is purely library based. It is also <em>modular</em>, because
-<br  />features can be mixed and matched and the framework is easy to
-<br  />extend.</p>
+types. In addition to the <em>staging</em> aspect, the technique is <em>lightweight</em>,
+because it is purely library based. It is also <em>modular</em>, because
+features can be mixed and matched and the framework is easy to
+extend.</p>
 <h2>My First Multi-Stage Program</h2>
 <p>This tutorial is a <a href="https://github.com/scala-lms/tutorials/tree/master/src/test/scala/lms/tutorial/start.scala">literate Scala file</a>. We invite you to clone the
-<br  /><a href="https://github.com/scala-lms/tutorials/">GitHub repo</a> and play with the code as you follow along.</p>
+<a href="https://github.com/scala-lms/tutorials/">GitHub repo</a> and play with the code as you follow along.</p>
 
 	    </div>
 	    <div class="code">
@@ -454,11 +454,11 @@ class GettingStartedTest extends TutorialFunSuite {
 		</div>
 		<h3>Rep[T] vs T</h3>
 <p>In LMS, <code>Rep[T]</code> represents a delayed computation of type <code>T</code>. Thus,
-<br  />during staging, an expression of type <code>Rep[T]</code> becomes part of
-<br  />the generated code, while an expression of bare type <code>T</code> becomes a
-<br  />constant in the generated code. For core Scala features, adding
-<br  /><code>Rep</code> types should be enough to build a program generator, as we
-<br  />will see later.</p>
+during staging, an expression of type <code>Rep[T]</code> becomes part of
+the generated code, while an expression of bare type <code>T</code> becomes a
+constant in the generated code. For core Scala features, adding
+<code>Rep</code> types should be enough to build a program generator, as we
+will see later.</p>
 
 	    </div>
 	    <div class="code">
@@ -497,11 +497,11 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>Contrast the snippet above, where <code>b</code> is a <code>Boolean</code>, with the snippet
-<br  />below, where <code>b</code> is a <code>Rep[Boolean]</code>. The expression <code>if (b) 1 else x</code>
-<br  />is executed at staging time when <code>b</code> is a <code>Boolean</code>, while it is delayed
-<br  />causing code to be generated for the <code>if</code> expression when <code>b</code> is a
-<br  /><code>Rep[Boolean]</code> &ndash; indeed, the actual value of <code>b</code> is not known at staging
-<br  />time, but only when the generated code is executed.</p>
+below, where <code>b</code> is a <code>Rep[Boolean]</code>. The expression <code>if (b) 1 else x</code>
+is executed at staging time when <code>b</code> is a <code>Boolean</code>, while it is delayed
+causing code to be generated for the <code>if</code> expression when <code>b</code> is a
+<code>Rep[Boolean]</code> &ndash; indeed, the actual value of <code>b</code> is not known at staging
+time, but only when the generated code is executed.</p>
 
 	    </div>
 	    <div class="code">
@@ -547,16 +547,16 @@ End of Generated Code
 </code></pre>
 <h3>Rep[A => B] vs Rep[A]=>Rep[B]</h3>
 <p>In the previous snippets, we already notice some <em>abstraction without
-<br  />regret</em>: the <code>compute</code> function exists only at staging time, and is
-<br  />not part of the generated code &ndash; more generally, we can freely use
-<br  />abstractions to structure and compose the staged program, but these
-<br  />abstractions are not part of the generated code when their type is a
-<br  />bare <code>T</code> as opposed of a <code>Rep[T]</code>. In the second snippet,
-<br  /><code>compute</code> has the type <code>Rep[Boolean] =&gt; Rep[Int]</code>, not
-<br  /><code>Rep[Boolean =&gt; Int]</code> &ndash; its type already tells us that the function
-<br  />is known at staging time.</p>
+regret</em>: the <code>compute</code> function exists only at staging time, and is
+not part of the generated code &ndash; more generally, we can freely use
+abstractions to structure and compose the staged program, but these
+abstractions are not part of the generated code when their type is a
+bare <code>T</code> as opposed of a <code>Rep[T]</code>. In the second snippet,
+<code>compute</code> has the type <code>Rep[Boolean] =&gt; Rep[Int]</code>, not
+<code>Rep[Boolean =&gt; Int]</code> &ndash; its type already tells us that the function
+is known at staging time.</p>
 <p>Similarly, below, the recursive power function and the helper square
-<br  />function only exists during staging time.</p>
+function only exists during staging time.</p>
 
 	    </div>
 	    <div class="code">
@@ -585,7 +585,7 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_4">&#182;</a>
 		</div>
 		<p>Because of common subexpression elimination, we get reuse of the square
-<br  />argument for free.</p>
+argument for free.</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
 Emitting Generated Code
 *******************************************/
@@ -603,7 +603,7 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>We could also create a generated square function, of type
-<br  /><code>Rep[Int=&gt;Int]</code> instead of <code>Rep[Int]=&gt;Rep[Int]</code>.</p>
+<code>Rep[Int=&gt;Int]</code> instead of <code>Rep[Int]=&gt;Rep[Int]</code>.</p>
 
 	    </div>
 	    <div class="code">
@@ -632,7 +632,7 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_5">&#182;</a>
 		</div>
 		<p>The code we get is in fact slightly less efficient, because of these
-<br  />extra calls to the generated square function.</p>
+extra calls to the generated square function.</p>
 <pre><code class="prettyprint lang-scala">/*****************************************
 Emitting Generated Code
 *******************************************/
@@ -655,7 +655,7 @@ End of Generated Code
 </code></pre>
 <h3>Rep[Range] vs Range</h3>
 <p>Loops can be unrolled in the first stage, or be generated as loops in
-<br  />the second stage, driven by the type of their condition.</p>
+the second stage, driven by the type of their condition.</p>
 
 	    </div>
 	    <div class="code">

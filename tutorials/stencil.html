@@ -423,7 +423,7 @@
 <p>For further reference, see:</p>
 <ul>
 <li>Shonan Challenge for Generative Programming (<a href="http://homes.sice.indiana.edu/ccshan/metafx/pepm2013.pdf">PDF</a>) (<a href="https://github.com/StagedHPC/shonan-challenge">official code repository</a>)
-<br  />Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13</li>
+Baris Aktemur, Yukiyoshi Kameyama, Oleg Kiselyov, Chung-chieh Shan. PEPM'13</li>
 </ul>
 <p>Outline:</p>
 <div id="tableofcontents"></div>
@@ -444,22 +444,22 @@ import scala.reflect.SourceContext
 		</div>
 		<h2>Stencil Challenge</h2>
 <p>We implement the challenge using an almost regular staged loop,
-<br  />except using <code>sliding</code> staging-time abstraction.</p>
+except using <code>sliding</code> staging-time abstraction.</p>
 <p>How does it work? We rely on the fact that LMS performs common
-<br  />subexpression elimination internally, and we insert variables for
-<br  />values that are re-used from one loop iteration to the next.</p>
+subexpression elimination internally, and we insert variables for
+values that are re-used from one loop iteration to the next.</p>
 <p>We compute the code for loop iterations i and i + 1. For iteration i + 1,
-<br  />we substitute i + 1 for i.</p>
+we substitute i + 1 for i.</p>
 <p>We peel the first loop iteration to initialize the variables.</p>
 <p>And then generate a modified loop that executes the remaining
-<br  />iterations. The loop body corresponds to the (i+1) iteration above
-<br  />plus the reads and write statements that maintain the variables.</p>
+iterations. The loop body corresponds to the (i+1) iteration above
+plus the reads and write statements that maintain the variables.</p>
 <p>So with a twist on our general CSE facility, we implement CSE across
-<br  />loop iterations. The approach also works for window sizes larger than
-<br  />1, we just need to unroll more iterations of the loop.
-<br  />In the challenge example, if we look at iteration i + 2, we find that
-<br  />it does not reuse any memory access operations from iteration i, so
-<br  />a larger window is not necessary in this case.</p>
+loop iterations. The approach also works for window sizes larger than
+1, we just need to unroll more iterations of the loop.
+In the challenge example, if we look at iteration i + 2, we find that
+it does not reuse any memory access operations from iteration i, so
+a larger window is not necessary in this case.</p>
 
 	    </div>
 	    <div class="code">
@@ -721,7 +721,7 @@ End of Generated Code
 *******************************************/
 </code></pre>
 <p>Note that for the examples here, the multi sliding does not improve
-<br  />upon the number of shared variables.</p>
+upon the number of shared variables.</p>
 
 	    </div>
 	    <div class="code">
@@ -787,7 +787,7 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_6">&#182;</a>
 		</div>
 		<p>We use a LMS transformer to evaluate the loop body
-<br  />across various iterations and transformations.</p>
+across various iterations and transformations.</p>
 
 	    </div>
 	    <div class="code">
@@ -841,8 +841,8 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_8">&#182;</a>
 		</div>
 		<p>Find the overlapping symbols: defined by f(i), used by f(i+1), f(i+2), &hellip;
-<br  />We create a helper function so that we can generalize to a fixpoint calculation
-<br  />in the subclass below.</p>
+We create a helper function so that we can generalize to a fixpoint calculation
+in the subclass below.</p>
 
 	    </div>
 	    <div class="code">
@@ -856,8 +856,8 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_9">&#182;</a>
 		</div>
 		<p>We evaluate loop contents f(i), then f(i+1), then f(i+2).
-<br  />For evaluation, we use the reified sub graph for f(i), but we substitute i for i+1 or i+2.
-<br  />Each time, we reflect the statements from the previous iteration.</p>
+For evaluation, we use the reified sub graph for f(i), but we substitute i for i+1 or i+2.
+Each time, we reflect the statements from the previous iteration.</p>
 
 	    </div>
 	    <div class="code">
@@ -909,7 +909,7 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_11">&#182;</a>
 		</div>
 		<p>We haven't yet a fixed point yet, if there are still overlapping symbols in the last iteration.
-<br  />We will fix this in the subclass below.</p>
+We will fix this in the subclass below.</p>
 
 	    </div>
 	    <div class="code">
@@ -932,7 +932,7 @@ End of Generated Code
 		    <a class="pilcrow" href="#section_12">&#182;</a>
 		</div>
 		<p>Build a variable for each overlap symbol.
-<br  />Initialize the variables by peeling first loop iteration.</p>
+Initialize the variables by peeling first loop iteration.</p>
 
 	    </div>
 	    <div class="code">

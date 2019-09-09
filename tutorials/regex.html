@@ -421,26 +421,26 @@
 <p>Outline:</p>
 <div id="tableofcontents"></div>
 <p>A staged interpreter is a compiler. This is useful, because an
-<br  />interpreter is usually much easier to implement than a compiler. In
-<br  />this section, we illustrate how to turn a vanilla interpreter into a
-<br  />compiler, using lightweight modular staging (LMS). The gist is to let
-<br  />LMS generate code for the interpreter specialized to a particular
-<br  />program &ndash; the program is fixed at staging time, while the input(s) to
-<br  />the program may vary in the generated code. Hence, staging an
-<br  />interpreter should be as simple as wrapping the types of expressions
-<br  />that vary in <code>Rep[_]</code> while leaving the types of expressions we want
-<br  />specialized as is.</p>
+interpreter is usually much easier to implement than a compiler. In
+this section, we illustrate how to turn a vanilla interpreter into a
+compiler, using lightweight modular staging (LMS). The gist is to let
+LMS generate code for the interpreter specialized to a particular
+program &ndash; the program is fixed at staging time, while the input(s) to
+the program may vary in the generated code. Hence, staging an
+interpreter should be as simple as wrapping the types of expressions
+that vary in <code>Rep[_]</code> while leaving the types of expressions we want
+specialized as is.</p>
 <p>As a case study, we stage a simple regular expression matcher. Our
-<br  />vanilla regular expression matcher is invoked on a regular expression
-<br  />string and an input string. The staged regular expression matcher is
-<br  />invoked on a <em>static</em> regular expression constant string and a <em>dynamic</em> input
-<br  />string of type <code>Rep[String]</code>, and generates code specialized to match
-<br  />any input string against the constant regular expression pattern.</p>
+vanilla regular expression matcher is invoked on a regular expression
+string and an input string. The staged regular expression matcher is
+invoked on a <em>static</em> regular expression constant string and a <em>dynamic</em> input
+string of type <code>Rep[String]</code>, and generates code specialized to match
+any input string against the constant regular expression pattern.</p>
 <p>We could further optimize the generated code by additional staged
-<br  />transformations, but here, we only illustrate the basic process of
-<br  />staging an interpreter. This process is widely applicable. For
-<br  />example, we used the same process to stage a bytecode interpreter into
-<br  />a bytecode compiler.</p>
+transformations, but here, we only illustrate the basic process of
+staging an interpreter. This process is widely applicable. For
+example, we used the same process to stage a bytecode interpreter into
+a bytecode compiler.</p>
 
 	    </div>
 	    <div class="code">
@@ -458,7 +458,7 @@ import org.scalatest.FunSuite
 		</div>
 		<h2>Regular Expression Matcher</h2>
 <p>We start with a small regular expression matcher, ported to Scala from
-<br  /><a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">a C version, written by Rob Pike and Brian Kernighan</a>.</p>
+<a href="http://www.cs.princeton.edu/courses/archive/spr09/cos333/beautiful.html">a C version, written by Rob Pike and Brian Kernighan</a>.</p>
 
 	    </div>
 	    <div class="code">
@@ -548,7 +548,7 @@ class RegexpMatcherTest extends FunSuite with RegexpMatcher with RegexpMatcherTe
 		</div>
 		<h2>Staged Interpreter</h2>
 <p>The staged interpreter simply consist in wrapping the variable
-<br  />parameters in <code>Rep[_]</code> types. Otherwise, the code is the same.</p>
+parameters in <code>Rep[_]</code> types. Otherwise, the code is the same.</p>
 
 	    </div>
 	    <div class="code">
